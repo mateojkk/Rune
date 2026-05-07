@@ -1,0 +1,22 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  z-index: 100;
+}
+
+.header-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.header-logo:hover {
+  opacity: 0.8;
+}

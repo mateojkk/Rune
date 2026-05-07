@@ -1,0 +1,203 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Wallet, Cloud, RefreshCw, LogOut, Copy, Check, Loader2 } from 'lucide-react';
+import { useWalletStore } from '../context/wallet';
+import { useWallet } from '@suiet/wallet-kit';
+import { getOAuthUrl, handleOAuthCallback, clearSession, clearUserSalt, type OAuthProvider } from '../lib/zklogin';
+import './Navbar.css';
+
+function formatAddress(addr: string) {
+  if (addr && addr.length >= 10) {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  }
+  return addr || '';
+}
+
+export function Navbar() {
+  const { account, isConnected, isConnecting, connectZkLogin, connectWallet, disconnect } = useWalletStore();
+  const { address, select, connecting: walletConnecting, allAvailableWallets } = useWallet();
+  const [copied, setCopied] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
+  const [showLogin, setShowLogin] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'zklogin' | 'wallet'>('zklogin');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isAppPage = location.pathname.startsWith('/app');
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('id_token')) {
+      handleAuthCallback();
+    }
+  }, []);
+
+  const handleAuthCallback = useCallback(async () => {
+    const result = await handleOAuthCallback();
+    if (result) {
+      connectZkLogin(result.address, result.provider, result.jwt);
+      navigate('/app/dashboard');
+    }
+  }, [connectZkLogin, navigate]);
+
+  const handleZkLogin = async (provider: OAuthProvider) => {
+    setConnecting(true);
+    try {
+      const oauthUrl = await getOAuthUrl(provider);
+      window.location.href = oauthUrl;
+    } catch (err) {
+      console.error('zklogin error:', err);
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    if (account) {
+      clearUserSalt(account.address);
+    }
+    clearSession();
+    disconnect();
+    setSyncStatus('idle');
+  };
+
+  const copyAddress = async () => {
+    if (account?.address) {
+      await navigator.clipboard.writeText(account.address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!account?.address) return;
+    setSyncing(true);
+    setSyncStatus('syncing');
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setSyncStatus('success');
+    } catch {
+      setSyncStatus('error');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-container">
+        <Link to="/" className="navbar-brand">
+          <span>rune</span>
+        </Link>
+        
+        {isAppPage ? (
+          <div className="navbar-links">
+            <Link to="/app/dashboard" className={location.pathname.includes('dashboard') ? 'active' : ''}>dashboard</Link>
+            <Link to="/app/builder" className={location.pathname.includes('builder') ? 'active' : ''}>builder</Link>
+          </div>
+        ) : (
+          <div className="navbar-links">
+            <Link to="/" className="nav-link">home</Link>
+          </div>
+        )}
+        
+        <div className="navbar-actions">
+          {isAppPage && isConnected && account ? (
+            <div className="wallet-section">
+              <button className="address-btn" onClick={copyAddress}>
+                <Wallet size={14} />
+                {formatAddress(account.address)}
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+              </button>
+              <button 
+                className={`sync-btn ${syncStatus}`}
+                onClick={handleSync}
+                disabled={syncing}
+                title="Sync to Walrus"
+              >
+                {syncing ? <RefreshCw size={14} className="spin" /> : <Cloud size={14} />}
+              </button>
+              <button 
+                className="btn-icon" 
+                onClick={handleDisconnect}
+                title="Disconnect"
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
+          ) : isAppPage ? (
+            <button className="connect-btn" onClick={() => setShowLogin(!showLogin)}>
+              {isConnecting ? <Loader2 size={14} className="spin" /> : <Wallet size={14} />}
+              {loginMethod === 'zklogin' ? 'sign in' : 'sign in'}
+            </button>
+          ) : (
+            <Link to="/app" className="app-link">
+              open app
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {showLogin && isAppPage && (
+        <div className="login-dropdown">
+          <div className="login-header">
+            <h4>{loginMethod === 'zklogin' ? 'sign in with' : 'connect wallet'}</h4>
+            <p>{loginMethod === 'zklogin' ? 'no wallet required' : 'using wallet extension'}</p>
+            
+            <div className="method-toggle">
+              <button 
+                className={loginMethod === 'zklogin' ? 'active' : ''}
+                onClick={() => setLoginMethod('zklogin')}
+              >
+                zk login
+              </button>
+              <button 
+                className={loginMethod === 'wallet' ? 'active' : ''}
+                onClick={() => setLoginMethod('wallet')}
+              >
+                wallet
+              </button>
+            </div>
+          </div>
+          
+          {loginMethod === 'zklogin' ? (
+            <div className="login-body">
+              <button 
+                className="oauth-btn google"
+                onClick={() => handleZkLogin('google')}
+                disabled={connecting}
+              >
+                <img src="https://www.google.com/favicon.ico" alt="" />
+                <span>{connecting ? 'connecting...' : 'google'}</span>
+              </button>
+            </div>
+          ) : (
+            <div className="login-body">
+              {allAvailableWallets.map((wallet) => (
+                <button 
+                  key={wallet.name}
+                  className="wallet-option" 
+                  onClick={async () => {
+                    try {
+                      await select(wallet.name);
+                      if (address) {
+                        connectWallet(address, wallet.name);
+                      }
+                      setShowLogin(false);
+                    } catch (err) {
+                      console.error('wallet connect error:', err);
+                    }
+                  }}
+                  disabled={walletConnecting}
+                >
+                  <Wallet size={18} />
+                  <span>{wallet.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </nav>
+  );
+}

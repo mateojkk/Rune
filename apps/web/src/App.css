@@ -1,0 +1,30 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 64px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--subtle);
+  letter-spacing: 0.03em;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
