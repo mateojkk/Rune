@@ -15,6 +15,12 @@ app.add_middleware(
 )
 
 
+def reraise_http_error(error: Exception) -> None:
+    if isinstance(error, HTTPException):
+        raise error
+    raise HTTPException(status_code=500, detail=str(error))
+
+
 @app.get("/api/config")
 def public_config():
     return get_settings().get_public_config()
@@ -40,7 +46,7 @@ def walrus_store(request: StoreRequest):
     try:
         return store_blob(request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reraise_http_error(e)
 
 
 @app.get("/api/walrus/read/{blob_id}")
@@ -48,7 +54,7 @@ def walrus_read(blob_id: str):
     try:
         return read_blob(blob_id)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reraise_http_error(e)
 
 
 @app.post("/api/seal/encrypt")
@@ -56,7 +62,7 @@ def seal_encrypt(request: EncryptRequest):
     try:
         return encrypt(request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reraise_http_error(e)
 
 
 @app.post("/api/seal/decrypt")
@@ -64,7 +70,7 @@ def seal_decrypt(request: DecryptRequest):
     try:
         return decrypt(request)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reraise_http_error(e)
 
 
 @app.post("/api/zklogin/prove")
@@ -96,7 +102,7 @@ def zk_proof(request: ZkProofRequest):
             "max_epoch": request.max_epoch,
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reraise_http_error(e)
 
 
 if __name__ == "__main__":

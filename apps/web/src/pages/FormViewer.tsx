@@ -104,7 +104,7 @@ export function FormViewer() {
       <div className="form-viewer-empty">
         <h2>Form not found</h2>
         <p>This form doesn't exist or has been removed</p>
-        <Link to="/builder" className="btn btn-primary">
+        <Link to="/app/builder" className="btn btn-primary">
           Create New Form
         </Link>
       </div>
@@ -119,7 +119,7 @@ export function FormViewer() {
         </div>
         <h2>Thank you!</h2>
         <p>Your response has been submitted</p>
-        <Link to="/dashboard" className="btn btn-secondary">
+        <Link to="/app/dashboard" className="btn btn-secondary">
           View Dashboard
         </Link>
       </div>

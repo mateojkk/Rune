@@ -1,15 +1,21 @@
+import { resolve } from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
+  const appRoot = process.cwd()
+  const repoRoot = resolve(appRoot, '../..')
+  const env = {
+    ...loadEnv(mode, repoRoot, ''),
+    ...loadEnv(mode, appRoot, ''),
+  }
 
   return {
     plugins: [react()],
     define: {
       'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE || 'http://localhost:3001'),
       'import.meta.env.VITE_WEB_URL': JSON.stringify(env.VITE_WEB_URL || 'http://localhost:5173'),
-      'import.meta.env.VITE_REDIRECT_URL': JSON.stringify(env.VITE_REDIRECT_URL || 'http://localhost:5173/auth/callback'),
+      'import.meta.env.VITE_REDIRECT_URL': JSON.stringify(env.VITE_REDIRECT_URL || 'http://localhost:5173/app/auth/callback'),
       'import.meta.env.VITE_NETWORK': JSON.stringify(env.NETWORK || 'testnet'),
       'import.meta.env.VITE_WALRUS_PUBLISHER_URL': JSON.stringify(env.WALRUS_PUBLISHER_URL || ''),
       'import.meta.env.VITE_WALRUS_AGGREGATOR_URL': JSON.stringify(env.WALRUS_AGGREGATOR_URL || ''),

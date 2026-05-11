@@ -58,7 +58,7 @@ export function Builder() {
     
     const form = createForm(title, description);
     setCurrentFormId(form.id);
-    navigate(`/builder/${form.id}`);
+    navigate(`/app/builder/${form.id}`);
   };
 
   const handleAddField = (type: FieldType) => {

@@ -9,6 +9,7 @@ class StoreRequest(BaseModel):
 
 class EncryptRequest(BaseModel):
     data: Any
+    threshold: int = 2
 
 
 class DecryptRequest(BaseModel):

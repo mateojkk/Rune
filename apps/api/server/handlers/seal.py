@@ -4,7 +4,7 @@ import uuid
 from typing import Any
 from fastapi import HTTPException
 
-from server.config import SEAL_PACKAGE_ID, SEAL_KEY_SERVERS
+from server.config import get_network
 from server.models import EncryptRequest, EncryptResponse, DecryptRequest
 
 seal_available = False
@@ -23,6 +23,7 @@ except ImportError:
 
 def encrypt(request: EncryptRequest) -> EncryptResponse:
     json_data = json.dumps(request.data).encode('utf-8')
+    threshold = request.threshold or 2
     
     if seal_available and SealClient:
         import asyncio
@@ -31,11 +32,11 @@ def encrypt(request: EncryptRequest) -> EncryptResponse:
             cfg = PytuskConfiguration(
                 pysui_config=PysuiConfiguration(
                     group_name=PysuiConfiguration.SUI_JSON_RPC_GROUP,
-                    profile_name='testnet',
+                    profile_name=get_network(),
                 ),
             )
             client = await SealClient.from_config(cfg)
-            return await client.encrypt(json_data, threshold=2)
+            return await client.encrypt(json_data, threshold=threshold)
         
         try:
             result = asyncio.get_event_loop().run_until_complete(_encrypt())
@@ -60,7 +61,7 @@ def encrypt(request: EncryptRequest) -> EncryptResponse:
         encryptedBytes=base64.b64encode(encrypted).decode(),
         backupKey=base64.b64encode(key).decode(),
         objectId=f"0x{uuid.uuid4().hex[:40]}",
-        threshold=2,
+        threshold=threshold,
     )
 
 
@@ -74,7 +75,7 @@ def decrypt(request: DecryptRequest) -> Any:
             cfg = PytuskConfiguration(
                 pysui_config=PysuiConfiguration(
                     group_name=PysuiConfiguration.SUI_JSON_RPC_GROUP,
-                    profile_name='testnet',
+                    profile_name=get_network(),
                 ),
             )
             client = await SealClient.from_config(cfg)

@@ -12,7 +12,9 @@ export interface ZkLoginConfig {
 export const DEFAULT_CONFIG: ZkLoginConfig = {
   network: import.meta.env.VITE_NETWORK === 'mainnet' ? 'mainnet' : 'testnet',
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com',
-  redirectUrl: import.meta.env.VITE_REDIRECT_URL || typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '',
+  redirectUrl:
+    import.meta.env.VITE_REDIRECT_URL ||
+    (typeof window !== 'undefined' ? `${window.location.origin}/app/auth/callback` : ''),
 };
 
 export interface EphemeralKeyPair {
@@ -28,14 +30,14 @@ export interface ZkLoginSession {
   createdAt: number;
 }
 
-function getRandomHex(len: number = 32): string {
+const BN254_FIELD_SIZE =
+  21888242871839275222246405745257275088548364400416034343698204186575808495617n;
+
+function getRandomBigIntString(len: number = 32): string {
   const arr = new Uint8Array(len);
   crypto.getRandomValues(arr);
-  let result = '';
-  for (let i = 0; i < len; i++) {
-    result += arr[i].toString(16).padStart(2, '0');
-  }
-  return result;
+  const hex = Array.from(arr, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return (BigInt(`0x${hex}`) % BN254_FIELD_SIZE).toString(10);
 }
 
 export async function generateEphemeralKeyPair(): Promise<EphemeralKeyPair> {
@@ -120,14 +122,35 @@ export function getStoredProvider(): string | null {
   return sessionStorage.getItem('zklogin_provider');
 }
 
+function normalizeSaltValue(value: string): string {
+  const trimmed = value.trim();
+  let salt: bigint;
+
+  if (/^\d+$/.test(trimmed)) {
+    salt = BigInt(trimmed);
+  } else if (/^[0-9a-fA-F]+$/.test(trimmed)) {
+    salt = BigInt(`0x${trimmed}`);
+  } else {
+    throw new Error('Stored zkLogin salt is invalid.');
+  }
+
+  return (salt % BN254_FIELD_SIZE).toString(10);
+}
+
 export function getUserSalt(address: string): string {
   if (typeof window === 'undefined') return '0';
   
   const key = `rune_salt_${address.toLowerCase()}`;
   const stored = localStorage.getItem(key);
-  if (stored) return stored;
+  if (stored) {
+    const normalized = normalizeSaltValue(stored);
+    if (normalized !== stored) {
+      localStorage.setItem(key, normalized);
+    }
+    return normalized;
+  }
   
-  const newSalt = getRandomHex(32);
+  const newSalt = getRandomBigIntString(32);
   localStorage.setItem(key, newSalt);
   return newSalt;
 }
@@ -155,23 +178,23 @@ export async function handleOAuthCallback(): Promise<{
   const provider = getStoredProvider();
   if (!session || !provider) {
     clearSession();
-    return null;
+    throw new Error('Sign-in session was not found. Please try again.');
   }
   
   const decoded = decodeJwt(jwt);
   if (!decoded) {
     clearSession();
-    return null;
+    throw new Error('Google returned an invalid ID token.');
   }
   
   const nonceStored = sessionStorage.getItem('zklogin_nonce');
   const decodedAny = decoded as { nonce?: string };
   if (decodedAny.nonce !== nonceStored) {
-    console.error('nonce mismatch');
-    return null;
+    throw new Error('Sign-in verification failed due to a nonce mismatch. Please try again.');
   }
   
-  const userSalt = getUserSalt('temp');
+  const saltSubject = `${decoded.iss}:${decoded.sub}`;
+  const userSalt = getUserSalt(saltSubject);
   const address = computeZkLoginAddress({
     claimName: 'sub',
     claimValue: decoded.sub,

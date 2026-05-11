@@ -6,5 +6,5 @@
 
 .app-main {
   flex: 1;
-  padding-top: 64px;
+  min-height: 0;
 }

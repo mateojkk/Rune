@@ -6,6 +6,7 @@ interface EnvVar {
   name: string;
   required: boolean;
   description: string;
+  default?: string;
   validValues?: string[];
 }
 
@@ -13,15 +14,15 @@ const ROOT_ENV_VARS: EnvVar[] = [
   { name: 'NETWORK', required: false, description: 'Network: testnet | mainnet', validValues: ['testnet', 'mainnet'] },
   { name: 'API_HOST', required: false, description: 'API server host', default: '0.0.0.0' },
   { name: 'API_PORT', required: false, description: 'API server port', default: '3001' },
+  { name: 'VITE_API_BASE', required: false, description: 'Web app API base URL', default: 'http://localhost:3001' },
+  { name: 'VITE_WEB_URL', required: false, description: 'Web app public URL', default: 'http://localhost:5173' },
+  { name: 'VITE_REDIRECT_URL', required: false, description: 'zkLogin callback URL', default: 'http://localhost:5173/app/auth/callback' },
+  { name: 'VITE_GOOGLE_CLIENT_ID', required: false, description: 'Google OAuth client ID' },
   { name: 'WALRUS_PUBLISHER_URL', required: false, description: 'Walrus publisher URL override' },
   { name: 'WALRUS_AGGREGATOR_URL', required: false, description: 'Walrus aggregator URL override' },
   { name: 'SEAL_PACKAGE_ID', required: false, description: 'Seal package ID override' },
   { name: 'SEAL_KEY_SERVER_1', required: false, description: 'Seal key server 1 object ID' },
   { name: 'SEAL_KEY_SERVER_2', required: false, description: 'Seal key server 2 object ID' },
-];
-
-const WEB_ENV_VARS: EnvVar[] = [
-  { name: 'VITE_API_BASE', required: false, description: 'Web app API base URL', default: 'http://localhost:3001' },
 ];
 
 function parseEnvFile(content: string): Record<string, string> {
@@ -83,21 +84,9 @@ function main() {
   
   const rootErrors = validateEnv(ROOT_ENV_VARS, rootEnv);
   
-  console.log('\n📁 Web .env:');
-  const webEnvPath = resolve(process.cwd(), 'apps/web/.env');
-  let webEnv: Record<string, string> = {};
-  
-  if (existsSync(webEnvPath)) {
-    webEnv = parseEnvFile(readFileSync(webEnvPath, 'utf-8'));
-  } else {
-    console.log('⚠️  apps/web/.env not found (optional)');
-  }
-  
-  const webErrors = validateEnv(WEB_ENV_VARS, webEnv, '');
-  
   console.log('\n' + '='.repeat(50));
   
-  if (rootErrors || webErrors) {
+  if (rootErrors) {
     console.error('\n❌ Environment validation failed');
     process.exit(1);
   }

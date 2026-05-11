@@ -86,6 +86,12 @@ export function setCurrentUser(address: string): void {
   saveFullAppState(state);
 }
 
+export function clearCurrentUser(): void {
+  const state = getFullAppState();
+  state.currentAddress = null;
+  saveFullAppState(state);
+}
+
 export function getCurrentUserAddress(): string | null {
   return getFullAppState().currentAddress;
 }

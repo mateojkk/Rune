@@ -81,14 +81,14 @@ function uint8ArrayToBase64(bytes: Uint8Array): string {
 
 export async function encryptWithSeal<T>(
   data: T,
-  _threshold = 2
+  threshold = 2
 ): Promise<EncryptedData> {
   const apiBase = useConfigStore.getState().apiBase;
   
   const response = await fetch(`${apiBase}/api/seal/encrypt`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data }),
+    body: JSON.stringify({ data, threshold }),
   });
 
   if (!response.ok) {

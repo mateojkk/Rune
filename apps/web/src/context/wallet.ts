@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { clearCurrentUser, setCurrentUser } from '../lib/forms';
 
 export type ConnectionMethod = 'zklogin' | 'wallet';
 
@@ -32,17 +33,20 @@ export const useWalletStore = create<WalletState>()(
       ephemeralPrivateKey: null,
 
       connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => {
+        const normalizedAddress = address.toLowerCase();
         set({
           isConnected: true,
           isConnecting: false,
           account: {
-            address: address.toLowerCase(),
+            address: normalizedAddress,
             provider,
             method: 'zklogin',
           },
           jwt,
           ephemeralPrivateKey: ephemeralKey || null,
         });
+
+        setCurrentUser(normalizedAddress);
         
         if (typeof window !== 'undefined') {
           sessionStorage.setItem('rune_jwt', jwt);
@@ -50,16 +54,19 @@ export const useWalletStore = create<WalletState>()(
       },
 
       connectWallet: (address: string, provider: string, publicKey?: string) => {
+        const normalizedAddress = address.toLowerCase();
         set({
           isConnected: true,
           isConnecting: false,
           account: {
-            address: address.toLowerCase(),
+            address: normalizedAddress,
             provider,
             method: 'wallet',
             publicKey,
           },
         });
+
+        setCurrentUser(normalizedAddress);
       },
 
       disconnect: () => {
@@ -71,6 +78,8 @@ export const useWalletStore = create<WalletState>()(
           jwt: null,
           ephemeralPrivateKey: null,
         });
+
+        clearCurrentUser();
         
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('rune_jwt');

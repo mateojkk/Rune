@@ -46,7 +46,7 @@ zkLogin uses Google's OAuth 2.0. You need to register a Google Cloud project to 
 2. Click **Create Credentials** → **OAuth client ID**
 3. Application type: **Web application**
 4. Name: `Rune Local`
-5. **Authorized redirect URIs**: Click **Add URI** → `http://localhost:5173/auth/callback`
+5. **Authorized redirect URIs**: Click **Add URI** → `http://localhost:5173/app/auth/callback`
 6. Click **Create**
 7. Copy the **Client ID** (format: `xxxxx.apps.googleusercontent.com`)
 
@@ -144,7 +144,7 @@ rune-monorepo/
 ### "id_token not found" in callback
 
 - Check Google Client ID is correct in `.env`
-- Check redirect URI matches exactly: `http://localhost:5173/auth/callback`
+- Check redirect URI matches exactly: `http://localhost:5173/app/auth/callback`
 - Make sure port isn't different (5174 if 5173 in use)
 
 ### "nonce mismatch" error
@@ -173,7 +173,7 @@ All production environment variables need to be set:
 NETWORK=mainnet
 VITE_API_BASE=https://api.yourdomain.com
 VITE_WEB_URL=https://yourdomain.com
-VITE_REDIRECT_URL=https://yourdomain.com/auth/callback
+VITE_REDIRECT_URL=https://yourdomain.com/app/auth/callback
 VITE_GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
 
 # Mainnet URLs for Walrus/Seal (get from docs)

@@ -45,7 +45,7 @@ export function Dashboard() {
     setForms(forms.filter(f => f.id !== id));
     if (selectedForm?.id === id) {
       setSelectedForm(null);
-      navigate('/dashboard');
+      navigate('/app/dashboard');
     }
   };
 
@@ -109,7 +109,7 @@ export function Dashboard() {
         <div className="forms-list">
           <div className="list-header">
             <h3>Your Forms</h3>
-            <Link to="/builder" className="btn-icon">
+            <Link to="/app/builder" className="btn-icon">
               <Plus size={16} />
             </Link>
           </div>
@@ -117,7 +117,7 @@ export function Dashboard() {
           {forms.length === 0 ? (
             <div className="list-empty">
               <p>No forms yet</p>
-              <Link to="/builder" className="btn btn-secondary btn-sm">
+              <Link to="/app/builder" className="btn btn-secondary btn-sm">
                 Create Form
               </Link>
             </div>
@@ -129,7 +129,7 @@ export function Dashboard() {
                   className={`form-item ${selectedForm?.id === form.id ? 'active' : ''}`}
                   onClick={() => {
                     setSelectedForm(form);
-                    navigate(`/dashboard/${form.id}`);
+                    navigate(`/app/dashboard/${form.id}`);
                   }}
                 >
                   <div className="form-item-icon">

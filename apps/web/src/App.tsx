@@ -4,6 +4,7 @@ import { Builder } from './pages/Builder';
 import { Dashboard } from './pages/Dashboard';
 import { FormViewer } from './pages/FormViewer';
 import { AppPage } from './pages/AppPage';
+import { AuthCallback } from './pages/AuthCallback';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="builder/:formId" element={<Builder />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="dashboard/:formId" element={<Dashboard />} />
+        <Route path="auth/callback" element={<AuthCallback />} />
         <Route path="form/:formId" element={<FormViewer />} />
         <Route index element={<Navigate to="/app/dashboard" replace />} />
       </Route>

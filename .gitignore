@@ -45,7 +45,7 @@ env/
 *.njsproj
 *.sln
 *.sw?
-
+devguide.md
 # Testing
 coverage/
 .nyc_output/

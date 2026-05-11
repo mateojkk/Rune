@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Wallet, Cloud, RefreshCw, LogOut, Copy, Check, Loader2 } from 'lucide-react';
 import { useWalletStore } from '../context/wallet';
 import { useWallet } from '@suiet/wallet-kit';
-import { getOAuthUrl, handleOAuthCallback, clearSession, clearUserSalt, type OAuthProvider } from '../lib/zklogin';
+import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
+import { getOAuthUrl, clearSession, clearUserSalt, type OAuthProvider } from '../lib/zklogin';
 import './Navbar.css';
 
 function formatAddress(addr: string) {
@@ -14,7 +15,7 @@ function formatAddress(addr: string) {
 }
 
 export function Navbar() {
-  const { account, isConnected, isConnecting, connectZkLogin, connectWallet, disconnect } = useWalletStore();
+  const { account, isConnected, isConnecting, connectWallet, disconnect } = useWalletStore();
   const { address, select, connecting: walletConnecting, allAvailableWallets } = useWallet();
   const [copied, setCopied] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -22,24 +23,27 @@ export function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'zklogin' | 'wallet'>('zklogin');
+  const [pendingWalletName, setPendingWalletName] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const isAppPage = location.pathname.startsWith('/app');
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes('id_token')) {
-      handleAuthCallback();
+    if (isConnected && account?.address && getCurrentUserAddress() !== account.address) {
+      setCurrentUser(account.address);
     }
-  }, []);
+  }, [account?.address, isConnected]);
 
-  const handleAuthCallback = useCallback(async () => {
-    const result = await handleOAuthCallback();
-    if (result) {
-      connectZkLogin(result.address, result.provider, result.jwt);
-      navigate('/app/dashboard');
+  useEffect(() => {
+    if (!pendingWalletName || !address) {
+      return;
     }
-  }, [connectZkLogin, navigate]);
+
+    connectWallet(address, pendingWalletName);
+    setPendingWalletName(null);
+    setShowLogin(false);
+    navigate('/app/dashboard');
+  }, [address, connectWallet, navigate, pendingWalletName]);
 
   const handleZkLogin = async (provider: OAuthProvider) => {
     setConnecting(true);
@@ -180,10 +184,7 @@ export function Navbar() {
                   onClick={async () => {
                     try {
                       await select(wallet.name);
-                      if (address) {
-                        connectWallet(address, wallet.name);
-                      }
-                      setShowLogin(false);
+                      setPendingWalletName(wallet.name);
                     } catch (err) {
                       console.error('wallet connect error:', err);
                     }

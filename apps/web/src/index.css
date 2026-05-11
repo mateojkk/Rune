@@ -110,6 +110,22 @@ input, textarea, select {
   color: var(--accent);
 }
 
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-sm {
+  padding: 0.55rem 1rem;
+  font-size: 0.78rem;
+}
+
 .input {
   width: 100%;
   padding: 12px 16px;
