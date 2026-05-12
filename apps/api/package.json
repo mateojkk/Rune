@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "./.venv/bin/python -m uvicorn server.app:app --reload --port 3001",
-    "start": "./.venv/bin/python -m uvicorn server.app:app --host 0.0.0.0 --port 3001",
+    "dev": "cd /home/mateo/Desktop/Rune/apps/api && .venv/bin/python -m uvicorn server.app:app --reload --port 3001",
+    "start": "cd /home/mateo/Desktop/Rune/apps/api && .venv/bin/python -m uvicorn server.app:app --host 0.0.0.0 --port 3001",
     "lint": "ruff check server/",
     "fix": "ruff check server/ --fix"
   },

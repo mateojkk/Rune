@@ -1,4 +1,9 @@
-import type { FormSchema, FormSubmission, FormField, UserProfile } from '../types/form';
+import type { FormSchema, FormSubmission, FormField, UserProfile, Workspace } from '../types/form';
+import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi } from './api';
+
+// --- Synchronous helpers (local state) ---
+
+const STORAGE_KEY = 'walrus_forms_app_state';
 
 function uuidv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -8,24 +13,16 @@ function uuidv4(): string {
   });
 }
 
-const STORAGE_KEY = 'walrus_forms_app_state';
-
 export interface FullAppState {
   profiles: Record<string, UserProfile>;
   currentAddress: string | null;
 }
 
 function getFullAppState(): FullAppState {
-  if (typeof window === 'undefined') {
-    return { profiles: {}, currentAddress: null };
-  }
-  
+  if (typeof window === 'undefined') return { profiles: {}, currentAddress: null };
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return { profiles: {}, currentAddress: null };
-    }
-    return JSON.parse(stored);
+    return stored ? JSON.parse(stored) : { profiles: {}, currentAddress: null };
   } catch {
     return { profiles: {}, currentAddress: null };
   }
@@ -33,56 +30,19 @@ function getFullAppState(): FullAppState {
 
 function saveFullAppState(state: FullAppState): void {
   if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // Silently fail
-  }
-}
-
-function getCurrentProfile(): UserProfile | null {
-  const state = getFullAppState();
-  if (!state.currentAddress) return null;
-  return state.profiles[state.currentAddress] || null;
-}
-
-function getOrCreateCurrentProfile(): UserProfile {
-  const state = getFullAppState();
-  
-  if (!state.currentAddress) {
-    throw new Error('No current user address set');
-  }
-  
-  let profile = state.profiles[state.currentAddress];
-  
-  if (!profile) {
-    profile = {
-      address: state.currentAddress,
-      forms: [],
-      submissions: {},
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    state.profiles[state.currentAddress] = profile;
-  }
-  
-  return profile;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* */ }
 }
 
 export function setCurrentUser(address: string): void {
   const state = getFullAppState();
   state.currentAddress = address.toLowerCase();
-  
   if (!state.profiles[address.toLowerCase()]) {
     state.profiles[address.toLowerCase()] = {
       address: address.toLowerCase(),
-      forms: [],
-      submissions: {},
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      forms: [], submissions: {}, workspaces: [],
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
     };
   }
-  
   saveFullAppState(state);
 }
 
@@ -96,289 +56,205 @@ export function getCurrentUserAddress(): string | null {
   return getFullAppState().currentAddress;
 }
 
-export function getUserProfile(address: string): UserProfile | null {
-  const state = getFullAppState();
-  return state.profiles[address.toLowerCase()] || null;
+// --- Async API-backed functions ---
+
+function address(): string {
+  const a = getCurrentUserAddress();
+  if (!a) throw new Error('No user address');
+  return a;
 }
 
-export function createUserProfile(address: string): UserProfile {
-  const normalizedAddress = address.toLowerCase();
-  const state = getFullAppState();
-  
-  if (state.profiles[normalizedAddress]) {
-    return state.profiles[normalizedAddress];
-  }
-  
-  const profile: UserProfile = {
-    address: normalizedAddress,
-    forms: [],
-    submissions: {},
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  
-  state.profiles[normalizedAddress] = profile;
-  saveFullAppState(state);
-  
-  return profile;
-}
+// --- Workspaces ---
 
-export function saveSyncBlobId(address: string, blobId: string): void {
-  const state = getFullAppState();
-  if (state.profiles[address.toLowerCase()]) {
-    state.profiles[address.toLowerCase()].blobId = blobId;
-    saveFullAppState(state);
+let _workspaceCache: { uuid: string; name: string; description: string; formIds: string[]; createdAt: string; updatedAt: string }[] = [];
+
+export async function getWorkspaces(): Promise<Workspace[]> {
+  try {
+    const data = await apiGetWorkspaces(address());
+    _workspaceCache = data;
+    return data.map(w => ({
+      id: w.uuid,
+      name: w.name,
+      formIds: w.formIds,
+      createdAt: w.createdAt,
+      updatedAt: w.updatedAt,
+    }));
+  } catch {
+    return [];
   }
 }
 
-export function getSyncBlobId(address: string): string | null {
-  const state = getFullAppState();
-  return state.profiles[address.toLowerCase()]?.blobId || null;
+export async function createWorkspace(name: string): Promise<Workspace> {
+  const w = await createWorkspaceApi(address(), name);
+  return { id: w.uuid, name: w.name, formIds: w.formIds, createdAt: w.createdAt, updatedAt: w.updatedAt };
 }
 
-export function createForm(title: string, description: string): FormSchema {
-  const profile = getOrCreateCurrentProfile();
-  
+export async function renameWorkspace(workspaceId: string, name: string): Promise<void> {
+  await fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:3001'}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
+}
+
+export async function deleteWorkspace(workspaceId: string): Promise<void> {
+  await fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:3001'}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
+}
+
+// --- Forms ---
+
+let _formCache: FormSchema[] = [];
+
+export async function getAllForms(): Promise<FormSchema[]> {
+  try {
+    const data = await getForms(address());
+    _formCache = data.map(f => ({
+      id: f.id,
+      title: f.title,
+      description: f.description,
+      workspaceId: f.workspaceId,
+      fields: f.fields as FormField[],
+      createdAt: f.createdAt,
+      updatedAt: f.updatedAt,
+      blobId: f.blobId,
+      profilePicture: f.profilePicture,
+      coverPicture: f.coverPicture,
+      walletAddress: address(),
+    }));
+    return _formCache;
+  } catch {
+    return _formCache;
+  }
+}
+
+export async function getForm(formId: string): Promise<FormSchema | null> {
+  const cached = _formCache.find(f => f.id === formId);
+  if (cached) return cached;
+  try {
+    const f = await getFormApi(formId);
+    if (!f) return null;
+    return {
+      id: f.id, title: f.title, description: f.description,
+      workspaceId: f.workspaceId, fields: f.fields as FormField[],
+      createdAt: f.createdAt, updatedAt: f.updatedAt,
+      blobId: f.blobId, profilePicture: f.profilePicture,
+      coverPicture: f.coverPicture, walletAddress: address(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function createForm(title: string, description: string, workspaceId?: string): Promise<FormSchema> {
+  const wsId = workspaceId || (_workspaceCache[0]?.uuid) || '';
+  const f = await createFormApi(address(), title, description, wsId);
   const form: FormSchema = {
-    id: uuidv4(),
-    title,
-    description,
-    fields: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    walletAddress: profile.address,
+    id: f.id, title: f.title, description: f.description,
+    workspaceId: f.workspaceId, fields: f.fields as FormField[],
+    createdAt: f.createdAt, updatedAt: f.updatedAt,
+    blobId: f.blobId, profilePicture: f.profilePicture,
+    coverPicture: f.coverPicture, walletAddress: address(),
   };
-  
-  profile.forms.push(form);
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
+  _formCache.push(form);
   return form;
 }
 
-export function updateForm(formId: string, updates: Partial<FormSchema>): FormSchema | null {
-  const profile = getCurrentProfile();
-  if (!profile) return null;
-  
-  const index = profile.forms.findIndex(f => f.id === formId);
-  if (index === -1) return null;
-  
-  profile.forms[index] = {
-    ...profile.forms[index],
-    ...updates,
-    updatedAt: new Date().toISOString(),
-  };
-  
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return profile.forms[index];
+export async function updateForm(formId: string, updates: Partial<FormSchema>): Promise<void> {
+  const body: Record<string, unknown> = {};
+  if (updates.title !== undefined) body.title = updates.title;
+  if (updates.description !== undefined) body.description = updates.description;
+  if (updates.fields !== undefined) body.fields = updates.fields;
+  if (updates.blobId !== undefined) body.blob_id = updates.blobId;
+  if (updates.profilePicture !== undefined) body.profile_picture = updates.profilePicture;
+  if (updates.coverPicture !== undefined) body.cover_picture = updates.coverPicture;
+  const updated = await updateFormApi(address(), formId, body);
+  const idx = _formCache.findIndex(f => f.id === formId);
+  if (idx !== -1) {
+    _formCache[idx] = {
+      ..._formCache[idx], ...updates,
+      updatedAt: updated.updatedAt,
+    };
+  }
 }
 
-export function deleteForm(formId: string): boolean {
-  const profile = getCurrentProfile();
-  if (!profile) return false;
-  
-  const index = profile.forms.findIndex(f => f.id === formId);
-  if (index === -1) return false;
-  
-  profile.forms.splice(index, 1);
-  delete profile.submissions[formId];
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return true;
+export async function deleteForm(formId: string): Promise<void> {
+  await deleteFormApi(address(), formId);
+  _formCache = _formCache.filter(f => f.id !== formId);
 }
 
-export function getForm(formId: string): FormSchema | null {
-  const profile = getCurrentProfile();
-  if (!profile) return null;
-  return profile.forms.find(f => f.id === formId) || null;
-}
-
-export function getAllForms(): FormSchema[] {
-  const profile = getCurrentProfile();
-  if (!profile) return [];
-  return profile.forms;
-}
-
-export function addField(formId: string, field: Omit<FormField, 'id'>): FormField | null {
-  const profile = getCurrentProfile();
-  if (!profile) return null;
-  
-  const form = profile.forms.find(f => f.id === formId);
+export async function addField(formId: string, field: Omit<FormField, 'id'>): Promise<FormField | null> {
+  const form = _formCache.find(f => f.id === formId);
   if (!form) return null;
-  
-  const newField: FormField = {
-    ...field,
-    id: uuidv4(),
-  };
-  
-  form.fields.push(newField);
-  form.updatedAt = new Date().toISOString();
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
+  const newField: FormField = { ...field, id: uuidv4() };
+  const fields = [...form.fields, newField];
+  await updateForm(formId, { fields });
   return newField;
 }
 
-export function updateField(formId: string, fieldId: string, updates: Partial<FormField>): FormField | null {
-  const profile = getCurrentProfile();
-  if (!profile) return null;
-  
-  const form = profile.forms.find(f => f.id === formId);
-  if (!form) return null;
-  
-  const fieldIndex = form.fields.findIndex(f => f.id === fieldId);
-  if (fieldIndex === -1) return null;
-  
-  form.fields[fieldIndex] = {
-    ...form.fields[fieldIndex],
-    ...updates,
-  };
-  
-  form.updatedAt = new Date().toISOString();
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return form.fields[fieldIndex];
+export async function updateField(formId: string, fieldId: string, updates: Partial<FormField>): Promise<void> {
+  const form = _formCache.find(f => f.id === formId);
+  if (!form) return;
+  const fields = form.fields.map(f => f.id === fieldId ? { ...f, ...updates } : f);
+  await updateForm(formId, { fields });
 }
 
-export function deleteField(formId: string, fieldId: string): boolean {
-  const profile = getCurrentProfile();
-  if (!profile) return false;
-  
-  const form = profile.forms.find(f => f.id === formId);
-  if (!form) return false;
-  
-  const index = form.fields.findIndex(f => f.id === fieldId);
-  if (index === -1) return false;
-  
-  form.fields.splice(index, 1);
-  form.updatedAt = new Date().toISOString();
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return true;
+export async function deleteField(formId: string, fieldId: string): Promise<void> {
+  const form = _formCache.find(f => f.id === formId);
+  if (!form) return;
+  const fields = form.fields.filter(f => f.id !== fieldId);
+  await updateForm(formId, { fields });
 }
 
-export function addSubmission(formId: string, data: Record<string, unknown>, walletAddress?: string): FormSubmission {
-  const profile = getOrCreateCurrentProfile();
-  
-  const submission: FormSubmission = {
-    id: uuidv4(),
-    formId,
-    data,
-    submittedAt: new Date().toISOString(),
-    walletAddress: walletAddress || profile.address,
-  };
-  
-  if (!profile.submissions[formId]) {
-    profile.submissions[formId] = [];
+// --- Submissions ---
+
+export async function getSubmissions(formId: string): Promise<FormSubmission[]> {
+  try {
+    const data = await getSubmissionsApi(formId);
+    return data.map(s => ({
+      id: s.id,
+      formId: s.formId,
+      data: s.data,
+      submittedAt: s.submittedAt,
+      walletAddress: s.walletAddress,
+      blobId: s.blobId,
+    }));
+  } catch {
+    return [];
   }
-  
-  profile.submissions[formId].push(submission);
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return submission;
 }
 
-export function getSubmissions(formId: string): FormSubmission[] {
-  const profile = getCurrentProfile();
-  if (!profile) return [];
-  return profile.submissions[formId] || [];
+export async function addSubmission(formId: string, data: Record<string, unknown>, walletAddress?: string): Promise<FormSubmission> {
+  const s = await createSubmissionApi(formId, data, walletAddress);
+  return {
+    id: s.id, formId: s.formId, data: s.data,
+    submittedAt: s.submittedAt, walletAddress: s.walletAddress, blobId: s.blobId,
+  };
 }
 
-export function deleteSubmission(formId: string, submissionId: string): boolean {
-  const profile = getCurrentProfile();
-  if (!profile) return false;
-  
-  const submissions = profile.submissions[formId];
-  if (!submissions) return false;
-  
-  const index = submissions.findIndex(s => s.id === submissionId);
-  if (index === -1) return false;
-  
-  submissions.splice(index, 1);
-  profile.updatedAt = new Date().toISOString();
-  
-  const state = getFullAppState();
-  state.profiles[profile.address] = profile;
-  saveFullAppState(state);
-  
-  return true;
+export async function deleteSubmission(formId: string, submissionId: string): Promise<void> {
+  await deleteSubmissionApi(address(), submissionId);
 }
+
+const _submissionCache: Record<string, FormSubmission[]> = {};
 
 export function filterSubmissions(
   formId: string,
-  filters: {
-    search?: string;
-    startDate?: string;
-    endDate?: string;
-  }
+  filters: { search?: string; startDate?: string; endDate?: string }
 ): FormSubmission[] {
-  const profile = getCurrentProfile();
-  if (!profile) return [];
-  
-  let submissions = profile.submissions[formId] || [];
-  
+  let subs = _submissionCache[formId] || [];
   if (filters.search) {
-    const search = filters.search.toLowerCase();
-    submissions = submissions.filter(sub => {
-      const searchStr = JSON.stringify(sub.data).toLowerCase();
-      return searchStr.includes(search);
-    });
+    const q = filters.search.toLowerCase();
+    subs = subs.filter(s => JSON.stringify(s.data).toLowerCase().includes(q));
   }
-  
-  if (filters.startDate) {
-    submissions = submissions.filter(sub => sub.submittedAt >= filters.startDate!);
-  }
-  
-  if (filters.endDate) {
-    submissions = submissions.filter(sub => sub.submittedAt <= filters.endDate!);
-  }
-  
-  return submissions;
+  if (filters.startDate) subs = subs.filter(s => s.submittedAt >= filters.startDate!);
+  if (filters.endDate) subs = subs.filter(s => s.submittedAt <= filters.endDate!);
+  return subs;
 }
 
-export function exportUserData(): string {
-  const profile = getCurrentProfile();
-  if (!profile) return '';
-  return JSON.stringify(profile, null, 2);
+export function cacheSubmissions(formId: string, subs: FormSubmission[]): void {
+  _submissionCache[formId] = subs;
 }
 
-export function importUserData(data: string): boolean {
-  try {
-    const imported = JSON.parse(data) as UserProfile;
-    if (!imported.address) return false;
-    
-    const state = getFullAppState();
-    state.profiles[imported.address.toLowerCase()] = imported;
-    saveFullAppState(state);
-    return true;
-  } catch {
-    return false;
-  }
+export function getCachedSubmissions(formId: string): FormSubmission[] {
+  return _submissionCache[formId] || [];
+}
+
+export async function deleteWorkspaceAndForms(workspaceId: string): Promise<void> {
+  await deleteWorkspace(workspaceId);
 }

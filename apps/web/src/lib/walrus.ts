@@ -1,82 +1,80 @@
 import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
-import { useConfigStore } from '../stores/config';
 
-const defaultWalrusUrls = {
-  publisher: import.meta.env.VITE_WALRUS_PUBLISHER_URL || 'https://publisher.testnet.walrus.space',
-  aggregator: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.testnet.walrus.space',
-};
-
-export async function storeBlob(data: unknown): Promise<{ blobId: string; objectId: string }> {
-  const apiBase = useConfigStore.getState().apiBase;
-  const urls = useConfigStore.getState().config?.walrus ?? defaultWalrusUrls;
-  const walrusPublisherUrl = urls.publisher;
-
-  try {
-    const response = await fetch(`${apiBase}/api/walrus/store`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data, epochs: 2 }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to store blob: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return {
-      blobId: result.blobId,
-      objectId: result.objectId,
-    };
-  } catch {
-    const encoder = new TextEncoder();
-    const jsonString = JSON.stringify(data);
-    const blob = encoder.encode(jsonString);
-
-    const response = await fetch(`${walrusPublisherUrl}/v1/store?epochs=2`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-      body: blob,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to store blob: ${response.status} - ${errorText}`);
-    }
-
-    const result = await response.json();
-    return {
-      blobId: result.newlyCreated?.blobId || result.alreadyCertified?.blobId,
-      objectId: result.newlyCreated?.objectId || result.alreadyCertified?.objectId,
-    };
-  }
+async function getWalrusClient() {
+  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
+  const { walrus } = await import('@mysten/walrus');
+  return new SuiGrpcClient({
+    network: 'mainnet',
+    baseUrl: 'https://fullnode.mainnet.sui.io:443',
+  }).$extend(walrus());
 }
 
-export async function readBlob(blobId: string): Promise<unknown> {
-  const apiBase = useConfigStore.getState().apiBase;
-  const urls = useConfigStore.getState().config?.walrus ?? defaultWalrusUrls;
-  const walrusAggregatorUrl = urls.aggregator;
+async function writeBlobFlow(
+  data: unknown,
+  address: string,
+  signTx: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+): Promise<string> {
+  const client = await getWalrusClient();
+  const jsonStr = JSON.stringify(data);
+  const flow = client.walrus.writeBlobFlow({ blob: new TextEncoder().encode(jsonStr) });
+  await flow.encode();
 
-  try {
-    const response = await fetch(`${apiBase}/api/walrus/read/${blobId}`);
+  const regTx = flow.register({ epochs: 2, owner: address, deletable: false });
+  const regResult = await signTx(regTx);
+  const digest = regResult?.digest || regResult?.effects?.transactionDigest || regResult?.Transaction?.digest;
+  if (!digest) throw new Error('Registration failed');
+  await flow.upload({ digest });
 
-    if (!response.ok) {
-      throw new Error(`Failed to read blob: ${response.statusText}`);
-    }
+  const certTx = flow.certify();
+  await signTx(certTx);
 
-    return response.json();
-  } catch {
-    const response = await fetch(`${walrusAggregatorUrl}/v1/${blobId}`);
+  const blobId = flow.blobId;
+  if (!blobId) throw new Error('No blobId from Walrus flow');
+  return blobId;
+}
 
-    if (!response.ok) {
-      throw new Error(`Failed to read blob: ${response.status}`);
-    }
+export async function storeBlobWithWallet(
+  data: unknown,
+  address: string,
+  signAndExecute: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+): Promise<{ blobId: string }> {
+  const blobId = await writeBlobFlow(data, address, signAndExecute);
+  return { blobId };
+}
 
-    const blob = await response.blob();
-    const text = await blob.text();
-    return JSON.parse(text);
+export async function storeBlobWithKeypair(
+  data: unknown,
+  keypair: { signAndExecuteTransaction: (opts: { transaction: Record<string, unknown>; client: Record<string, unknown> }) => Promise<{ digest?: string }> },
+  address: string
+): Promise<{ blobId: string }> {
+  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
+  const suiClient = new SuiGrpcClient({
+    network: 'mainnet',
+    baseUrl: 'https://fullnode.mainnet.sui.io:443',
+  });
+  const signTx = async (tx: Record<string, unknown>) => {
+    const result = await keypair.signAndExecuteTransaction({ transaction: tx, client: suiClient as unknown as Record<string, unknown> });
+    const digest = result?.digest;
+    if (!digest) throw new Error('Transaction failed');
+    return { digest, Transaction: { digest } } as Record<string, unknown>;
+  };
+  const blobId = await writeBlobFlow(data, address, signTx);
+  return { blobId };
+}
+
+export async function storeBlob(data: unknown): Promise<{ blobId: string; objectId: string }> {
+  const response = await fetch(`/api/walrus/store`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data, epochs: 2 }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Walrus store failed: ${response.status} — ${text}`);
   }
+
+  return response.json();
 }
 
 export async function storeForm(form: FormSchema): Promise<{ blobId: string; objectId: string }> {
@@ -93,6 +91,12 @@ export async function storeSubmission(submission: FormSubmission): Promise<{ blo
     version: '1.0',
     ...submission,
   });
+}
+
+export async function readBlob(blobId: string): Promise<unknown> {
+  const response = await fetch(`/api/walrus/read/${blobId}`);
+  if (!response.ok) throw new Error(`Failed to read blob: ${response.statusText}`);
+  return response.json();
 }
 
 export async function readForm(blobId: string): Promise<FormSchema> {
@@ -149,7 +153,6 @@ export async function uploadSyncData(
     lastSynced: new Date().toISOString(),
     version: '1.0',
   };
-  
   return storeBlob(syncData);
 }
 
@@ -181,9 +184,7 @@ export async function syncFromWalrus(blobId: string): Promise<{
 }> {
   try {
     const syncData = await downloadSyncData(blobId);
-    if (!syncData) {
-      return { success: false };
-    }
+    if (!syncData) return { success: false };
     return { success: true, profile: syncData.profile };
   } catch (error) {
     console.error('Sync from Walrus failed:', error);

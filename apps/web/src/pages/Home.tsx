@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Database, Lock, Globe, FileText, Star, Zap } from 'lucide-react';
-import { Header } from '../components/Header';
+import { Navbar } from '../components/Navbar';
 import './Home.css';
 
 export function Home() {
   return (
     <div className="home">
-      <Header />
+      <Navbar />
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
@@ -15,11 +15,6 @@ export function Home() {
           <p className="hero-subtitle">
             build forms. collect submissions. store immutably on walrus.
           </p>
-          <div className="hero-actions">
-            <Link to="/app" className="btn btn-primary">
-              open app <ArrowRight size={16} />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -90,9 +85,9 @@ export function Home() {
 
       <section className="cta-section">
         <h2>ready to build?</h2>
-        <p>open the app to sign in and start building forms.</p>
+        <p>sign in to start building forms.</p>
         <Link to="/app" className="btn btn-primary">
-          open app <ArrowRight size={16} />
+          sign in <ArrowRight size={16} />
         </Link>
       </section>
     </div>

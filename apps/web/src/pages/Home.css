@@ -1,9 +1,9 @@
 .home {
-  min-height: calc(100vh - 64px);
+  min-height: 100vh;
 }
 
 .hero {
-  padding: 100px 24px 60px;
+  padding: 48px 24px 48px;
 }
 
 .hero-content {
@@ -70,7 +70,7 @@
 }
 
 .feature-section {
-  padding: 3rem 24px;
+  padding: 2.5rem 24px;
 }
 
 .feature-header {
@@ -230,4 +230,16 @@
   .hero-actions {
     flex-direction: column;
   }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 32px 16px 32px; }
+  .hero-title { font-size: clamp(1.5rem, 7vw, 2rem) !important; }
+  .hero-subtitle { font-size: 0.85rem; }
+  .feature-header h2 { font-size: 1.3rem; }
+  .feature-card { padding: 1rem; }
+  .split-section { padding: 1.5rem 16px; gap: 1rem; }
+  .cta-section { padding: 1.5rem 16px; }
+  .cta-section h2 { font-size: 1.2rem; }
+  .card-grid { grid-template-columns: 1fr; }
 }

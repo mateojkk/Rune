@@ -4,7 +4,320 @@
   flex-direction: column;
 }
 
-.app-main {
+.app-body {
+  display: flex;
   flex: 1;
   min-height: 0;
+}
+
+.app-sidebar {
+  width: 190px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 1px;
+}
+
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.app-nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.app-nav-item.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.app-nav-item svg {
+  flex-shrink: 0;
+}
+
+/* Workspace items */
+
+.app-ws-item {
+  padding-left: 28px;
+  font-size: 0.8rem;
+  gap: 7px;
+}
+
+.app-ws-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--subtle);
+  flex-shrink: 0;
+}
+
+.app-sidebar-label-inline {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  padding: 6px 12px 2px;
+}
+
+.app-ws-item.active .app-ws-dot {
+  background: var(--accent);
+}
+
+.app-ws-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-ws-count {
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  color: var(--subtle);
+  font-weight: 500;
+}
+
+/* New workspace */
+
+.app-ws-row {
+  display: flex;
+  align-items: center;
+}
+
+.app-ws-row .app-ws-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-ws-del {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  color: var(--subtle);
+  cursor: pointer;
+  border-radius: 3px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: all 0.15s;
+  margin-right: 4px;
+}
+
+.app-ws-row:hover .app-ws-del {
+  opacity: 1;
+}
+
+.app-ws-del:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.08);
+}
+
+.app-ws-del-confirm {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.app-ws-del-yes,
+.app-ws-del-no {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.app-ws-del-yes:hover {
+  color: #51cf66;
+  background: rgba(81, 207, 102, 0.1);
+}
+
+.app-ws-del-no:hover {
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.app-ws-new {
+  padding-left: 28px;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--subtle);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.app-ws-new:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.app-ws-create {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px 2px 28px;
+}
+
+.app-ws-create input {
+  flex: 1;
+  padding: 4px 7px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.76rem;
+  min-width: 0;
+}
+
+.app-ws-create input:focus {
+  outline: none;
+}
+
+.app-ws-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: var(--subtle);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.app-ws-btn.confirm:hover {
+  color: #51cf66;
+  background: rgba(81, 207, 102, 0.1);
+}
+
+.app-ws-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Main content */
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.app-main > * {
+  flex: 1;
+}
+
+/* ─── Auth Gate ─── */
+
+.app-gate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-gate-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.app-gate-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  max-width: 360px;
+}
+
+.app-gate-card svg {
+  color: var(--subtle);
+  margin-bottom: 4px;
+}
+
+.app-gate-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.app-gate-card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 6px 8px;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-nav-item {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .app-ws-item {
+    padding-left: 10px;
+  }
+
+  .app-sidebar-label-inline {
+    display: none;
+  }
+
+  .app-ws-row .app-ws-del {
+    opacity: 1;
+  }
 }

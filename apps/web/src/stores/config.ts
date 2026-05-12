@@ -24,15 +24,14 @@ interface ConfigState {
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
 
 const DEFAULT_WALRUS_URLS = {
-  publisher: import.meta.env.VITE_WALRUS_PUBLISHER_URL || 'https://publisher.testnet.walrus.space',
-  aggregator: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.testnet.walrus.space',
+  publisher: import.meta.env.VITE_WALRUS_PUBLISHER_URL || '',
+  aggregator: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.walrus.space',
 };
 
 const DEFAULT_SEAL_CONFIG = {
-  packageId: import.meta.env.VITE_SEAL_PACKAGE_ID || '0x8d90881fc48eb30d4422db68083b49e7d0f879658444e3a0ed85ce47feaa54b2',
+  packageId: import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7',
   keyServers: [
-    { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x73d05d62c18d9374e3ea529e8e0ed6161da1a141a94d3f76ae3fe4e99356db75', weight: 1 },
-    { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_2 || '0xf5d14a81a982144ae441cd7d64b09027f116a468bd36e7eca494f750591623c8', weight: 1 },
+    { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6', weight: 1 },
   ],
 };
 

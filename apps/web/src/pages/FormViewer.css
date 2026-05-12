@@ -1,35 +1,27 @@
-.form-viewer {
-  display: flex;
-  justify-content: center;
-  padding: 48px 24px;
-  min-height: calc(100vh - 64px);
-}
-
-.form-viewer-empty,
-.form-viewer-success {
+.fv-loading,
+.fv-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 12px;
-  min-height: 400px;
-}
-
-.form-viewer-empty h2,
-.form-viewer-success h2 {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.form-viewer-empty p,
-.form-viewer-success p {
-  font-size: 0.88rem;
-  font-weight: 300;
+  gap: 14px;
+  min-height: 60vh;
+  padding: 24px;
   color: var(--muted);
 }
 
-.success-icon {
+.fv-center h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.fv-center p {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.fv-success-icon {
   width: 64px;
   height: 64px;
   display: flex;
@@ -38,193 +30,303 @@
   background: var(--accent-bg);
   border-radius: 50%;
   color: var(--accent);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
-.form-viewer-container {
+/* ─── Viewer Layout ─── */
+
+.form-viewer {
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px;
+  min-height: 100vh;
+}
+
+.fv-container {
   width: 100%;
-  max-width: 560px;
+  max-width: 520px;
 }
 
-.form-header {
+.fv-header {
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border);
 }
 
-.back-link {
+.fv-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--subtle);
+  text-decoration: none;
   margin-bottom: 16px;
   transition: color 0.2s;
 }
 
-.back-link:hover {
+.fv-back:hover {
   color: var(--accent);
 }
 
-.form-header h1 {
-  font-size: 2rem;
-  font-weight: 500;
+.fv-cover-wrap {
+  width: 100%;
+  height: 120px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: var(--surface);
+}
+
+.fv-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fv-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fv-profile-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.fv-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
   margin-bottom: 8px;
 }
 
-.form-header p {
-  font-size: 0.88rem;
-  font-weight: 300;
+.fv-header p {
+  font-size: 0.9rem;
   color: var(--muted);
+  line-height: 1.5;
 }
 
-.form-fields {
+/* ─── Fields ─── */
+
+.fv-fields {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
-.form-field {
+.fv-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.form-field.error .input,
-.form-field.error .textarea {
-  border-color: #EF4444;
-}
-
-.field-label {
+.fv-label {
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.field-label .required {
-  color: #EF4444;
+.fv-required {
+  color: #e74c3c;
   margin-left: 4px;
 }
 
-.textarea {
+.fv-input {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 400;
+  transition: all 0.2s;
+}
+
+.fv-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232, 117, 58, 0.08);
+}
+
+.fv-textarea {
   resize: vertical;
   min-height: 100px;
+  line-height: 1.6;
 }
 
-.checkbox-field {
+.fv-richtext {
+  min-height: 140px;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.fv-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.fv-checkbox {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
 }
 
-.checkbox-field input {
+.fv-checkbox input {
   width: 18px;
   height: 18px;
   accent-color: var(--accent);
 }
 
-.multiselect-field {
+.fv-multiselect {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.multiselect-option {
+.fv-multi-opt {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
 }
 
-.multiselect-option input {
+.fv-multi-opt input {
   width: 18px;
   height: 18px;
   accent-color: var(--accent);
 }
 
-.star-field {
+.fv-stars {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
-.star-btn {
+.fv-star-btn {
   background: transparent;
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: var(--subtle);
-  transition: color 0.2s;
-}
-
-.star-btn:hover,
-.star-btn.filled {
+  transition: transform 0.15s;
   color: var(--accent);
 }
 
-.file-field {
+.fv-star-btn:hover {
+  transform: scale(1.15);
+}
+
+.fv-star-btn svg {
+  display: block;
+}
+
+.fv-file {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 32px;
+  gap: 10px;
+  padding: 14px 16px;
   background: var(--surface);
   border: 1px dashed var(--border);
+  border-radius: var(--radius);
   color: var(--muted);
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  font-size: 0.88rem;
 }
 
-.file-field:hover {
+.fv-file:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
-.file-field input {
+.fv-file input {
   display: none;
 }
 
-.field-description {
-  font-size: 0.82rem;
-  color: var(--muted);
+.fv-desc {
+  font-size: 0.8rem;
+  color: var(--subtle);
+  margin-top: -2px;
 }
 
-.field-error {
-  font-size: 0.82rem;
-  color: #EF4444;
+.fv-error {
+  font-size: 0.8rem;
+  color: #e74c3c;
 }
 
-.form-actions {
+.fv-field.error .fv-input {
+  border-color: #e74c3c;
+}
+
+/* ─── Submit ─── */
+
+.fv-actions {
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
 }
 
-.submit-btn {
+.fv-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   padding: 14px 24px;
   background: var(--text);
   color: var(--bg);
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-size: 0.92rem;
+  font-weight: 600;
   border: none;
-  border-radius: var(--radius-sm);
-  transition: background 0.2s;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.submit-btn:hover {
+.fv-submit:hover:not(:disabled) {
   background: var(--accent);
+  color: #fff;
 }
 
-select.input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 40px;
+.fv-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .form-viewer { padding: 32px 16px; }
+  .fv-header h1 { font-size: 1.4rem; }
+  .fv-cover-wrap { height: 80px; }
+  .fv-profile-img { width: 36px; height: 36px; }
+  .fv-fields { gap: 18px; }
+}
+
+@media (max-width: 480px) {
+  .form-viewer { padding: 20px 12px; }
+  .fv-header { margin-bottom: 20px; padding-bottom: 16px; }
+  .fv-header h1 { font-size: 1.2rem; }
+  .fv-cover-wrap { height: 60px; }
+  .fv-profile-img { width: 32px; height: 32px; }
+  .fv-title-row { gap: 10px; }
+  .fv-fields { gap: 14px; }
+  .fv-input { padding: 9px 12px; font-size: 0.85rem; }
+  .fv-stars { gap: 4px; }
+  .fv-star-btn svg { width: 24px; height: 24px; }
+  .fv-file { padding: 10px 12px; font-size: 0.82rem; }
+  .fv-submit { padding: 12px 16px; font-size: 0.85rem; }
+  .fv-actions { margin-top: 24px; padding-top: 16px; }
 }

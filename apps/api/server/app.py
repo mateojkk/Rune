@@ -4,8 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from server.config import API_HOST, API_PORT, get_network, is_mainnet, get_settings
 from server.models import HealthResponse, StoreRequest, EncryptRequest, DecryptRequest, ZkProofRequest
 from server.handlers import store_blob, read_blob, encrypt, decrypt
+from server.handlers.data import router as data_router
+from server.database import init_db
 
 app = FastAPI(title="Rune Backend API")
+
+init_db()
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +25,8 @@ def reraise_http_error(error: Exception) -> None:
     raise HTTPException(status_code=500, detail=str(error))
 
 
+app.include_router(data_router)
+
 @app.get("/api/config")
 def public_config():
     return get_settings().get_public_config()
@@ -28,9 +34,9 @@ def public_config():
 
 @app.get("/api/health", response_model=HealthResponse)
 def health():
-    from server.handlers.walrus import walrus_available as walrus
+    from server.handlers.walrus import _get_walrus_client
     from server.handlers.seal import seal_available as seal
-    return HealthResponse(status="ok", walrus=walrus, seal=seal)
+    return HealthResponse(status="ok", walrus=_get_walrus_client() is not False, seal=seal)
 
 
 @app.get("/api/network")

@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 try:
     from dotenv import load_dotenv
-    env_path = Path(__file__).parent.parent / '.env'
+    env_path = Path(__file__).parent.parent.parent.parent / '.env'
     load_dotenv(env_path)
 except ImportError:
     pass
@@ -55,19 +55,19 @@ class Settings(BaseSettings):
     def walrus_publisher(self) -> str:
         if self.walrus_publisher_url:
             return self.walrus_publisher_url
-        return 'https://publisher.walrus.space' if self.is_mainnet else 'https://publisher.testnet.walrus.space'
+        return 'https://publisher.walrus.space' if self.is_mainnet else 'https://publisher.walrus-testnet.walrus.space'
 
     @property
     def walrus_aggregator(self) -> str:
         if self.walrus_aggregator_url:
             return self.walrus_aggregator_url
-        return 'https://aggregator.walrus.space' if self.is_mainnet else 'https://aggregator.testnet.walrus.space'
+        return 'https://aggregator.walrus.space' if self.is_mainnet else 'https://aggregator.walrus-testnet.walrus.space'
 
     @property
     def seal_package(self) -> str:
         if self.seal_package_id:
             return self.seal_package_id
-        return '0x8d90881fc48eb30d4422db68083b49e7d0f879658444e3a0ed85ce47feaa54b2'
+        return '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7'
 
     @property
     def seal_key_servers(self) -> list[dict]:

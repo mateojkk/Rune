@@ -2,14 +2,12 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 12px 24px;
+  padding: 10px 24px 10px 10px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
 .navbar-container {
-  max-width: 1400px;
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,82 +16,53 @@
 .navbar-brand {
   display: flex;
   align-items: center;
-  font-weight: 600;
-  font-size: 18px;
-  text-transform: lowercase;
+  text-decoration: none;
+  line-height: 0;
 }
 
-.navbar-links {
-  display: flex;
-  gap: 32px;
-}
-
-.nav-link {
-  color: var(--subtle);
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: lowercase;
-  transition: color 0.2s;
-}
-
-.nav-link:hover {
-  color: var(--accent);
-}
-
-.navbar-links a.active {
-  color: var(--accent);
-}
-
-.app-link {
-  font-size: 0.8rem;
-  color: var(--accent);
-  text-transform: lowercase;
-  transition: opacity 0.2s;
-}
-
-.app-link:hover {
-  opacity: 0.8;
+.navbar-logo {
+  height: 50px;
+  width: auto;
+  display: block;
 }
 
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.wallet-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.address-btn {
+.wallet-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   color: var(--muted);
   font-size: 12px;
-  font-family: monospace;
+  font-family: var(--font-mono);
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.address-btn:hover {
+.wallet-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.sync-btn {
+.wallet-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.sidebar-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -102,32 +71,13 @@
   transition: all 0.2s;
 }
 
-.sync-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.sync-btn.success {
-  color: var(--accent);
-}
-
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--subtle);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-icon:hover {
+.sidebar-icon-btn:hover {
   color: var(--accent);
   border-color: var(--accent);
+}
+
+.sidebar-icon-btn.success {
+  color: var(--accent);
 }
 
 .spin {
@@ -146,11 +96,10 @@
   padding: 8px 14px;
   background: transparent;
   border: 1px solid var(--accent);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   color: var(--accent);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  text-transform: lowercase;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -160,15 +109,27 @@
   color: var(--bg);
 }
 
+/* ─── Login dropdown ─── */
+
 .login-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 200;
+}
+
+.login-dropdown-inner {
+  position: absolute;
+  top: 60px;
+  right: 24px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
   min-width: 260px;
+  box-shadow: var(--shadow-lg);
 }
 
 .login-header {
@@ -250,25 +211,6 @@
   border-radius: 50%;
 }
 
-.twitch-icon,
-.apple-icon,
-.github-icon {
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
-
-.twitch-icon {
-  color: #9146ff;
-}
-
-.apple-icon {
-  color: #fff;
-}
-
 .wallet-option {
   display: flex;
   align-items: center;
@@ -289,11 +231,47 @@
   border-color: var(--accent);
 }
 
-.wallet-option.secondary {
-  color: var(--muted);
-  text-decoration: none;
+.app-link {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-transform: lowercase;
+  transition: opacity 0.2s;
 }
 
-.wallet-option.secondary:hover {
-  color: var(--text);
+.app-link:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 8px 12px;
+  }
+
+  .navbar-brand img {
+    height: 32px !important;
+  }
+
+  .wallet-btn span {
+    display: none;
+  }
+
+  .wallet-actions .sidebar-icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 6px 10px;
+  }
+
+  .navbar-brand img {
+    height: 28px !important;
+  }
+
+  .connect-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
 }

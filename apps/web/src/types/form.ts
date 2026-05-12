@@ -22,15 +22,27 @@ export interface FormField {
   description?: string;
 }
 
+export interface Workspace {
+  id: string;
+  name: string;
+  description?: string;
+  formIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface FormSchema {
   id: string;
   title: string;
   description: string;
   fields: FormField[];
+  workspaceId: string;
   createdAt: string;
   updatedAt: string;
   walletAddress?: string;
   blobId?: string;
+  profilePicture?: string;
+  coverPicture?: string;
 }
 
 export interface FormSubmission {
@@ -46,6 +58,7 @@ export interface UserProfile {
   address: string;
   forms: FormSchema[];
   submissions: Record<string, FormSubmission[]>;
+  workspaces: Workspace[];
   createdAt: string;
   updatedAt: string;
   blobId?: string;
