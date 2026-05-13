@@ -3,9 +3,7 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
-import { storeBlobWithWallet, storeBlobWithKeypair } from '../lib/walrus';
-import { useWallet, WalletProvider } from '@suiet/wallet-kit';
-import { useWalletStore } from '../context/wallet';
+import { WalletProvider } from '@suiet/wallet-kit';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
@@ -29,7 +27,6 @@ function BuilderInner() {
   const address = getCurrentUserAddress();
   const [searchParams] = useSearchParams();
   const workspaceContext = searchParams.get('ws');
-  const wallet = useWallet();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -164,48 +161,12 @@ function BuilderInner() {
       const form = await getForm(currentFormId);
       if (!form) return;
 
-      const blobData = { type: 'form', version: '1.0', ...form };
-      let blobId: string;
-      let published = false;
-
-      // Try wallet-based signing (wallet extension or zkLogin)
-      if (wallet.connected && wallet.signAndExecuteTransaction) {
-        try {
-          const result = await storeBlobWithWallet(
-            blobData,
-            wallet.address || address,
-            async (tx: Record<string, unknown>) => await wallet.signAndExecuteTransaction({ transaction: tx as never, chain: 'sui:mainnet' } as never) as unknown as Record<string, unknown>
-          );
-          blobId = result.blobId;
-          published = true;
-        } catch { /* fall through */ }
-      }
-
-      // Try zkLogin keypair
-      if (!published) {
-        const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
-        const account = useWalletStore.getState().account;
-        if (ephemeralKey && account?.method === 'zklogin') {
-          try {
-            const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
-            const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            const result = await storeBlobWithKeypair(blobData, keypair, account.address);
-            blobId = result.blobId;
-            published = true;
-          } catch { /* fall through */ }
-        }
-      }
-
-      if (!published) {
-        throw new Error('Publishing failed: no wallet connected and no zkLogin keypair available');
-      }
-
-      await updateForm(currentFormId, { blobId: blobId! });
+      await updateForm(currentFormId, { title: form.title, description: form.description, fields: form.fields });
       setSaved(true);
       setPublishedUrl(`${window.location.origin}/form/${currentFormId}`);
       setTimeout(() => { setSaved(false); }, 4000);
     } catch (e) {
-      setError(`Failed to publish: ${e instanceof Error ? e.message : 'unknown error'}`);
+      setError(`Failed to save: ${e instanceof Error ? e.message : 'unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -386,7 +347,7 @@ function BuilderInner() {
                 onClick={handleSaveToWalrus}
                 disabled={saving}
               >
-                {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Published</> : <><Save size={15} /> Publish to Walrus</>}
+                {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Publish</>}
               </button>
               {publishedUrl && (
                 <div className="b-share-link">
