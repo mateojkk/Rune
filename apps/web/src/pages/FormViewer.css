@@ -59,61 +59,79 @@
   min-height: 100vh;
 }
 
-/* ─── Intro Screen ─── */
+/* ─── Start Screen ─── */
 
-.fv-intro {
+.fv-start {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  padding: 48px 24px;
 }
 
-.fv-cover-wrap {
+.fv-start-cover {
   width: 100%;
-  max-width: 400px;
-  height: 120px;
-  border-radius: var(--radius);
+  height: 260px;
   overflow: hidden;
-  margin-bottom: 16px;
   background: var(--surface);
+  flex-shrink: 0;
 }
 
-.fv-cover-img {
+.fv-start-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.fv-title-row {
+.fv-start-body {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  padding: 36px 24px 32px;
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.fv-profile-img {
-  width: 44px;
-  height: 44px;
+.fv-start-header {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.fv-start-profile {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border);
-  flex-shrink: 0;
 }
 
-.fv-intro h1 {
-  font-size: 1.75rem;
+.fv-start-header h1 {
+  font-size: 2rem;
   font-weight: 300;
   letter-spacing: -0.03em;
   line-height: 1.2;
-  margin-bottom: 8px;
 }
 
-.fv-intro p {
-  font-size: 0.9rem;
+.fv-start-header p {
+  font-size: 0.95rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+.fv-start-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.fv-start-count {
+  font-size: 0.82rem;
+  color: var(--subtle);
 }
 
 .fv-start-btn {
@@ -130,11 +148,56 @@
   border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .fv-start-btn:hover {
   background: var(--accent);
   color: #fff;
+}
+
+@media (max-width: 768px) {
+  .fv-start-cover { height: 180px; }
+  .fv-start-body { padding: 28px 16px 24px; }
+  .fv-start-header h1 { font-size: 1.6rem; }
+  .fv-start-profile { width: 48px; height: 48px; }
+}
+
+@media (max-width: 480px) {
+  .fv-start-cover { height: 140px; }
+  .fv-start-header h1 { font-size: 1.3rem; }
+  .fv-start-profile { width: 40px; height: 40px; }
+  .fv-start-btn { padding: 12px 32px; font-size: 0.85rem; }
+}
+
+/* ─── Back to Editor ─── */
+
+.fv-back-editor {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  z-index: 200;
+  transition: all 0.2s;
+}
+
+.fv-back-editor:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fv-back-editor-flow {
+  top: 14px;
 }
 
 /* ─── Progress Bar ─── */
@@ -160,6 +223,9 @@
 .fv-flow {
   align-items: flex-start;
   padding-top: 60px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .fv-flow-container {
@@ -168,6 +234,9 @@
   margin: 0 auto;
   padding: 0 24px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .fv-flow-back {
@@ -193,8 +262,10 @@
 .fv-flow-field {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 12px;
-  min-height: 50vh;
+  flex: 1;
+  min-height: 0;
   animation: fv-fade-in 0.25s ease;
 }
 

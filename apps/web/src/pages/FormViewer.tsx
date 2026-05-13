@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Star, CheckSquare, Upload, FileText, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
@@ -258,22 +258,23 @@ export function FormViewer() {
   if (step < 0) {
     return (
       <div className="form-viewer">
-        <div className="fv-container">
-          <div className="fv-intro">
-            {coverPicture && (
-              <div className="fv-cover-wrap">
-                <img src={coverPicture} alt="" className="fv-cover-img" />
-              </div>
-            )}
-            <div className="fv-title-row" style={{ justifyContent: 'center', textAlign: 'center', marginTop: coverPicture ? 24 : 0 }}>
-              {profilePicture && <img src={profilePicture} alt="" className="fv-profile-img" />}
-              <div>
-                <h1>{form.title}</h1>
-                {form.description && <p>{form.description}</p>}
-              </div>
+        <Link to="/app/dashboard" className="fv-back-editor">
+          <ArrowLeft size={13} /> Editor
+        </Link>
+        <div className="fv-start">
+          {coverPicture && (
+            <div className="fv-start-cover">
+              <img src={coverPicture} alt="" />
             </div>
-            <div style={{ textAlign: 'center', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{form.fields.length} question{form.fields.length !== 1 ? 's' : ''}</span>
+          )}
+          <div className="fv-start-body">
+            <div className="fv-start-header">
+              {profilePicture && <img src={profilePicture} alt="" className="fv-start-profile" />}
+              <h1>{form.title}</h1>
+              {form.description && <p>{form.description}</p>}
+            </div>
+            <div className="fv-start-footer">
+              <span className="fv-start-count">{form.fields.length} question{form.fields.length !== 1 ? 's' : ''}</span>
               <button className="fv-start-btn" onClick={() => { setStep(0); setTimeout(() => inputRef.current?.focus(), 100); }}>
                 Start
               </button>
@@ -289,6 +290,9 @@ export function FormViewer() {
 
   return (
     <div className="form-viewer fv-flow">
+      <Link to="/app/dashboard" className="fv-back-editor fv-back-editor-flow">
+        <ArrowLeft size={13} /> Editor
+      </Link>
       <div className="fv-progress-bar">
         <div className="fv-progress-fill" style={{ width: `${progress}%` }} />
       </div>
