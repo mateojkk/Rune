@@ -36,7 +36,6 @@
   flex-direction: column;
 }
 
-.d-main > .d-form-grid,
 .d-main > .d-main-empty {
   flex: 1;
 }
