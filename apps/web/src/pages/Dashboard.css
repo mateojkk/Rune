@@ -166,7 +166,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 14px 14px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -624,9 +624,9 @@
 @media (max-width: 900px) {
   .d-main { padding: 20px; }
   .d-form-grid { gap: 4px; }
-  .d-form-card { padding: 6px 10px; gap: 8px; }
-  .d-form-card-body h3 { font-size: 0.8rem; }
-  .d-form-card-meta { font-size: 0.65rem; }
+  .d-form-card { padding: 12px 14px; gap: 8px; }
+  .d-form-card-body h3 { font-size: 0.82rem; }
+  .d-form-card-meta { font-size: 0.68rem; }
   .d-ws-header h1 { font-size: 1.1rem; }
 
   .d-subs-header { flex-wrap: wrap; gap: 8px; }
@@ -674,7 +674,7 @@
 
 @media (max-width: 768px) {
   .d-main { padding: 16px; }
-  .d-form-card { padding: 8px 10px; gap: 8px; }
+  .d-form-card { padding: 12px 14px; gap: 8px; }
   .d-form-card-body h3 { font-size: 0.82rem; }
   .d-form-card-meta { font-size: 0.68rem; }
   .d-form-card-actions .btn { padding: 4px 8px; font-size: 0.72rem; }
