@@ -114,15 +114,12 @@ export function FormViewer() {
         }
       }
 
-      if (blobId) {
-        await addSubmission(form.id, { blobId, submittedAt: submissionData.submittedAt }, account.address);
-      } else {
-        await addSubmission(form.id, formData);
-      }
+      if (!blobId) throw new Error('Walrus storage failed — please try again');
 
+      await addSubmission(form.id, { blobId, submittedAt: submissionData.submittedAt }, account.address);
       setSubmitted(true);
-    } catch {
-      alert('Failed to submit form');
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to submit form');
     }
   };
 
