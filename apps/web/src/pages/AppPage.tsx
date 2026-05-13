@@ -234,13 +234,13 @@ export function AppPage() {
             ) : (
               <div className="app-ws-mobile-picker" ref={pickerRef}>
                 <button className="app-ws-mobile-btn" onClick={() => setWsPickerOpen(!wsPickerOpen)}>
-                  <span>{workspaces.find(w => w.id === currentWs)?.name || 'All Workspaces'}</span>
+                  <span>{workspaces.find(w => w.id === currentWs)?.name || 'Home'}</span>
                   <ChevronDown size={12} className={`app-ws-mobile-chevron ${wsPickerOpen ? 'open' : ''}`} />
                 </button>
                 {wsPickerOpen && (
                   <div className="app-ws-mobile-options">
                     <button className={`app-ws-mobile-option ${!currentWs ? 'active' : ''}`} onClick={() => { navigate('/app/dashboard'); setWsPickerOpen(false); }}>
-                      All Workspaces
+                      Home
                     </button>
                     {workspaces.map(ws => (
                       <button key={ws.id} className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
