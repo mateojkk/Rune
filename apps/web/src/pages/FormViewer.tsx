@@ -200,7 +200,6 @@ export function FormViewer() {
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <img src="/runelogo.png" alt="Rune" style={{ height: 16, filter: 'invert(1)' }} />
-            <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>Rune · walrus form</span>
           </div>
           {coverPicture && (
             <div className="fv-cover-wrap">
