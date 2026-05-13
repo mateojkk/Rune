@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
-import { Home, Plus, Check, X, Wallet, Trash2, PenLine, Loader2 } from 'lucide-react';
+import { Home, Plus, Check, X, Wallet, Trash2, PenLine, Loader2, ChevronDown } from 'lucide-react';
 import { getWorkspaces, createWorkspace, deleteWorkspace, renameWorkspace, type Workspace } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
 import './AppPage.css';
@@ -25,8 +25,10 @@ export function AppPage() {
   const [confirmDeleteWs, setConfirmDeleteWs] = useState<string | null>(null);
   const [deletingWsId, setDeletingWsId] = useState<string | null>(null);
   const [renamingLoading, setRenamingLoading] = useState(false);
+  const [wsPickerOpen, setWsPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsub = useWalletStore.persist.onFinishHydration(() => setHydrated(true));
@@ -37,6 +39,16 @@ export function AppPage() {
   const refresh = async () => setWorkspaces(await getWorkspaces());
 
   useEffect(() => { refresh(); }, [path]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setWsPickerOpen(false);
+      }
+    };
+    if (wsPickerOpen) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [wsPickerOpen]);
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
@@ -119,22 +131,31 @@ export function AppPage() {
 
           <div className="app-sidebar-label-inline">My Workspace</div>
 
-          <select
-            className="app-ws-mobile-select"
-            value={currentWs || ''}
-            onChange={e => {
-              const val = e.target.value;
-              navigate(val ? `/app/dashboard?ws=${val}` : '/app/dashboard');
-            }}
-          >
-            <option value="">All Workspaces</option>
-            {workspaces.map(ws => (
-              <option key={ws.id} value={ws.id}>{ws.name} ({ws.formIds.length})</option>
-            ))}
-          </select>
-          <button className="app-ws-mobile-add" onClick={() => setCreating(true)} title="New workspace">
-            <Plus size={14} />
-          </button>
+          <div className="app-ws-mobile-picker" ref={pickerRef}>
+            <button className="app-ws-mobile-btn" onClick={() => setWsPickerOpen(!wsPickerOpen)}>
+              <span>{workspaces.find(w => w.id === currentWs)?.name || 'All Workspaces'}</span>
+              <ChevronDown size={12} className={`app-ws-mobile-chevron ${wsPickerOpen ? 'open' : ''}`} />
+            </button>
+            {wsPickerOpen && (
+              <div className="app-ws-mobile-options">
+                <button className={`app-ws-mobile-option ${!currentWs ? 'active' : ''}`} onClick={() => { navigate('/app/dashboard'); setWsPickerOpen(false); }}>
+                  All Workspaces
+                </button>
+                {workspaces.map(ws => (
+                  <button key={ws.id} className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
+                    <span className="app-ws-mobile-opt-dot" />
+                    <span>{ws.name}</span>
+                    <span className="app-ws-mobile-opt-count">{ws.formIds.length}</span>
+                  </button>
+                ))}
+                <div className="app-ws-mobile-divider" />
+                <button className="app-ws-mobile-option app-ws-mobile-opt-new" onClick={() => { setWsPickerOpen(false); setCreating(true); }}>
+                  <Plus size={13} />
+                  <span>New Workspace</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className="app-ws-desktop-list">
             {workspaces.map(ws => (
