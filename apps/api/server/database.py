@@ -1,5 +1,5 @@
 from pathlib import Path
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from server.config import DATABASE_URL as CFG_DATABASE_URL
 
@@ -18,3 +18,15 @@ def init_db():
     except Exception as e:
         import sys
         print(f"WARNING: DB init failed: {e}", file=sys.stderr)
+
+    try:
+        with engine.connect() as conn:
+            for col, col_type in [("display_name", "VARCHAR(255)"), ("pfp", "TEXT"), ("theme", "VARCHAR(20)")]:
+                try:
+                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} {col_type}"))
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+    except Exception as e:
+        import sys
+        print(f"WARNING: DB migration failed: {e}", file=sys.stderr)
