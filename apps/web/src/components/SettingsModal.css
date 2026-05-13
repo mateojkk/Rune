@@ -108,6 +108,11 @@
   transition: border-color 0.15s;
 }
 
+.settings-pfp span {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .settings-pfp:hover {
   border-color: var(--accent);
 }

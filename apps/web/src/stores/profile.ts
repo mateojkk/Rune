@@ -18,7 +18,7 @@ export const useProfileStore = create<ProfileState>()(
     (set, get) => ({
       displayName: '',
       pfp: '',
-      theme: 'dark',
+      theme: 'light',
       setDisplayName: (name: string) => set({ displayName: name }),
       setPfp: (url: string) => set({ pfp: url }),
       setTheme: (theme: Theme) => set({ theme }),

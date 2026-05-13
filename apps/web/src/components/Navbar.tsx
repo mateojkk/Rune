@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, Cloud, RefreshCw, LogOut, Copy, Loader2, Settings, ChevronDown, User } from 'lucide-react';
+import { Wallet, Cloud, RefreshCw, LogOut, Copy, Loader2, Settings, ChevronDown } from 'lucide-react';
 import { useWalletStore } from '../context/wallet';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
@@ -14,6 +14,12 @@ function formatAddress(addr: string) {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   }
   return addr || '';
+}
+
+function getInitials(name: string, addr?: string) {
+  if (name) return name.slice(0, 2).toUpperCase();
+  if (addr) return addr.slice(0, 2).toUpperCase();
+  return '?';
 }
 
 export function Navbar() {
@@ -100,7 +106,7 @@ export function Navbar() {
                   {pfp ? (
                     <img src={pfp} alt="" />
                   ) : (
-                    <User size={14} />
+                    <span>{getInitials(displayName, account.address)}</span>
                   )}
                 </div>
                 <span className="profile-name">{displayName || formatAddress(account.address)}</span>
@@ -111,7 +117,7 @@ export function Navbar() {
                 <div className="profile-dropdown">
                   <div className="profile-dropdown-header">
                     <div className="profile-dropdown-avatar">
-                      {pfp ? <img src={pfp} alt="" /> : <User size={18} />}
+                      {pfp ? <img src={pfp} alt="" /> : <span>{getInitials(displayName, account.address)}</span>}
                     </div>
                     <div>
                       <div className="profile-dropdown-name">{displayName || 'User'}</div>

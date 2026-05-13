@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Sun, Moon, Image, User } from 'lucide-react';
+import { X, Sun, Moon, Image } from 'lucide-react';
 import { useProfileStore } from '../stores/profile';
 import { useWalletStore } from '../context/wallet';
 import './SettingsModal.css';
@@ -48,7 +48,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
                 {pfpUrl ? (
                   <img src={pfpUrl} alt="" />
                 ) : (
-                  <User size={20} />
+                  <span>{(displayName || account?.address || '?').slice(0, 2).toUpperCase()}</span>
                 )}
               </div>
               <div>
