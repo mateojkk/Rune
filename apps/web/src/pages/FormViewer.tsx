@@ -107,7 +107,7 @@ export function FormViewer() {
           try {
             const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
             const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            await storeBlobWithKeypair(blobData, keypair as never, account.address);
+            await storeBlobWithKeypair(blobData, keypair, account.address);
           } catch { /* walrus optional */ }
         }
       }

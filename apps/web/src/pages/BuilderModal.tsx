@@ -139,7 +139,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
           try {
             const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
             const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            const result = await storeBlobWithKeypair(blobData, keypair as unknown as Parameters<typeof storeBlobWithKeypair>[1], account.address);
+            const result = await storeBlobWithKeypair(blobData, keypair, account.address);
             blobId = result.blobId; published = true;
           } catch { /* */ }
         }

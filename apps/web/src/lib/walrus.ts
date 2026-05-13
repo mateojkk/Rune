@@ -1,11 +1,11 @@
 import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
 
 async function getWalrusClient() {
-  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
+  const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
   const { walrus } = await import('@mysten/walrus');
-  return new SuiGrpcClient({
+  return new SuiJsonRpcClient({
+    url: 'https://fullnode.mainnet.sui.io:443',
     network: 'mainnet',
-    baseUrl: 'https://fullnode.mainnet.sui.io:443',
   }).$extend(walrus());
 }
 
@@ -45,19 +45,20 @@ export async function storeBlobWithWallet(
 
 export async function storeBlobWithKeypair(
   data: unknown,
-  keypair: { signAndExecuteTransaction: (opts: { transaction: Record<string, unknown>; client: Record<string, unknown> }) => Promise<{ digest?: string }> },
+  keypair: { toSuiAddress(): string },
   address: string
 ): Promise<{ blobId: string }> {
-  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
-  const suiClient = new SuiGrpcClient({
+  const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
+  const suiClient = new SuiJsonRpcClient({
+    url: 'https://fullnode.mainnet.sui.io:443',
     network: 'mainnet',
-    baseUrl: 'https://fullnode.mainnet.sui.io:443',
   });
   const signTx = async (tx: Record<string, unknown>) => {
-    const result = await keypair.signAndExecuteTransaction({ transaction: tx, client: suiClient as unknown as Record<string, unknown> });
-    const digest = result?.digest;
-    if (!digest) throw new Error('Transaction failed');
-    return { digest, Transaction: { digest } } as Record<string, unknown>;
+    const result = await suiClient.signAndExecuteTransaction({
+      transaction: tx as never,
+      signer: keypair as never,
+    });
+    return result as unknown as Record<string, unknown>;
   };
   const blobId = await writeBlobFlow(data, address, signTx);
   return { blobId };
