@@ -90,12 +90,20 @@ export async function createWorkspace(name: string): Promise<Workspace> {
   return { id: w.uuid, name: w.name, formIds: w.formIds, createdAt: w.createdAt, updatedAt: w.updatedAt };
 }
 
+async function _fetch(url: string, opts?: RequestInit): Promise<void> {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(body || `Request failed: ${res.status}`);
+  }
+}
+
 export async function renameWorkspace(workspaceId: string, name: string): Promise<void> {
-  await fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
+  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
 }
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
-  await fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
+  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
 }
 
 // --- Forms ---

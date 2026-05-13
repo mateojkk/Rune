@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
 import { Home, Plus, Check, X, Wallet, Trash2, PenLine, Loader2 } from 'lucide-react';
 import { getWorkspaces, createWorkspace, deleteWorkspace, renameWorkspace, type Workspace } from '../lib/forms';
@@ -14,6 +14,7 @@ export function AppPage() {
   const isConnected = useWalletStore(s => s.isConnected);
   const account = useWalletStore(s => s.account);
   const [hydrated, setHydrated] = useState(false);
+  const navigate = useNavigate();
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [creating, setCreating] = useState(false);
@@ -21,7 +22,8 @@ export function AppPage() {
   const [renamingWs, setRenamingWs] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [creatingWs, setCreatingWs] = useState(false);
-  const [deletingWs, setDeletingWs] = useState<string | null>(null);
+  const [confirmDeleteWs, setConfirmDeleteWs] = useState<string | null>(null);
+  const [deletingWsId, setDeletingWsId] = useState<string | null>(null);
   const [renamingLoading, setRenamingLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameRef = useRef<HTMLInputElement>(null);
@@ -50,12 +52,13 @@ export function AppPage() {
   };
 
   const handleDeleteWorkspace = async (wsId: string) => {
-    setDeletingWs(wsId);
+    setDeletingWsId(wsId);
     try {
       await deleteWorkspace(wsId);
       await refresh();
     } finally {
-      setDeletingWs(null);
+      setConfirmDeleteWs(null);
+      setDeletingWsId(null);
     }
   };
 
@@ -115,56 +118,73 @@ export function AppPage() {
           </Link>
 
           <div className="app-sidebar-label-inline">My Workspace</div>
-          {workspaces.map(ws => (
-            <div key={ws.id} className="app-ws-row">
-              {renamingWs === ws.id ? (
-                <div className="app-ws-rename">
-                  <input
-                    ref={renameRef}
-                    type="text"
-                    value={renameValue}
-                    onChange={e => setRenameValue(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') handleRename(ws.id);
-                      if (e.key === 'Escape') { setRenamingWs(null); setRenameValue(''); }
-                    }}
-                    onBlur={() => { setRenamingWs(null); setRenameValue(''); }}
-                    autoFocus
-                  />
-                  <button className="app-ws-btn confirm" onClick={() => handleRename(ws.id)} disabled={renamingLoading}>
-                    {renamingLoading ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
-                  </button>
-                  <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }} disabled={renamingLoading}><X size={10} /></button>
-                </div>
-              ) : (
-                <Link
-                  to={`/app/dashboard?ws=${ws.id}`}
-                  className={`app-nav-item app-ws-item ${currentWs === ws.id ? 'active' : ''}`}
-                >
-                  <span className="app-ws-dot" />
-                  <span className="app-ws-name">{ws.name}</span>
-                  <span className="app-ws-count">{ws.formIds.length}</span>
-                </Link>
-              )}
-              {renamingWs !== ws.id && workspaces.length > 1 && deletingWs === ws.id ? (
-                <div className="app-ws-del-confirm">
-                  <button className="app-ws-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} title="Delete">
-                    {deletingWs === ws.id ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
-                  </button>
-                  <button className="app-ws-del-no" onClick={() => setDeletingWs(null)} title="Cancel"><X size={10} /></button>
-                </div>
-              ) : renamingWs !== ws.id && workspaces.length > 1 ? (
-                <div className="app-ws-actions">
-                  <button className="app-ws-action" onClick={() => startRename(ws)} title="Rename">
-                    <PenLine size={10} />
-                  </button>
-                  <button className="app-ws-action" onClick={() => setDeletingWs(ws.id)} title="Delete workspace">
-                    <Trash2 size={10} />
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          ))}
+
+          <select
+            className="app-ws-mobile-select"
+            value={currentWs || ''}
+            onChange={e => {
+              const val = e.target.value;
+              navigate(val ? `/app/dashboard?ws=${val}` : '/app/dashboard');
+            }}
+          >
+            <option value="">All Workspaces</option>
+            {workspaces.map(ws => (
+              <option key={ws.id} value={ws.id}>{ws.name} ({ws.formIds.length})</option>
+            ))}
+          </select>
+
+          <div className="app-ws-desktop-list">
+            {workspaces.map(ws => (
+              <div key={ws.id} className="app-ws-row">
+                {renamingWs === ws.id ? (
+                  <div className="app-ws-rename">
+                    <input
+                      ref={renameRef}
+                      type="text"
+                      value={renameValue}
+                      onChange={e => setRenameValue(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') handleRename(ws.id);
+                        if (e.key === 'Escape') { setRenamingWs(null); setRenameValue(''); }
+                      }}
+                      onBlur={() => { setRenamingWs(null); setRenameValue(''); }}
+                      autoFocus
+                    />
+                    <button className="app-ws-btn confirm" onClick={() => handleRename(ws.id)} disabled={renamingLoading}>
+                      {renamingLoading ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
+                    </button>
+                    <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }} disabled={renamingLoading}><X size={10} /></button>
+                  </div>
+                ) : (
+                  <Link
+                    to={`/app/dashboard?ws=${ws.id}`}
+                    className={`app-nav-item app-ws-item ${currentWs === ws.id ? 'active' : ''}`}
+                  >
+                    <span className="app-ws-dot" />
+                    <span className="app-ws-name">{ws.name}</span>
+                    <span className="app-ws-count">{ws.formIds.length}</span>
+                  </Link>
+                )}
+                {renamingWs !== ws.id && workspaces.length > 1 && confirmDeleteWs === ws.id ? (
+                  <div className="app-ws-del-confirm">
+                    <button className="app-ws-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} title="Delete" disabled={!!deletingWsId}>
+                      {deletingWsId === ws.id ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
+                    </button>
+                    <button className="app-ws-del-no" onClick={() => setConfirmDeleteWs(null)} disabled={!!deletingWsId}><X size={10} /></button>
+                  </div>
+                ) : renamingWs !== ws.id && workspaces.length > 1 ? (
+                  <div className="app-ws-actions">
+                    <button className="app-ws-action" onClick={() => startRename(ws)} title="Rename">
+                      <PenLine size={10} />
+                    </button>
+                    <button className="app-ws-action" onClick={() => setConfirmDeleteWs(ws.id)} title="Delete workspace">
+                      <Trash2 size={10} />
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
 
           {creating ? (
             <div className="app-ws-create">
