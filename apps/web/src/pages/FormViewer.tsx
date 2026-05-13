@@ -1,62 +1,65 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
 import { getFormApi } from '../lib/api';
+import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
 import './FormViewer.css';
 
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
-  const [wallets, setWallets] = useState<{ name: string; icon?: string }[]>([]);
+  const [wallets, setWallets] = useState<any[]>([]);
   const [connecting, setConnecting] = useState<string | null>(null);
-  const [noWallet, setNoWallet] = useState(false);
-  const walletObj = useRef<any>(null);
 
   useEffect(() => {
-    const detected: { name: string; icon?: string }[] = [];
-    if ((window as any).suiWallet) {
-      walletObj.current = (window as any).suiWallet;
-      detected.push({ name: 'Sui Wallet' });
-    }
-    if ((window as any).sui) {
-      if (!walletObj.current) walletObj.current = (window as any).sui;
-      detected.push({ name: 'Martian Wallet' });
-    }
-    if (detected.length === 0) {
-      setNoWallet(true);
-    }
-    setWallets(detected);
+    const registry = getWallets();
+    const sui = registry.get().filter((w: any) => isWalletWithRequiredFeatureSet(w, ['sui:signAndExecuteTransaction']));
+    setWallets(sui);
+
+    const unregister = registry.on('register', () => {
+      const updated = getWallets().get();
+      setWallets(updated.filter((w: any) => isWalletWithRequiredFeatureSet(w, ['sui:signAndExecuteTransaction'])));
+    });
+
+    return () => unregister();
   }, []);
 
-  const connect = async (name: string) => {
-    if (!walletObj.current) return;
-    setConnecting(name);
+  const connect = async (wallet: any) => {
+    setConnecting(wallet.name);
     try {
-      const accounts = await walletObj.current.requestConnection();
-      const address = accounts[0]?.address;
-      if (address) {
-        onConnected(address, {
-          signAndExecuteTransaction: async (tx: any) =>
-            walletObj.current.signAndExecuteTransaction({
-              transaction: tx.transaction || tx,
-              chain: 'sui:mainnet',
-            }),
-        });
-      }
+      const connectFeature = wallet.features['standard:connect'];
+      if (!connectFeature) throw new Error('Wallet does not support connect');
+      const { accounts } = await connectFeature.connect();
+      const account = accounts[0];
+      if (!account?.address) throw new Error('No account address received');
+
+      const signFeature = wallet.features['sui:signAndExecuteTransaction'];
+      if (!signFeature) throw new Error('Wallet does not support signing');
+
+      onConnected(account.address, {
+        signAndExecuteTransaction: async (tx: any) => {
+          const result = await signFeature.signAndExecuteTransaction({
+            transaction: tx.transaction || tx,
+            account,
+            chain: 'sui:mainnet',
+          });
+          return result as unknown as Record<string, unknown>;
+        },
+      });
     } catch (e) {
       console.error('Wallet connection failed:', e);
     }
     setConnecting(null);
   };
 
-  if (noWallet) {
+  if (wallets.length === 0) {
     return (
       <div className="fv-wallet-list">
         <div className="wallet-option" style={{ justifyContent: 'center', opacity: 0.6, cursor: 'default' }}>
           <span>No Sui wallet found</span>
         </div>
-        <a href="https://chrome.google.com/webstore/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil" target="_blank" rel="noopener noreferrer" className="wallet-option" style={{ textDecoration: 'none', justifyContent: 'center', color: 'var(--accent)' }}>
+        <a href="https://chromewebstore.google.com/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil" target="_blank" rel="noopener noreferrer" className="wallet-option" style={{ textDecoration: 'none', justifyContent: 'center', color: 'var(--accent)' }}>
           <ExternalLink size={14} />
           <span>Install Sui Wallet</span>
         </a>
@@ -67,8 +70,8 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
   return (
     <div className="fv-wallet-list">
       {wallets.map(w => (
-        <button key={w.name} className="wallet-option" onClick={() => connect(w.name)} disabled={connecting === w.name}>
-          <Wallet size={18} />
+        <button key={w.name} className="wallet-option" onClick={() => connect(w)} disabled={connecting === w.name}>
+          {w.icon ? <img src={w.icon} alt="" style={{ width: 18, height: 18 }} /> : <Wallet size={18} />}
           <span>{connecting === w.name ? 'Connecting...' : w.name}</span>
         </button>
       ))}
