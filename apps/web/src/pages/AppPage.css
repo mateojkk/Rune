@@ -132,6 +132,63 @@
   background: rgba(255, 107, 107, 0.08);
 }
 
+.app-ws-actions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+  margin-right: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.app-ws-row:hover .app-ws-actions {
+  opacity: 1;
+}
+
+.app-ws-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  color: var(--subtle);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+
+.app-ws-action:hover {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-ws-rename {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px 2px 28px;
+  flex: 1;
+  min-width: 0;
+}
+
+.app-ws-rename input {
+  flex: 1;
+  padding: 4px 7px;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.76rem;
+  min-width: 0;
+}
+
+.app-ws-rename input:focus {
+  outline: none;
+}
+
 .app-ws-del-confirm {
   display: flex;
   align-items: center;

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft, Clock, Folder } from 'lucide-react';
 import type { FormSchema, FormSubmission } from '../types/form';
-import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress } from '../lib/forms';
+import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
+import type { Workspace } from '../types/form';
 import { BuilderModal } from './BuilderModal';
 import './Dashboard.css';
 
@@ -22,6 +23,8 @@ export function Dashboard() {
   const workspaceFilter = searchParams.get('ws');
 
   const [forms, setForms] = useState<FormSchema[]>([]);
+  const [allForms, setAllForms] = useState<FormSchema[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -42,10 +45,12 @@ export function Dashboard() {
   }, [searchQuery, viewingSubs, submissions]);
 
   const refreshForms = async (wsId?: string) => {
-    const all = await getAllForms();
+    const [all, wss] = await Promise.all([getAllForms(), getWorkspaces()]);
+    setAllForms(all);
+    setWorkspaces(wss);
     const filtered = wsId ? all.filter(f => f.workspaceId === wsId) : all;
     setForms(filtered);
-    await Promise.all(filtered.map(async f => {
+    await Promise.all(all.map(async f => {
       if (getCachedSubmissions(f.id).length === 0) {
         const subs = await getSubmissions(f.id);
         cacheSubmissions(f.id, subs);
@@ -265,7 +270,72 @@ export function Dashboard() {
     );
   }
 
-  // Forms list view
+  // Home overview
+  if (!workspaceFilter) {
+    const totalForms = allForms.length;
+    const totalSubs = allForms.reduce((acc, f) => acc + getCachedSubmissions(f.id).length, 0);
+    const recentForms = [...allForms]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 8);
+
+    return (
+      <div className="dashboard">
+        <div className="d-main">
+          <header className="d-home-header">
+            <h1>Overview</h1>
+            <button className="btn btn-primary btn-sm" onClick={startNewForm}>
+              <Plus size={14} />
+              New Form
+            </button>
+          </header>
+
+          <div className="d-stats-row">
+            <span>{totalForms} form{totalForms !== 1 ? 's' : ''}</span>
+            <span>·</span>
+            <span>{totalSubs} submission{totalSubs !== 1 ? 's' : ''}</span>
+          </div>
+
+          {totalForms === 0 ? (
+            <div className="d-main-empty">
+              <FileText size={36} />
+              <h3>No forms yet</h3>
+              <p>Create your first form to start collecting responses</p>
+            </div>
+          ) : (
+            <>
+              <h3 className="d-home-section-title">Recent Forms</h3>
+              <div className="d-home-recent">
+                {recentForms.map(form => {
+                  const ws = workspaces.find(w => w.id === form.workspaceId);
+                  const subCount = getCachedSubmissions(form.id).length;
+                  return (
+                    <Link key={form.id} to={`/app/dashboard/${editingFormId === form.id ? '' : `?open=${form.id}`}`} className="d-home-card" onClick={e => { e.preventDefault(); startEditForm(form.id); }}>
+                      <div className="d-home-card-top">
+                        <FileText size={16} />
+                        <span className="d-home-card-meta">{form.fields.length}f · {subCount}s</span>
+                      </div>
+                      <h3 className="d-home-card-title">{form.title || 'Untitled'}</h3>
+                      {form.description && <p className="d-home-card-desc">{form.description}</p>}
+                      <div className="d-home-card-footer">
+                        {ws && <span><Folder size={11} />{ws.name}</span>}
+                        <span><Clock size={11} />{new Date(form.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {(showNewForm || editingFormId) && (
+          <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />
+        )}
+      </div>
+    );
+  }
+
+  // Workspace forms list
   return (
     <div className="dashboard">
       <div className="d-main">

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
-import { Home, Plus, Check, X, Wallet, Trash2 } from 'lucide-react';
-import { getWorkspaces, createWorkspace, deleteWorkspace, type Workspace } from '../lib/forms';
+import { Home, Plus, Check, X, Wallet, Trash2, PenLine } from 'lucide-react';
+import { getWorkspaces, createWorkspace, deleteWorkspace, renameWorkspace, type Workspace } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
 import './AppPage.css';
 
@@ -18,8 +18,11 @@ export function AppPage() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
+  const [renamingWs, setRenamingWs] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [deletingWs, setDeletingWs] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const renameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsub = useWalletStore.persist.onFinishHydration(() => setHydrated(true));
@@ -43,6 +46,20 @@ export function AppPage() {
     await deleteWorkspace(wsId);
     setDeletingWs(null);
     refresh();
+  };
+
+  const handleRename = async (wsId: string) => {
+    if (!renameValue.trim()) return;
+    await renameWorkspace(wsId, renameValue.trim());
+    setRenamingWs(null);
+    setRenameValue('');
+    refresh();
+  };
+
+  const startRename = (ws: Workspace) => {
+    setRenamingWs(ws.id);
+    setRenameValue(ws.name);
+    setTimeout(() => renameRef.current?.focus(), 0);
   };
 
   const isHome = path === '/app/dashboard' && !currentWs;
@@ -84,23 +101,47 @@ export function AppPage() {
           <div className="app-sidebar-label-inline">My Workspace</div>
           {workspaces.map(ws => (
             <div key={ws.id} className="app-ws-row">
-              <Link
-                to={`/app/dashboard?ws=${ws.id}`}
-                className={`app-nav-item app-ws-item ${currentWs === ws.id ? 'active' : ''}`}
-              >
-                <span className="app-ws-dot" />
-                <span className="app-ws-name">{ws.name}</span>
-                <span className="app-ws-count">{ws.formIds.length}</span>
-              </Link>
-              {workspaces.length > 1 && deletingWs === ws.id ? (
+              {renamingWs === ws.id ? (
+                <div className="app-ws-rename">
+                  <input
+                    ref={renameRef}
+                    type="text"
+                    value={renameValue}
+                    onChange={e => setRenameValue(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') handleRename(ws.id);
+                      if (e.key === 'Escape') { setRenamingWs(null); setRenameValue(''); }
+                    }}
+                    onBlur={() => { setRenamingWs(null); setRenameValue(''); }}
+                    autoFocus
+                  />
+                  <button className="app-ws-btn confirm" onClick={() => handleRename(ws.id)}><Check size={10} /></button>
+                  <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }}><X size={10} /></button>
+                </div>
+              ) : (
+                <Link
+                  to={`/app/dashboard?ws=${ws.id}`}
+                  className={`app-nav-item app-ws-item ${currentWs === ws.id ? 'active' : ''}`}
+                >
+                  <span className="app-ws-dot" />
+                  <span className="app-ws-name">{ws.name}</span>
+                  <span className="app-ws-count">{ws.formIds.length}</span>
+                </Link>
+              )}
+              {renamingWs !== ws.id && workspaces.length > 1 && deletingWs === ws.id ? (
                 <div className="app-ws-del-confirm">
                   <button className="app-ws-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} title="Delete"><Check size={10} /></button>
                   <button className="app-ws-del-no" onClick={() => setDeletingWs(null)} title="Cancel"><X size={10} /></button>
                 </div>
-              ) : workspaces.length > 1 ? (
-                <button className="app-ws-del" onClick={() => setDeletingWs(ws.id)} title="Delete workspace">
-                  <Trash2 size={11} />
-                </button>
+              ) : renamingWs !== ws.id && workspaces.length > 1 ? (
+                <div className="app-ws-actions">
+                  <button className="app-ws-action" onClick={() => startRename(ws)} title="Rename">
+                    <PenLine size={10} />
+                  </button>
+                  <button className="app-ws-action" onClick={() => setDeletingWs(ws.id)} title="Delete workspace">
+                    <Trash2 size={10} />
+                  </button>
+                </div>
               ) : null}
             </div>
           ))}

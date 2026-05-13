@@ -66,6 +66,94 @@
 
 .d-ws-header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; }
 
+.d-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.d-home-header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; }
+
+.d-home-section-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.d-home-recent {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.d-home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.d-home-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.d-home-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--subtle);
+}
+
+.d-home-card-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.d-home-card-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.d-home-card-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.d-home-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--subtle);
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.d-home-card-footer span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ─── Form Cards (compact row layout) ─── */
 
 .d-form-grid {
