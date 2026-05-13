@@ -231,6 +231,24 @@ export function AppPage() {
                 </button>
                 <button className="app-ws-btn" onClick={() => { setCreating(false); setNewName(''); }} disabled={creatingWs}><X size={11} /></button>
               </div>
+            ) : renamingWs ? (
+              <div className="app-ws-rename-mobile">
+                <input
+                  ref={renameRef}
+                  type="text"
+                  value={renameValue}
+                  onChange={e => setRenameValue(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleRename(renamingWs);
+                    if (e.key === 'Escape') { setRenamingWs(null); setRenameValue(''); }
+                  }}
+                  autoFocus
+                />
+                <button className="app-ws-btn confirm" onClick={() => handleRename(renamingWs)} disabled={renamingLoading}>
+                  {renamingLoading ? <Loader2 size={11} className="spin" /> : <Check size={11} />}
+                </button>
+                <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }} disabled={renamingLoading}><X size={11} /></button>
+              </div>
             ) : (
               <div className="app-ws-mobile-picker" ref={pickerRef}>
                 <button className="app-ws-mobile-btn" onClick={() => setWsPickerOpen(!wsPickerOpen)}>
@@ -243,11 +261,35 @@ export function AppPage() {
                       Home
                     </button>
                     {workspaces.map(ws => (
-                      <button key={ws.id} className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
-                        <span className="app-ws-mobile-opt-dot" />
-                        <span>{ws.name}</span>
-                        <span className="app-ws-mobile-opt-count">{ws.formIds.length}</span>
-                      </button>
+                      <div key={ws.id} className="app-ws-mobile-opt-row">
+                        {confirmDeleteWs === ws.id ? (
+                          <div className="app-ws-mobile-del-confirm">
+                            <span>Delete?</span>
+                            <button className="app-ws-mobile-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} disabled={!!deletingWsId}>
+                              {deletingWsId === ws.id ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
+                            </button>
+                            <button className="app-ws-mobile-del-no" onClick={() => setConfirmDeleteWs(null)} disabled={!!deletingWsId}><X size={10} /></button>
+                          </div>
+                        ) : (
+                          <>
+                            <button className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
+                              <span className="app-ws-mobile-opt-dot" />
+                              <span className="app-ws-mobile-opt-name">{ws.name}</span>
+                              <span className="app-ws-mobile-opt-count">{ws.formIds.length}</span>
+                            </button>
+                            {workspaces.length > 1 && (
+                              <div className="app-ws-mobile-opt-actions">
+                                <button className="app-ws-mobile-opt-action" onClick={() => { setWsPickerOpen(false); startRename(ws); }} title="Rename">
+                                  <PenLine size={10} />
+                                </button>
+                                <button className="app-ws-mobile-opt-action" onClick={() => setConfirmDeleteWs(ws.id)} title="Delete">
+                                  <Trash2 size={10} />
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
                     ))}
                     <div className="app-ws-mobile-divider" />
                     <button className="app-ws-mobile-option app-ws-mobile-opt-new" onClick={() => { setWsPickerOpen(false); setCreating(true); }}>
