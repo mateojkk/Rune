@@ -18,6 +18,9 @@ export function Home() {
           <p className="hero-subtitle">
             build forms. collect submissions. store immutably on walrus.
           </p>
+          <Link to="/app" className="btn btn-primary" style={{ marginTop: 20, fontSize: '0.9rem', padding: '12px 28px' }}>
+            Go to App <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 

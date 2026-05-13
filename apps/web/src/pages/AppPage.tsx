@@ -132,6 +132,9 @@ export function AppPage() {
               <option key={ws.id} value={ws.id}>{ws.name} ({ws.formIds.length})</option>
             ))}
           </select>
+          <button className="app-ws-mobile-add" onClick={() => setCreating(true)} title="New workspace">
+            <Plus size={14} />
+          </button>
 
           <div className="app-ws-desktop-list">
             {workspaces.map(ws => (

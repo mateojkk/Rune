@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
 import type { FormField, FieldType } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress } from '../lib/forms';
-import { storeBlobWithWallet, storeBlobWithKeypair, storeForm } from '../lib/walrus';
+import { storeBlobWithWallet, storeBlobWithKeypair } from '../lib/walrus';
 import { useWallet, WalletProvider } from '@suiet/wallet-kit';
 import { useWalletStore } from '../context/wallet';
 import './Builder.css';
@@ -145,10 +145,9 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
         }
       }
       if (!published) {
-        const fallback = await storeForm(form);
-        blobId = fallback.blobId;
+        throw new Error('Publishing failed: no wallet connected and no zkLogin keypair available');
       }
-      await updateForm(currentFormId, { blobId });
+      await updateForm(currentFormId, { blobId: blobId! });
       setSaved(true);
       setPublishedUrl(`${window.location.origin}/form/${currentFormId}`);
       setTimeout(() => setSaved(false), 4000);

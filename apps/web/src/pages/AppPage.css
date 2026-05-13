@@ -350,42 +350,37 @@
   .app-sidebar {
     width: 100%;
     flex-direction: row;
-    flex-wrap: wrap;
+    align-items: center;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    padding: 6px 8px;
-    gap: 4px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    padding: 6px 10px;
+    gap: 6px;
   }
 
   .app-nav-item {
-    padding: 6px 10px;
+    padding: 6px 8px;
     font-size: 0.78rem;
     white-space: nowrap;
     flex-shrink: 0;
-  }
-
-  .app-ws-item {
-    padding-left: 10px;
+    border-radius: var(--radius-sm);
   }
 
   .app-sidebar-label-inline {
     display: none;
   }
 
-  .app-ws-row .app-ws-del,
-  .app-ws-row .app-ws-actions {
-    opacity: 1;
-  }
-
   .app-ws-mobile-select {
     display: block;
-    min-width: 0;
     flex: 1;
+    min-width: 0;
   }
 
-  .app-ws-desktop-list {
+  .app-ws-mobile-add {
+    display: flex;
+  }
+
+  .app-ws-desktop-list,
+  .app-ws-new {
     display: none;
   }
 }
@@ -394,13 +389,45 @@
 
 .app-ws-mobile-select {
   display: none;
-  padding: 6px 8px;
+  padding: 7px 28px 7px 10px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 0.78rem;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  height: 32px;
+}
+
+.app-ws-mobile-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.app-ws-mobile-add {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--tag);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.app-ws-mobile-add:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .app-ws-desktop-list {
