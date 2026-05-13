@@ -97,6 +97,7 @@ export function FormViewer() {
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
+  const directionRef = useRef<'forward' | 'backward'>('forward');
 
   useEffect(() => {
     if (!formId) return;
@@ -168,12 +169,16 @@ export function FormViewer() {
     const field = form.fields[step];
     if (field && !validateField(field.id)) return;
     if (step < form.fields.length - 1) {
+      directionRef.current = 'forward';
       setStep(step + 1);
     }
   };
 
   const goBack = () => {
-    if (step > 0) setStep(step - 1);
+    if (step > 0) {
+      directionRef.current = 'backward';
+      setStep(step - 1);
+    }
     else setStep(-1);
   };
 
@@ -295,7 +300,7 @@ export function FormViewer() {
           </button>
         )}
 
-        <div className="fv-flow-field">
+        <div key={step} className={`fv-flow-field fv-slide-${directionRef.current}`}>
           {field.type !== 'checkbox' && (
             <label className="fv-label">
               {field.label}
