@@ -307,6 +307,17 @@
   cursor: not-allowed;
 }
 
+.fv-preview-notice {
+  text-align: center;
+  padding: 12px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .form-viewer { padding: 32px 16px; }
   .fv-header h1 { font-size: 1.4rem; }

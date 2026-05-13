@@ -328,12 +328,6 @@ export function Dashboard() {
           )}
         </div>
 
-        {!editingFormId && !showNewForm && (
-          <button className="d-fab" onClick={startNewForm} title="New Form">
-            <Plus size={20} />
-          </button>
-        )}
-
         {(showNewForm || editingFormId) && (
           <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />
         )}
@@ -397,12 +391,6 @@ export function Dashboard() {
           </div>
         )}
       </div>
-
-      {!editingFormId && !showNewForm && (
-        <button className="d-fab" onClick={startNewForm} title="New Form">
-          <Plus size={20} />
-        </button>
-      )}
 
       {(showNewForm || editingFormId) && (
         <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />

@@ -162,7 +162,7 @@
 
 .app-ws-action:hover {
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--tag);
 }
 
 .app-ws-rename {
@@ -213,12 +213,12 @@
 
 .app-ws-del-yes:hover {
   color: #51cf66;
-  background: rgba(81, 207, 102, 0.1);
+  background: rgba(81, 207, 102, 0.15);
 }
 
 .app-ws-del-no:hover {
   color: var(--muted);
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--tag);
 }
 
 .app-ws-new {

@@ -251,7 +251,11 @@ export function FormViewer() {
           ))}
         </div>
 
-        {form.fields.length > 0 && (
+        {isEmbedded ? (
+          <div className="fv-actions">
+            <div className="fv-preview-notice">Preview mode — submissions are disabled</div>
+          </div>
+        ) : form.fields.length > 0 && (
           <div className="fv-actions">
             <button className="fv-submit" onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Submitting...' : <><Send size={16} /> Submit</>}

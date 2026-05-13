@@ -735,36 +735,4 @@
   .b-profile-img, .b-profile-add { width: 32px; height: 32px; }
 }
 
-.d-fab {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(232, 117, 58, 0.35);
-  z-index: 50;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
 
-.d-fab:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(232, 117, 58, 0.45);
-}
-
-.d-fab:active {
-  transform: scale(0.95);
-}
-
-@media (min-width: 769px) {
-  .d-fab {
-    display: none;
-  }
-}
