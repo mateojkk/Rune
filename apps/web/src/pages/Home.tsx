@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Database, Lock, Globe, FileText, Star, Zap } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+import { useConfigStore } from '../stores/config';
 import './Home.css';
 
 export function Home() {
+  const network = useConfigStore(s => s.config?.network ?? 'testnet');
+
   return (
     <div className="home">
       <Navbar />
@@ -21,11 +24,11 @@ export function Home() {
       <section className="ticker">
         <div className="ticker-track">
           <span>walrus</span><span>//</span><span>seal</span><span>//</span>
-          <span>testnet</span><span>//</span><span>decentralized</span><span>//</span>
+          <span>{network}</span><span>//</span><span>decentralized</span><span>//</span>
           <span>walrus</span><span>//</span><span>seal</span><span>//</span>
-          <span>testnet</span><span>//</span><span>decentralized</span><span>//</span>
+          <span>{network}</span><span>//</span><span>decentralized</span><span>//</span>
           <span>walrus</span><span>//</span><span>seal</span><span>//</span>
-          <span>testnet</span><span>//</span><span>decentralized</span>
+          <span>{network}</span><span>//</span><span>decentralized</span>
         </div>
       </section>
 

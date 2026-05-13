@@ -33,13 +33,6 @@ export interface ZkLoginSession {
 const BN254_FIELD_SIZE =
   21888242871839275222246405745257275088548364400416034343698204186575808495617n;
 
-function getRandomBigIntString(len: number = 32): string {
-  const arr = new Uint8Array(len);
-  crypto.getRandomValues(arr);
-  const hex = Array.from(arr, (byte) => byte.toString(16).padStart(2, '0')).join('');
-  return (BigInt(`0x${hex}`) % BN254_FIELD_SIZE).toString(10);
-}
-
 export async function generateEphemeralKeyPair(): Promise<EphemeralKeyPair> {
   const keypair = new Secp256k1Keypair();
   const privateKey = keypair.getSecretKey();
@@ -122,43 +115,13 @@ export function getStoredProvider(): string | null {
   return sessionStorage.getItem('zklogin_provider');
 }
 
-function normalizeSaltValue(value: string): string {
-  const trimmed = value.trim();
-  let salt: bigint;
-
-  if (/^\d+$/.test(trimmed)) {
-    salt = BigInt(trimmed);
-  } else if (/^[0-9a-fA-F]+$/.test(trimmed)) {
-    salt = BigInt(`0x${trimmed}`);
-  } else {
-    throw new Error('Stored zkLogin salt is invalid.');
-  }
-
-  return (salt % BN254_FIELD_SIZE).toString(10);
-}
-
-export function getUserSalt(address: string): string {
-  if (typeof window === 'undefined') return '0';
-  
-  const key = `rune_salt_${address.toLowerCase()}`;
-  const stored = localStorage.getItem(key);
-  if (stored) {
-    const normalized = normalizeSaltValue(stored);
-    if (normalized !== stored) {
-      localStorage.setItem(key, normalized);
-    }
-    return normalized;
-  }
-  
-  const newSalt = getRandomBigIntString(32);
-  localStorage.setItem(key, newSalt);
-  return newSalt;
-}
-
-export function clearUserSalt(address: string) {
-  if (typeof window === 'undefined') return;
-  const key = `rune_salt_${address.toLowerCase()}`;
-  localStorage.removeItem(key);
+export async function getUserSalt(sub: string, iss: string): Promise<string> {
+  const input = `${iss}:${sub}:rune-2024`;
+  const encoder = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(input));
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return (BigInt(`0x${hashHex}`) % BN254_FIELD_SIZE).toString(10);
 }
 
 export async function handleOAuthCallback(): Promise<{
@@ -193,8 +156,7 @@ export async function handleOAuthCallback(): Promise<{
     throw new Error('Sign-in verification failed due to a nonce mismatch. Please try again.');
   }
   
-  const saltSubject = `${decoded.iss}:${decoded.sub}`;
-  const userSalt = getUserSalt(saltSubject);
+  const userSalt = await getUserSalt(decoded.sub, decoded.iss);
   const address = computeZkLoginAddress({
     claimName: 'sub',
     claimValue: decoded.sub,

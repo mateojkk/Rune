@@ -669,6 +669,9 @@
   .d-form-card-meta { font-size: 0.6rem; }
   .d-ws-header { margin-bottom: 10px; padding-bottom: 8px; }
   .d-ws-header h1 { font-size: 1rem; }
+  .d-home-header h1 { font-size: 1rem; }
+  .d-home-recent { grid-template-columns: 1fr; }
+  .d-home-section-title { font-size: 0.75rem; margin: 14px 0 8px; }
   .d-main-empty svg { width: 24px; height: 24px; }
   .d-main-empty h3 { font-size: 0.9rem; }
   .d-subs-header h1 { font-size: 0.9rem; }

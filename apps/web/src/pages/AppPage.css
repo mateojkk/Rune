@@ -374,7 +374,8 @@
     display: none;
   }
 
-  .app-ws-row .app-ws-del {
+  .app-ws-row .app-ws-del,
+  .app-ws-row .app-ws-actions {
     opacity: 1;
   }
 }
