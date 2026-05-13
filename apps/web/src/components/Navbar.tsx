@@ -5,6 +5,7 @@ import { useWalletStore } from '../context/wallet';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
 import { useProfileStore } from '../stores/profile';
+import { useBalances } from '../hooks/useBalances';
 import { WalletLogin } from './WalletLogin';
 import { SettingsModal } from './SettingsModal';
 import './Navbar.css';
@@ -25,6 +26,7 @@ function getInitials(name: string, addr?: string) {
 export function Navbar() {
   const { account, isConnected, isConnecting, connectWallet, disconnect } = useWalletStore();
   const { displayName, pfp } = useProfileStore();
+  const { sui, wal } = useBalances(account?.address);
   const [showDropdown, setShowDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -113,6 +115,10 @@ export function Navbar() {
                       <Copy size={13} />
                       <span>{copied ? 'Copied!' : 'Copy Address'}</span>
                     </button>
+                    <div className="profile-balances">
+                      <span className="profile-balance"><span className="profile-balance-label">SUI</span><span className="profile-balance-value">{sui ?? '...'}</span></span>
+                      <span className="profile-balance"><span className="profile-balance-label">WAL</span><span className="profile-balance-value">{wal ?? '...'}</span></span>
+                    </div>
                     <button className="profile-dropdown-item" onClick={() => { setShowSettings(true); setShowDropdown(false); }}>
                       <Settings size={13} />
                       <span>Settings</span>

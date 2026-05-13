@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Send, Star, CheckSquare, Upload, FileText, ArrowLeft } from 'lucide-react';
-import type { FormSchema, FormSubmission, FormField } from '../types/form';
+import { Star, CheckSquare, Upload, FileText, ArrowLeft, Wallet, Loader2 } from 'lucide-react';
+import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
-import { storeSubmission } from '../lib/walrus';
+import { useWalletStore } from '../context/wallet';
+import { getOAuthUrl } from '../lib/zklogin';
+import { storeBlobWithKeypair } from '../lib/walrus';
 import { getFormApi } from '../lib/api';
 import './FormViewer.css';
 
@@ -11,16 +13,17 @@ export function FormViewer() {
   const { formId } = useParams();
   const location = useLocation();
   const isEmbedded = location.pathname.startsWith('/app/');
+  const { account, isConnected } = useWalletStore();
 
   const [form, setForm] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
+  const [connecting, setConnecting] = useState(false);
 
   useEffect(() => {
     if (!formId) return;
@@ -83,23 +86,36 @@ export function FormViewer() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!form || !validate()) return;
-    setSubmitting(true);
+  const handleZkLogin = async () => {
+    setConnecting(true);
     try {
-      const submission: FormSubmission = {
-        id: crypto.randomUUID(),
-        formId: form.id,
-        data: formData,
-        submittedAt: new Date().toISOString(),
-      };
-      try { await storeSubmission(submission); } catch { /* walrus optional */ }
+      const oauthUrl = await getOAuthUrl('google');
+      window.location.href = oauthUrl;
+    } catch {
+      setConnecting(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form || !validate() || !account?.address) return;
+    try {
+      const blobData = { type: 'submission', version: '1.0', formId: form.id, data: formData, submittedAt: new Date().toISOString() };
+
+      if (account.method === 'zklogin') {
+        const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
+        if (ephemeralKey) {
+          try {
+            const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
+            const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
+            await storeBlobWithKeypair(blobData, keypair as never, account.address);
+          } catch { /* walrus optional */ }
+        }
+      }
+
       await addSubmission(form.id, formData);
       setSubmitted(true);
     } catch {
       alert('Failed to submit form');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -119,11 +135,17 @@ export function FormViewer() {
 
   if (submitted) {
     return (
-      <div className="fv-center">
+      <div className="fv-center" style={{ gap: 12 }}>
+        <img src="/runelogo.png" alt="Rune" style={{ height: 36, opacity: 0.5, marginBottom: 4 }} />
         <div className="fv-success-icon"><CheckSquare size={40} /></div>
         <h2>Thank you!</h2>
         <p>Your response has been submitted</p>
-        {isEmbedded && <Link to="/app/dashboard" className="btn btn-secondary" style={{ marginTop: 8 }}>Back to Dashboard</Link>}
+        <p style={{ fontSize: '0.8rem', color: 'var(--subtle)', marginTop: 4 }}>
+          Powered by <strong>Rune</strong> — decentralized feedback forms on Walrus
+        </p>
+        <a href="https://runeso.vercel.app" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm" style={{ marginTop: 8 }}>
+          Try Rune
+        </a>
       </div>
     );
   }
@@ -138,6 +160,10 @@ export function FormViewer() {
               Back to Dashboard
             </Link>
           )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, opacity: 0.4 }}>
+            <img src="/runelogo.png" alt="Rune" style={{ height: 16 }} />
+            <span style={{ fontSize: '0.68rem', color: 'var(--subtle)' }}>Rune · walrus form</span>
+          </div>
           {coverPicture && (
             <div className="fv-cover-wrap">
               <img src={coverPicture} alt="" className="fv-cover-img" />
@@ -152,6 +178,19 @@ export function FormViewer() {
           </div>
         </header>
 
+        {!isConnected || !account?.address ? (
+          <div className="fv-gate">
+            <Wallet size={28} />
+            <h3>Sign in to submit</h3>
+            <p>Connect your wallet or sign in with Google to submit this form. You'll sign a Walrus storage transaction to store your response on-chain.</p>
+            <div className="fv-gate-actions">
+              <button className="btn btn-primary btn-sm" onClick={handleZkLogin} disabled={connecting}>
+                {connecting ? <Loader2 size={14} className="spin" /> : null}
+                Sign in with Google
+              </button>
+            </div>
+          </div>
+        ) : (
         <div className="fv-fields">
           {form.fields.map(field => (
             <div key={field.id} className={`fv-field ${errors[field.id] ? 'error' : ''}`}>
@@ -249,18 +288,17 @@ export function FormViewer() {
               {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
             </div>
           ))}
+          {form.fields.length > 0 && (
+            <div className="fv-actions">
+              <button className="fv-submit" onClick={handleSubmit}>
+                Submit
+              </button>
+            </div>
+          )}
+          <div className="fv-powered" style={{ textAlign: 'center', marginTop: 20, fontSize: '0.72rem', color: 'var(--subtle)' }}>
+            submissions stored on walrus. <span style={{ opacity: 0.5 }}>powered by rune</span>
+          </div>
         </div>
-
-        {isEmbedded ? (
-          <div className="fv-actions">
-            <div className="fv-preview-notice">Preview mode — submissions are disabled</div>
-          </div>
-        ) : form.fields.length > 0 && (
-          <div className="fv-actions">
-            <button className="fv-submit" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? 'Submitting...' : <><Send size={16} /> Submit</>}
-            </button>
-          </div>
         )}
       </div>
     </div>

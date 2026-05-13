@@ -318,6 +318,40 @@
   font-weight: 500;
 }
 
+.fv-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 40px 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
+}
+
+.fv-gate svg {
+  color: var(--subtle);
+}
+
+.fv-gate h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fv-gate p {
+  font-size: 0.82rem;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.fv-gate-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 @media (max-width: 768px) {
   .form-viewer { padding: 32px 16px; }
   .fv-header h1 { font-size: 1.4rem; }

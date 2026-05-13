@@ -205,6 +205,31 @@
   font-family: var(--font-mono);
 }
 
+.profile-balances {
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.profile-balance {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+}
+
+.profile-balance-label {
+  color: var(--subtle);
+  font-weight: 600;
+}
+
+.profile-balance-value {
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
 .profile-dropdown-items {
   padding: 6px;
   display: flex;
