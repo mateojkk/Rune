@@ -41,6 +41,7 @@ export function Dashboard() {
   const [deletingSub, setDeletingSub] = useState<string | null>(null);
   const [copiedFormId, setCopiedFormId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const activeWorkspaceId = workspaceFilter || workspaceId;
 
   const copyFormLink = async (formId: string) => {
     await navigator.clipboard.writeText(`${window.location.origin}/form/${formId}`);
@@ -85,10 +86,11 @@ export function Dashboard() {
 
     // Decrypt any encrypted submissions
     const decrypted = await Promise.all(subs.map(async (sub) => {
-      const blobData = sub.data as Record<string, unknown> | undefined;
-      if (!blobData?.blobId) return sub;
+      const legacyBlobData = sub.data as Record<string, unknown> | undefined;
+      const blobId = sub.blobId || (typeof legacyBlobData?.blobId === 'string' ? legacyBlobData.blobId : undefined);
+      if (!blobId) return sub;
       try {
-        const raw = await downloadBlob(blobData.blobId as string);
+        const raw = await downloadBlob(blobId);
         if (!raw) return sub;
         const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
         const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
@@ -292,7 +294,7 @@ export function Dashboard() {
         </div>
 
         {editingFormId && (
-          <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />
+          <BuilderModal formId={editingFormId} workspaceId={activeWorkspaceId} onClose={closeModal} onSaved={handleFormSaved} />
         )}
       </div>
     );
@@ -369,7 +371,7 @@ export function Dashboard() {
         </div>
 
         {(showNewForm || editingFormId) && (
-          <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />
+          <BuilderModal formId={editingFormId} workspaceId={activeWorkspaceId} onClose={closeModal} onSaved={handleFormSaved} />
         )}
       </div>
     );
@@ -435,7 +437,7 @@ export function Dashboard() {
       </div>
 
       {(showNewForm || editingFormId) && (
-        <BuilderModal formId={editingFormId} workspaceId={workspaceId} onClose={closeModal} onSaved={handleFormSaved} />
+        <BuilderModal formId={editingFormId} workspaceId={activeWorkspaceId} onClose={closeModal} onSaved={handleFormSaved} />
       )}
     </div>
   );

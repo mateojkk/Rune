@@ -1,11 +1,12 @@
 import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
+import { getCurrentNetwork, getSuiRpcUrl } from './network';
 
 async function getWalrusClient() {
   const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
   const { walrus } = await import('@mysten/walrus');
   return new SuiJsonRpcClient({
-    url: 'https://fullnode.mainnet.sui.io:443',
-    network: 'mainnet',
+    url: getSuiRpcUrl(),
+    network: getCurrentNetwork(),
   }).$extend(walrus());
 }
 
@@ -50,8 +51,8 @@ export async function storeBlobWithKeypair(
 ): Promise<{ blobId: string }> {
   const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
   const suiClient = new SuiJsonRpcClient({
-    url: 'https://fullnode.mainnet.sui.io:443',
-    network: 'mainnet',
+    url: getSuiRpcUrl(),
+    network: getCurrentNetwork(),
   });
   const signTx = async (tx: Record<string, unknown>) => {
     const result = await suiClient.signAndExecuteTransaction({

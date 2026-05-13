@@ -6,6 +6,7 @@ import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
 import { getFormApi } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
+import { getSuiChain } from '../lib/network';
 import './FormViewer.css';
 
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
@@ -42,7 +43,7 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
           const result = await signFeature.signAndExecuteTransaction({
             transaction: tx.transaction || tx,
             account,
-            chain: 'sui:mainnet',
+            chain: getSuiChain(),
           });
           return result as unknown as Record<string, unknown>;
         },
@@ -75,6 +76,18 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
           <span>{connecting === w.name ? 'Connecting...' : w.name}</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+function BrandFooter() {
+  return (
+    <div className="fv-brand-footer">
+      <span>Powered by</span>
+      <div className="fv-brand-lockup">
+        <img src="/runelogo.png" alt="Rune" />
+        <strong>Rune</strong>
+      </div>
     </div>
   );
 }
@@ -195,10 +208,15 @@ export function FormViewer() {
         blobData,
         walletAddr,
         async (tx: Record<string, unknown>) =>
-          (await walletRef.signAndExecuteTransaction({ transaction: tx as never, chain: 'sui:mainnet' } as never)) as unknown as Record<string, unknown>,
+          (await walletRef.signAndExecuteTransaction({ transaction: tx as never, chain: getSuiChain() } as never)) as unknown as Record<string, unknown>,
       );
 
-      await addSubmission(form.id, { blobId: result.blobId, submittedAt: submissionData.submittedAt }, walletAddr);
+      await addSubmission(form.id, {
+        data: formData,
+        walletAddress: walletAddr,
+        submittedAt: submissionData.submittedAt,
+        blobId: result.blobId,
+      });
       setSubmitted(true);
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Failed to submit form');
@@ -244,13 +262,11 @@ export function FormViewer() {
   if (submitted) {
     return (
       <div className="fv-center" style={{ gap: 12 }}>
-        <img src="/runelogo.png" alt="Rune" style={{ height: 36, opacity: 0.5, marginBottom: 4 }} />
+        <img src="/runelogo.png" alt="Rune" style={{ height: 36, opacity: 0.7, marginBottom: 4 }} />
         <div className="fv-success-icon"><CheckSquare size={40} /></div>
         <h2>Thank you!</h2>
         <p>Your response has been submitted</p>
-        <p style={{ fontSize: '0.8rem', color: 'var(--subtle)', marginTop: 4 }}>
-          Powered by <strong>Rune</strong>
-        </p>
+        <BrandFooter />
       </div>
     );
   }
@@ -264,6 +280,10 @@ export function FormViewer() {
         <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
           <div className="fv-start-overlay" />
           <div className="fv-start-body">
+            <div className="fv-rune-mark">
+              <img src="/runelogo.png" alt="Rune" />
+              <span>Rune form</span>
+            </div>
             {profilePicture && <img src={profilePicture} alt="" className="fv-start-profile" />}
             <h1>{form.title}</h1>
             {form.description && <p>{form.description}</p>}
@@ -273,6 +293,7 @@ export function FormViewer() {
                 Start
               </button>
             </div>
+            <BrandFooter />
           </div>
         </div>
       </div>
@@ -299,6 +320,13 @@ export function FormViewer() {
         )}
 
         <div key={step} className={`fv-flow-field fv-slide-${directionRef.current}`}>
+          <div className="fv-step-meta">
+            <span className="fv-step-count">Question {step + 1} of {form.fields.length}</span>
+            <div className="fv-rune-mark fv-rune-mark-inline">
+              <img src="/runelogo.png" alt="Rune" />
+              <span>Rune</span>
+            </div>
+          </div>
           {field.type !== 'checkbox' && (
             <label className="fv-label">
               {field.label}
@@ -398,6 +426,7 @@ export function FormViewer() {
           {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
 
           {renderActions()}
+          <BrandFooter />
         </div>
       </div>
     </div>

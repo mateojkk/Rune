@@ -156,19 +156,26 @@ def create_form(body: FormCreate, address: str):
     db = next(get_db())
     try:
         user = _get_or_create_user(db, address)
-        ws = db.query(Workspace).filter(Workspace.uuid == body.workspace_uuid).first()
-        if not ws:
+        ws = None
+        if body.workspace_uuid:
+            ws = db.query(Workspace).filter(
+                Workspace.uuid == body.workspace_uuid,
+                Workspace.user_address == user.address,
+            ).first()
+            if not ws:
+                raise HTTPException(404, "Workspace not found")
+        if not body.workspace_uuid:
             first = db.query(Workspace).filter(Workspace.user_address == user.address).first()
             if not first:
                 first = Workspace(name="General", user_address=user.address)
                 db.add(first)
                 db.commit()
                 db.refresh(first)
-            body.workspace_uuid = first.uuid
+            ws = first
         f = Form(
             title=body.title,
             description=body.description,
-            workspace_uuid=body.workspace_uuid,
+            workspace_uuid=ws.uuid,
             user_address=user.address,
             fields=body.fields,
             profile_picture=body.profile_picture,
@@ -272,10 +279,17 @@ def create_submission(body: SubmissionCreate, form_uuid: str):
         f = db.query(Form).filter(Form.uuid == form_uuid).first()
         if not f:
             raise HTTPException(404, "Form not found")
-        s = SubmissionModel(
+        submission_kwargs = dict(
             form_uuid=form_uuid,
             data=body.data,
             wallet_address=body.walletAddress,
+            blob_id=body.blobId,
+        )
+        if body.submittedAt is not None:
+            submission_kwargs["submitted_at"] = body.submittedAt
+
+        s = SubmissionModel(
+            **submission_kwargs,
         )
         db.add(s)
         db.commit()

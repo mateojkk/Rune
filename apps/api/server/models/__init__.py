@@ -60,6 +60,8 @@ class FormOut(BaseModel):
 class SubmissionCreate(BaseModel):
     data: dict
     walletAddress: Optional[str] = None
+    submittedAt: Optional[datetime] = None
+    blobId: Optional[str] = None
 
 class SubmissionOut(BaseModel):
     id: str

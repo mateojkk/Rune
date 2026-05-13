@@ -1,5 +1,5 @@
 import type { FormSchema, FormSubmission, FormField, UserProfile, Workspace } from '../types/form';
-import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi, getProfileApi, updateProfileApi } from './api';
+import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi, getProfileApi, updateProfileApi, type SubmissionCreatePayload } from './api';
 export type { Workspace };
 
 // --- Synchronous helpers (local state) ---
@@ -151,7 +151,18 @@ export async function getForm(formId: string): Promise<FormSchema | null> {
 }
 
 export async function createForm(title: string, description: string, workspaceId?: string): Promise<FormSchema> {
-  const wsId = workspaceId || (_workspaceCache[0]?.uuid) || '';
+  let wsId = workspaceId?.trim() || '';
+  if (!wsId) {
+    const workspaces = _workspaceCache.length > 0
+      ? _workspaceCache
+      : await apiGetWorkspaces(address());
+    _workspaceCache = workspaces;
+    if (workspaces.length === 1) {
+      wsId = workspaces[0].uuid;
+    } else {
+      throw new Error('Select a workspace before creating a form');
+    }
+  }
   const f = await createFormApi(address(), title, description, wsId);
   const form: FormSchema = {
     id: f.id, title: f.title, description: f.description,
@@ -228,8 +239,8 @@ export async function getSubmissions(formId: string): Promise<FormSubmission[]> 
   }
 }
 
-export async function addSubmission(formId: string, data: Record<string, unknown>, walletAddress?: string): Promise<FormSubmission> {
-  const s = await createSubmissionApi(formId, data, walletAddress);
+export async function addSubmission(formId: string, submission: SubmissionCreatePayload): Promise<FormSubmission> {
+  const s = await createSubmissionApi(formId, submission);
   return {
     id: s.id, formId: s.formId, data: s.data,
     submittedAt: s.submittedAt, walletAddress: s.walletAddress, blobId: s.blobId,

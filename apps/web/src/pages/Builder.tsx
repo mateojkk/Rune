@@ -52,6 +52,7 @@ function BuilderInner() {
     const load = async () => {
       const [ws, all] = await Promise.all([getWorkspaces(), getAllForms()]);
       setWorkspaces(ws);
+      setCurrentWorkspaceId(workspaceContext || ws[0]?.id || '');
 
       if (!formId) {
         const filtered = all
@@ -105,7 +106,13 @@ function BuilderInner() {
       return;
     }
 
-    const form = await createForm(title, description, workspaceContext || undefined);
+    const targetWorkspaceId = workspaceContext || currentWorkspaceId;
+    if (!targetWorkspaceId) {
+      setError('Select a workspace before creating a form');
+      return;
+    }
+
+    const form = await createForm(title, description, targetWorkspaceId);
     setCurrentFormId(form.id);
     setCurrentWorkspaceId(form.workspaceId || '');
     setPublishedUrl('');

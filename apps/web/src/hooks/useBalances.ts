@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
+import { getSuiRpcUrl } from '../lib/network';
 
-const SUI_RPC = 'https://fullnode.mainnet.sui.io:443';
 const WAL_COIN_TYPE = '0x2134d52768ea07e8c43570ef975eb3e4c27a39fa6396bef985b5abc58d03ddd2::wal::WAL';
 
 function formatBalance(balance: string): string {
@@ -11,7 +11,7 @@ function formatBalance(balance: string): string {
 }
 
 async function fetchBalance(owner: string, coinType?: string): Promise<string> {
-  const res = await fetch(SUI_RPC, {
+  const res = await fetch(getSuiRpcUrl(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
-import type { FormField, FieldType } from '../types/form';
-import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress } from '../lib/forms';
+import type { FormField, FieldType, Workspace } from '../types/form';
+import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
@@ -43,6 +43,16 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId);
+
+  useEffect(() => {
+    (async () => {
+      const loaded = await getWorkspaces();
+      setWorkspaces(loaded);
+      setSelectedWorkspaceId(current => current || workspaceId || loaded[0]?.id || '');
+    })();
+  }, [workspaceId]);
 
   useEffect(() => {
     if (formId) {
@@ -55,6 +65,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
           setCurrentFormId(formId);
           setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
+          setSelectedWorkspaceId(form.workspaceId || '');
         }
       })();
     } else {
@@ -64,13 +75,15 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
       setCurrentFormId(undefined);
       setProfilePicture('');
       setCoverPicture('');
+      setSelectedWorkspaceId(workspaceId);
     }
   }, [formId]);
 
   const handleCreateForm = async () => {
     if (!address) { setError('Connect your wallet first'); return; }
     if (!title.trim()) { setError('Enter a form title'); return; }
-    const form = await createForm(title, description, workspaceId);
+    if (!selectedWorkspaceId) { setError('Select a workspace first'); return; }
+    const form = await createForm(title, description, selectedWorkspaceId);
     setCurrentFormId(form.id);
     setPublishedUrl('');
     setError(null);
@@ -224,6 +237,17 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
               <label className="b-label">Description</label>
               <textarea className="b-input b-textarea" value={description} onChange={e => handleDescriptionChange(e.target.value)} placeholder="Optional description" rows={2} />
             </div>
+            {!currentFormId && (
+              <div className="b-field">
+                <label className="b-label">Workspace</label>
+                <select className="b-input" value={selectedWorkspaceId} onChange={e => setSelectedWorkspaceId(e.target.value)}>
+                  <option value="" disabled>Select workspace</option>
+                  {workspaces.map(ws => (
+                    <option key={ws.id} value={ws.id}>{ws.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="b-field-palette">
               <div className="b-palette-header">

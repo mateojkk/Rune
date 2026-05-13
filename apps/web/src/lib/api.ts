@@ -46,6 +46,13 @@ export interface SubmissionDTO {
   blobId?: string;
 }
 
+export interface SubmissionCreatePayload {
+  data: Record<string, unknown>;
+  walletAddress?: string;
+  submittedAt?: string;
+  blobId?: string;
+}
+
 // --- Workspaces ---
 
 export async function getWorkspaces(address: string): Promise<WorkspaceDTO[]> {
@@ -99,10 +106,10 @@ export async function getSubmissionsApi(formUuid: string): Promise<SubmissionDTO
   return req(`/submissions?form_uuid=${encodeURIComponent(formUuid)}`);
 }
 
-export async function createSubmissionApi(formUuid: string, data: Record<string, unknown>, walletAddress?: string): Promise<SubmissionDTO> {
+export async function createSubmissionApi(formUuid: string, payload: SubmissionCreatePayload): Promise<SubmissionDTO> {
   return req(`/submissions?form_uuid=${encodeURIComponent(formUuid)}`, {
     method: 'POST',
-    body: JSON.stringify({ data, walletAddress }),
+    body: JSON.stringify(payload),
   });
 }
 

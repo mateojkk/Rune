@@ -2,16 +2,20 @@ import { SealClient, SessionKey } from '@mysten/seal';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { Transaction } from '@mysten/sui/transactions';
 import { storeBlobWithKeypair } from './walrus';
+import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
 
 const SEAL_PACKAGE_ID = import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7';
 const SEAL_KEY_SERVER_1 = import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6';
-const WALRUS_AGGREGATOR = import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.walrus.space';
-const SUI_RPC = 'https://fullnode.mainnet.sui.io:443';
 
 let _suiClient: SuiJsonRpcClient | null = null;
+let _suiClientNetwork: string | null = null;
 
 function getSuiClient() {
-  if (!_suiClient) _suiClient = new SuiJsonRpcClient({ url: SUI_RPC, network: 'mainnet' });
+  const network = getCurrentNetwork();
+  if (!_suiClient || _suiClientNetwork !== network) {
+    _suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network });
+    _suiClientNetwork = network;
+  }
   return _suiClient;
 }
 
@@ -46,7 +50,7 @@ export async function encryptAndStore(
 
 export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {
   try {
-    const res = await fetch(`${WALRUS_AGGREGATOR}/v1/blobs/${blobId}`);
+    const res = await fetch(`${getWalrusAggregatorUrl()}/v1/blobs/${blobId}`);
     if (!res.ok) return null;
     return new Uint8Array(await res.arrayBuffer());
   } catch {

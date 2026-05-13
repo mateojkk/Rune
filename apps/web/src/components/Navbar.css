@@ -2,15 +2,18 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 10px 24px 10px 10px;
+  padding: 10px 24px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
 .navbar-container {
+  width: min(1120px, 100%);
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 .navbar-brand {
@@ -34,6 +37,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .sidebar-icon-btn {
@@ -433,6 +437,16 @@
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     max-height: 60vh;
     overflow-y: auto;
+  }
+
+  .login-dropdown-inner {
+    top: auto;
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    min-width: 0;
+    width: auto;
+    max-width: none;
   }
 }
 
