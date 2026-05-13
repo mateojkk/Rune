@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
-import { WalletProvider } from '@suiet/wallet-kit';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
@@ -568,9 +567,5 @@ function BuilderInner() {
 }
 
 export function Builder() {
-  return (
-    <WalletProvider>
-      <BuilderInner />
-    </WalletProvider>
-  );
+  return <BuilderInner />;
 }

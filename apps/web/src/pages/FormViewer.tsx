@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2, Wallet } from 'lucide-react';
+import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
@@ -8,44 +8,72 @@ import { getFormApi } from '../lib/api';
 import './FormViewer.css';
 
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
-  const [WalletProvider, setWP] = useState<any>(null);
-  const [WalletList, setWL] = useState<any>(null);
+  const [wallets, setWallets] = useState<{ name: string; icon?: string }[]>([]);
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const [noWallet, setNoWallet] = useState(false);
+  const walletObj = useRef<any>(null);
 
   useEffect(() => {
-    (async () => {
-      const kit = await import('@suiet/wallet-kit');
-      setWP(() => kit.WalletProvider);
-      setWL(() => function WalletList() {
-        const w = kit.useWallet();
-        const { address, signAndExecuteTransaction, select, connecting, allAvailableWallets } = w;
-
-        useEffect(() => {
-          if (address) {
-            onConnected(address, { signAndExecuteTransaction });
-          }
-        }, [address]);
-
-        return (
-          <div className="fv-wallet-list">
-            {allAvailableWallets.map((w: any) => (
-              <button key={w.name} className="wallet-option" onClick={async () => {
-                try { await select(w.name); } catch { /* */ }
-              }} disabled={connecting}>
-                <Wallet size={18} />
-                <span>{w.name}</span>
-              </button>
-            ))}
-          </div>
-        );
-      });
-    })();
+    const detected: { name: string; icon?: string }[] = [];
+    if ((window as any).suiWallet) {
+      walletObj.current = (window as any).suiWallet;
+      detected.push({ name: 'Sui Wallet' });
+    }
+    if ((window as any).sui) {
+      if (!walletObj.current) walletObj.current = (window as any).sui;
+      detected.push({ name: 'Martian Wallet' });
+    }
+    if (detected.length === 0) {
+      setNoWallet(true);
+    }
+    setWallets(detected);
   }, []);
 
-  if (!WalletProvider || !WalletList) {
-    return <div className="wallet-option" style={{ justifyContent: 'center' }}><Loader2 size={14} className="spin" /></div>;
+  const connect = async (name: string) => {
+    if (!walletObj.current) return;
+    setConnecting(name);
+    try {
+      const accounts = await walletObj.current.requestConnection();
+      const address = accounts[0]?.address;
+      if (address) {
+        onConnected(address, {
+          signAndExecuteTransaction: async (tx: any) =>
+            walletObj.current.signAndExecuteTransaction({
+              transaction: tx.transaction || tx,
+              chain: 'sui:mainnet',
+            }),
+        });
+      }
+    } catch (e) {
+      console.error('Wallet connection failed:', e);
+    }
+    setConnecting(null);
+  };
+
+  if (noWallet) {
+    return (
+      <div className="fv-wallet-list">
+        <div className="wallet-option" style={{ justifyContent: 'center', opacity: 0.6, cursor: 'default' }}>
+          <span>No Sui wallet found</span>
+        </div>
+        <a href="https://chrome.google.com/webstore/detail/sui-wallet/opcgpfmipidbgpenhmajoajpbobppdil" target="_blank" rel="noopener noreferrer" className="wallet-option" style={{ textDecoration: 'none', justifyContent: 'center', color: 'var(--accent)' }}>
+          <ExternalLink size={14} />
+          <span>Install Sui Wallet</span>
+        </a>
+      </div>
+    );
   }
 
-  return <WalletProvider><WalletList /></WalletProvider>;
+  return (
+    <div className="fv-wallet-list">
+      {wallets.map(w => (
+        <button key={w.name} className="wallet-option" onClick={() => connect(w.name)} disabled={connecting === w.name}>
+          <Wallet size={18} />
+          <span>{connecting === w.name ? 'Connecting...' : w.name}</span>
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export function FormViewer() {

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
 import type { FormField, FieldType } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress } from '../lib/forms';
-import { WalletProvider } from '@suiet/wallet-kit';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
@@ -333,9 +332,5 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 }
 
 export function BuilderModal(props: Props) {
-  return (
-    <WalletProvider>
-      <BuilderModalInner {...props} />
-    </WalletProvider>
-  );
+  return <BuilderModalInner {...props} />;
 }
