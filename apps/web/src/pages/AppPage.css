@@ -350,20 +350,14 @@
 
   .app-sidebar {
     width: 100%;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
     border-right: none;
     border-bottom: 1px solid var(--border);
     padding: 6px 10px;
-    gap: 6px;
   }
 
-  .app-nav-item {
-    padding: 6px 8px;
-    font-size: 0.78rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-    border-radius: var(--radius-sm);
+  .app-nav-home {
+    display: none;
   }
 
   .app-sidebar-label-inline {
@@ -372,8 +366,7 @@
 
   .app-ws-mobile-picker {
     display: block;
-    flex: 1;
-    min-width: 0;
+    width: 100%;
   }
 
   .app-ws-desktop-list,
@@ -383,11 +376,9 @@
 
   .app-ws-create {
     display: flex;
-    flex: 2;
     align-items: center;
     gap: 3px;
-    padding: 0 0 0 4px;
-    min-width: 0;
+    padding: 2px 0;
   }
 
   .app-ws-create input {

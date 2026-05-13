@@ -123,7 +123,7 @@ export function AppPage() {
         <nav className="app-sidebar">
           <Link
             to="/app/dashboard"
-            className={`app-nav-item ${isHome ? 'active' : ''}`}
+            className={`app-nav-item app-nav-home ${isHome ? 'active' : ''}`}
           >
             <Home size={16} />
             <span>Home</span>
