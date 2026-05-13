@@ -258,21 +258,15 @@ export function FormViewer() {
   if (step < 0) {
     return (
       <div className="form-viewer">
-        <Link to="/app/dashboard" className="fv-back-editor">
+        <Link to={`/app/builder/${formId}`} className="fv-back-editor">
           <ArrowLeft size={13} /> Editor
         </Link>
-        <div className="fv-start">
-          {coverPicture && (
-            <div className="fv-start-cover">
-              <img src={coverPicture} alt="" />
-            </div>
-          )}
+        <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
+          <div className="fv-start-overlay" />
           <div className="fv-start-body">
-            <div className="fv-start-header">
-              {profilePicture && <img src={profilePicture} alt="" className="fv-start-profile" />}
-              <h1>{form.title}</h1>
-              {form.description && <p>{form.description}</p>}
-            </div>
+            {profilePicture && <img src={profilePicture} alt="" className="fv-start-profile" />}
+            <h1>{form.title}</h1>
+            {form.description && <p>{form.description}</p>}
             <div className="fv-start-footer">
               <span className="fv-start-count">{form.fields.length} question{form.fields.length !== 1 ? 's' : ''}</span>
               <button className="fv-start-btn" onClick={() => { setStep(0); setTimeout(() => inputRef.current?.focus(), 100); }}>
@@ -290,7 +284,7 @@ export function FormViewer() {
 
   return (
     <div className="form-viewer fv-flow">
-      <Link to="/app/dashboard" className="fv-back-editor fv-back-editor-flow">
+      <Link to={`/app/builder/${formId}`} className="fv-back-editor fv-back-editor-flow">
         <ArrowLeft size={13} /> Editor
       </Link>
       <div className="fv-progress-bar">

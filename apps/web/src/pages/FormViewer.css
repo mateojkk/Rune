@@ -64,69 +64,63 @@
 .fv-start {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg);
+  padding: 48px 24px;
 }
 
-.fv-start-cover {
-  width: 100%;
-  height: 260px;
-  overflow: hidden;
-  background: var(--surface);
-  flex-shrink: 0;
-}
-
-.fv-start-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.fv-start-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(20,20,19,0.7), rgba(20,20,19,0.92));
+  z-index: 0;
 }
 
 .fv-start-body {
-  flex: 1;
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  padding: 36px 24px 32px;
-  max-width: 520px;
-  margin: 0 auto;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  max-width: 480px;
   width: 100%;
 }
 
-.fv-start-header {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-}
-
 .fv-start-profile {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border);
+  border: 2px solid rgba(255,255,255,0.15);
+  margin-bottom: 4px;
 }
 
-.fv-start-header h1 {
-  font-size: 2rem;
+.fv-start-body h1 {
+  font-size: 2.2rem;
   font-weight: 300;
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
-.fv-start-header p {
+.fv-start-body p {
   font-size: 0.95rem;
   color: var(--muted);
   line-height: 1.5;
+  max-width: 360px;
 }
 
 .fv-start-footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 24px;
+  gap: 16px;
+  margin-top: 20px;
 }
 
 .fv-start-count {
@@ -139,7 +133,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 48px;
+  padding: 14px 56px;
   background: var(--text);
   color: var(--bg);
   font-size: 0.95rem;
@@ -148,7 +142,6 @@
   border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s;
-  flex-shrink: 0;
 }
 
 .fv-start-btn:hover {
@@ -157,17 +150,15 @@
 }
 
 @media (max-width: 768px) {
-  .fv-start-cover { height: 180px; }
-  .fv-start-body { padding: 28px 16px 24px; }
-  .fv-start-header h1 { font-size: 1.6rem; }
-  .fv-start-profile { width: 48px; height: 48px; }
+  .fv-start { padding: 32px 16px; }
+  .fv-start-body h1 { font-size: 1.7rem; }
+  .fv-start-profile { width: 52px; height: 52px; }
 }
 
 @media (max-width: 480px) {
-  .fv-start-cover { height: 140px; }
-  .fv-start-header h1 { font-size: 1.3rem; }
-  .fv-start-profile { width: 40px; height: 40px; }
-  .fv-start-btn { padding: 12px 32px; font-size: 0.85rem; }
+  .fv-start-body h1 { font-size: 1.4rem; }
+  .fv-start-profile { width: 44px; height: 44px; }
+  .fv-start-btn { padding: 12px 40px; font-size: 0.85rem; }
 }
 
 /* ─── Back to Editor ─── */
