@@ -9,10 +9,10 @@
     "dev": "concurrently \"npm:dev:*\"",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run dev --workspace=apps/api",
-    "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces",
-    "typecheck": "npm run typecheck --workspaces",
-    "check:env": "npx tsx scripts/check-env.ts",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "check:env": "node scripts/check-env.mjs",
     "setup": "npm install && npm run check:env"
   },
   "devDependencies": {
