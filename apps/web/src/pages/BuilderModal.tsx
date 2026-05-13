@@ -94,6 +94,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const titleTimer = useRef<ReturnType<typeof setTimeout>>();
+  const descTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const handleTitleChange = (value: string) => {
     setTitle(value);
@@ -107,8 +108,8 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const handleDescriptionChange = (value: string) => {
     setDescription(value);
     if (!currentFormId) return;
-    clearTimeout(titleTimer.current);
-    titleTimer.current = setTimeout(() => {
+    clearTimeout(descTimer.current);
+    descTimer.current = setTimeout(() => {
       updateForm(currentFormId, { description: value }).catch(() => {});
     }, 500);
   };

@@ -210,17 +210,6 @@ export function FormViewer() {
     setShowPicker(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (step >= 0 && form && step === form.fields.length - 1 && walletAddr) {
-        handleSubmit();
-      } else {
-        goNext();
-      }
-    }
-  };
-
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
