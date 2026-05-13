@@ -1,3 +1,19 @@
+.form-viewer,
+.fv-loading,
+.fv-center {
+  --accent: #FFB38A;
+  --accent-hover: #FF9E6B;
+  --accent-bg: rgba(255, 179, 138, 0.1);
+  --bg: #141413;
+  --surface: #1F1F1E;
+  --surface-elevated: #2A2A28;
+  --text: #FAF9F5;
+  --muted: #9A9A95;
+  --subtle: #6A6A65;
+  --border: #2A2A28;
+  --tag: #2A2A28;
+}
+
 .fv-loading,
 .fv-center {
   display: flex;

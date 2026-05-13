@@ -76,7 +76,8 @@ function BuilderInner() {
           setCurrentWorkspaceId(form.workspaceId || '');
           setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
-          setPublishedUrl('');
+          setPublishedUrl(`${window.location.origin}/form/${formId}`);
+          setSaved(true);
         }
       }
     };
@@ -347,7 +348,7 @@ function BuilderInner() {
                 onClick={handleSaveToWalrus}
                 disabled={saving}
               >
-                {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Publish</>}
+                {saving ? 'Saving...' : publishedUrl ? <><CheckSquare size={15} /> Share Link</> : <><Save size={15} /> Publish</>}
               </button>
               {publishedUrl && (
                 <div className="b-share-link">

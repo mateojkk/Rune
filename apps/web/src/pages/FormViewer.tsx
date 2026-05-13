@@ -16,13 +16,15 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
       const kit = await import('@suiet/wallet-kit');
       setWP(() => kit.WalletProvider);
       setWL(() => function WalletList() {
-        const { address, select, connecting, allAvailableWallets } = kit.useWallet();
+        const w = kit.useWallet();
+        const { address, signAndExecuteTransaction, select, connecting, allAvailableWallets } = w;
+
         useEffect(() => {
-          if (address && allAvailableWallets.length) {
-            const w = allAvailableWallets.find((w: any) => w.name === address || (w as any).address === address);
-            onConnected(address, { signAndExecuteTransaction: () => select(w?.name).then(() => address) });
+          if (address) {
+            onConnected(address, { signAndExecuteTransaction });
           }
         }, [address]);
+
         return (
           <div className="fv-wallet-list">
             {allAvailableWallets.map((w: any) => (
@@ -196,9 +198,9 @@ export function FormViewer() {
               Back to Dashboard
             </Link>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, opacity: 0.4 }}>
-            <img src="/runelogo.png" alt="Rune" style={{ height: 16 }} />
-            <span style={{ fontSize: '0.68rem', color: 'var(--subtle)' }}>Rune · walrus form</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <img src="/runelogo.png" alt="Rune" style={{ height: 16, filter: 'invert(1)' }} />
+            <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>Rune · walrus form</span>
           </div>
           {coverPicture && (
             <div className="fv-cover-wrap">
