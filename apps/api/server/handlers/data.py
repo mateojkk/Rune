@@ -79,7 +79,7 @@ def list_workspaces(address: str):
         user = _get_or_create_user(db, address)
         workspaces = db.query(Workspace).filter(Workspace.user_address == user.address).all()
         if not workspaces:
-            default = Workspace(name="Default", user_address=user.address)
+            default = Workspace(name="General", user_address=user.address)
             db.add(default)
             db.commit()
             workspaces = [default]
@@ -159,7 +159,7 @@ def create_form(body: FormCreate, address: str):
         if not ws:
             first = db.query(Workspace).filter(Workspace.user_address == user.address).first()
             if not first:
-                first = Workspace(name="Default", user_address=user.address)
+                first = Workspace(name="General", user_address=user.address)
                 db.add(first)
                 db.commit()
                 db.refresh(first)
