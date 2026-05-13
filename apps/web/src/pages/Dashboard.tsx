@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft, Clock, Folder } from 'lucide-react';
+import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft, Clock, Folder, Copy } from 'lucide-react';
 import type { FormSchema, FormSubmission } from '../types/form';
 import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
@@ -39,7 +39,14 @@ export function Dashboard() {
   const [expandedSub, setExpandedSub] = useState<string | null>(null);
   const [confirmDeleteSub, setConfirmDeleteSub] = useState<string | null>(null);
   const [deletingSub, setDeletingSub] = useState<string | null>(null);
+  const [copiedFormId, setCopiedFormId] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const copyFormLink = async (formId: string) => {
+    await navigator.clipboard.writeText(`${window.location.origin}/form/${formId}`);
+    setCopiedFormId(formId);
+    setTimeout(() => setCopiedFormId(null), 2000);
+  };
 
   const displaySubmissions = useMemo(() => {
     if (!searchQuery || !viewingSubs) return submissions;
@@ -390,6 +397,9 @@ export function Dashboard() {
                     <div className="d-form-card-actions">
                       <button className="btn btn-secondary btn-sm" onClick={() => openSubmissions(form)}>
                         <Eye size={12} /> {subCount}
+                      </button>
+                      <button className="btn btn-secondary btn-sm" onClick={() => copyFormLink(form.id)} title="Copy form link">
+                        {copiedFormId === form.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
                       <button className="btn btn-secondary btn-sm" onClick={() => startEditForm(form.id)}>
                         <PenLine size={12} />

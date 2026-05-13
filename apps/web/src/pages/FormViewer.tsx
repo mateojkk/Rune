@@ -1,19 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2 } from 'lucide-react';
+import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2, Wallet } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
-import { useWalletStore } from '../context/wallet';
-import { getOAuthUrl } from '../lib/zklogin';
-import { encryptAndStore } from '../lib/encrypted-storage';
+import { storeBlobWithWallet } from '../lib/walrus';
 import { getFormApi } from '../lib/api';
 import './FormViewer.css';
+
+function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
+  const [WalletProvider, setWP] = useState<any>(null);
+  const [WalletList, setWL] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      const kit = await import('@suiet/wallet-kit');
+      setWP(() => kit.WalletProvider);
+      setWL(() => function WalletList() {
+        const { address, select, connecting, allAvailableWallets } = kit.useWallet();
+        useEffect(() => {
+          if (address && allAvailableWallets.length) {
+            const w = allAvailableWallets.find((w: any) => w.name === address || (w as any).address === address);
+            onConnected(address, { signAndExecuteTransaction: () => select(w?.name).then(() => address) });
+          }
+        }, [address]);
+        return (
+          <div className="fv-wallet-list">
+            {allAvailableWallets.map((w: any) => (
+              <button key={w.name} className="wallet-option" onClick={async () => {
+                try { await select(w.name); } catch { /* */ }
+              }} disabled={connecting}>
+                <Wallet size={18} />
+                <span>{w.name}</span>
+              </button>
+            ))}
+          </div>
+        );
+      });
+    })();
+  }, []);
+
+  if (!WalletProvider || !WalletList) {
+    return <div className="wallet-option" style={{ justifyContent: 'center' }}><Loader2 size={14} className="spin" /></div>;
+  }
+
+  return <WalletProvider><WalletList /></WalletProvider>;
+}
 
 export function FormViewer() {
   const { formId } = useParams();
   const location = useLocation();
   const isEmbedded = location.pathname.startsWith('/app/');
-  const { account, isConnected } = useWalletStore();
+
+  const [walletAddr, setWalletAddr] = useState<string | null>(null);
+  const [walletRef, setWalletRef] = useState<any>(null);
+  const [showPicker, setShowPicker] = useState(false);
 
   const [form, setForm] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +63,7 @@ export function FormViewer() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
-  const [connecting, setConnecting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!formId) return;
@@ -86,41 +126,33 @@ export function FormViewer() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleZkLogin = async () => {
-    setConnecting(true);
-    try {
-      const oauthUrl = await getOAuthUrl('google');
-      window.location.href = oauthUrl;
-    } catch {
-      setConnecting(false);
-    }
-  };
-
   const handleSubmit = async () => {
-    if (!form || !validate() || !account?.address) return;
+    if (!form || !validate() || !walletAddr || !walletRef) return;
+    setSubmitting(true);
     try {
       const submissionData = { data: formData, submittedAt: new Date().toISOString() };
-      let blobId: string | undefined;
+      const blobData = { type: 'submission', version: '1.0', ...submissionData };
 
-      if (account.method === 'zklogin') {
-        const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
-        if (ephemeralKey) {
-          try {
-            const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
-            const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            const result = await encryptAndStore(submissionData, form.walletAddress || account.address, keypair, account.address);
-            blobId = result.blobId;
-          } catch (e) { console.error('Walrus storage failed:', e); }
-        }
-      }
+      const result = await storeBlobWithWallet(
+        blobData,
+        walletAddr,
+        async (tx: Record<string, unknown>) =>
+          (await walletRef.signAndExecuteTransaction({ transaction: tx as never, chain: 'sui:mainnet' } as never)) as unknown as Record<string, unknown>,
+      );
 
-      if (!blobId) throw new Error('Walrus storage failed — please try again');
-
-      await addSubmission(form.id, { blobId, submittedAt: submissionData.submittedAt }, account.address);
+      await addSubmission(form.id, { blobId: result.blobId, submittedAt: submissionData.submittedAt }, walletAddr);
       setSubmitted(true);
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Failed to submit form');
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const onWalletConnected = (address: string, w: any) => {
+    setWalletAddr(address);
+    setWalletRef(w);
+    setShowPicker(false);
   };
 
   if (loading) {
@@ -281,15 +313,25 @@ export function FormViewer() {
           ))}
           {form.fields.length > 0 && (
             <div className="fv-actions">
-              {isConnected && account?.address ? (
-                <button className="fv-submit" onClick={handleSubmit}>
-                  Submit
+              {walletAddr ? (
+                <button className="fv-submit" onClick={handleSubmit} disabled={submitting}>
+                  {submitting ? <Loader2 size={16} className="spin" /> : null}
+                  {submitting ? 'Submitting...' : 'Submit'}
                 </button>
               ) : (
-                <button className="fv-submit" onClick={handleZkLogin} disabled={connecting}>
-                  {connecting ? <Loader2 size={16} className="spin" /> : null}
-                  Connect Wallet
-                </button>
+                <div className="fv-connect-wrap">
+                  <button className="fv-submit" onClick={() => setShowPicker(!showPicker)}>
+                    <Wallet size={16} />
+                    Connect Wallet
+                  </button>
+                  {showPicker && (
+                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
+                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
+                        <WalletConnection onConnected={onWalletConnected} />
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           )}
