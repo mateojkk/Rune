@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
-import type { FormField, FieldType, Workspace } from '../types/form';
+import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
 import { storeBlobWithWallet, storeBlobWithKeypair, storeForm } from '../lib/walrus';
 import { useWallet } from '@suiet/wallet-kit';
@@ -169,7 +169,7 @@ export function Builder() {
           const result = await storeBlobWithWallet(
             blobData,
             wallet.address || address,
-            (tx: Record<string, unknown>) => wallet.signAndExecuteTransaction({ transaction: tx, chain: 'sui:mainnet' })
+            async (tx: Record<string, unknown>) => await wallet.signAndExecuteTransaction({ transaction: tx as never, chain: 'sui:mainnet' } as never) as unknown as Record<string, unknown>
           );
           blobId = result.blobId;
           published = true;
@@ -184,7 +184,7 @@ export function Builder() {
           try {
             const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
             const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            const result = await storeBlobWithKeypair(blobData, keypair, account.address);
+            const result = await storeBlobWithKeypair(blobData, keypair as unknown as Parameters<typeof storeBlobWithKeypair>[1], account.address);
             blobId = result.blobId;
             published = true;
           } catch { /* fall through */ }

@@ -50,5 +50,8 @@ devguide.md
 coverage/
 .nyc_output/
 
+# Vercel
+.vercel
+
 # Misc
 *.tsbuildinfo

@@ -123,7 +123,7 @@ export function BuilderModal({ formId, workspaceId, onClose }: Props) {
       if (wallet.connected && wallet.signAndExecuteTransaction) {
         try {
           const result = await storeBlobWithWallet(blobData, wallet.address || address,
-            (tx: Record<string, unknown>) => wallet.signAndExecuteTransaction({ transaction: tx, chain: 'sui:mainnet' }));
+            async (tx: Record<string, unknown>) => await wallet.signAndExecuteTransaction({ transaction: tx as never, chain: 'sui:mainnet' } as never) as unknown as Record<string, unknown>);
           blobId = result.blobId; published = true;
         } catch { /* */ }
       }
@@ -134,7 +134,7 @@ export function BuilderModal({ formId, workspaceId, onClose }: Props) {
           try {
             const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
             const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            const result = await storeBlobWithKeypair(blobData, keypair, account.address);
+            const result = await storeBlobWithKeypair(blobData, keypair as unknown as Parameters<typeof storeBlobWithKeypair>[1], account.address);
             blobId = result.blobId; published = true;
           } catch { /* */ }
         }

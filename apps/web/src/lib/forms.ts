@@ -1,5 +1,6 @@
 import type { FormSchema, FormSubmission, FormField, UserProfile, Workspace } from '../types/form';
 import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi } from './api';
+export type { Workspace };
 
 // --- Synchronous helpers (local state) ---
 
@@ -227,7 +228,7 @@ export async function addSubmission(formId: string, data: Record<string, unknown
   };
 }
 
-export async function deleteSubmission(formId: string, submissionId: string): Promise<void> {
+export async function deleteSubmission(_formId: string, submissionId: string): Promise<void> {
   await deleteSubmissionApi(address(), submissionId);
 }
 

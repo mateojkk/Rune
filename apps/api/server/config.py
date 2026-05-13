@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     seal_key_server_1: Optional[str] = Field(default=None, validation_alias='SEAL_KEY_SERVER_1')
     seal_key_server_2: Optional[str] = Field(default=None, validation_alias='SEAL_KEY_SERVER_2')
 
+    database_url: Optional[str] = Field(default=None, validation_alias='DATABASE_URL')
+
     @field_validator('network', mode='before')
     @classmethod
     def normalize_network(cls, v: Optional[str]) -> str:
@@ -103,6 +105,7 @@ WALRUS_PUBLISHER_URL = settings.walrus_publisher
 WALRUS_AGGREGATOR_URL = settings.walrus_aggregator
 SEAL_PACKAGE_ID = settings.seal_package
 SEAL_KEY_SERVERS = settings.seal_key_servers
+DATABASE_URL = settings.database_url
 
 
 def get_settings() -> Settings:
