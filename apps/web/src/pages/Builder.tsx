@@ -4,7 +4,7 @@ import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload,
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
 import { storeBlobWithWallet, storeBlobWithKeypair, storeForm } from '../lib/walrus';
-import { useWallet } from '@suiet/wallet-kit';
+import { useWallet, WalletProvider } from '@suiet/wallet-kit';
 import { useWalletStore } from '../context/wallet';
 import './Builder.css';
 
@@ -23,7 +23,7 @@ const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] =
   { type: 'number', label: 'Number', icon: <Hash size={16} /> },
 ];
 
-export function Builder() {
+function BuilderInner() {
   const { formId } = useParams();
   const navigate = useNavigate();
   const address = getCurrentUserAddress();
@@ -599,5 +599,13 @@ export function Builder() {
         )}
       </main>
     </div>
+  );
+}
+
+export function Builder() {
+  return (
+    <WalletProvider>
+      <BuilderInner />
+    </WalletProvider>
   );
 }

@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       exclude: ['@mysten/walrus-wasm'],
     },
     define: {
-      'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE || 'http://localhost:3001'),
+      'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE || ''),
       'import.meta.env.VITE_WEB_URL': JSON.stringify(env.VITE_WEB_URL || 'http://localhost:5173'),
       'import.meta.env.VITE_REDIRECT_URL': JSON.stringify(env.VITE_REDIRECT_URL || 'http://localhost:5173/app/auth/callback'),
       'import.meta.env.VITE_NETWORK': JSON.stringify(env.NETWORK || 'testnet'),

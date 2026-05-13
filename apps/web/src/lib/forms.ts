@@ -91,11 +91,11 @@ export async function createWorkspace(name: string): Promise<Workspace> {
 }
 
 export async function renameWorkspace(workspaceId: string, name: string): Promise<void> {
-  await fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:3001'}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
+  await fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
 }
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
-  await fetch(`${import.meta.env.VITE_API_BASE || 'http://localhost:3001'}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
+  await fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
 }
 
 // --- Forms ---

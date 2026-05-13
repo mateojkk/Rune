@@ -4,7 +4,7 @@ import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDow
 import type { FormField, FieldType } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress } from '../lib/forms';
 import { storeBlobWithWallet, storeBlobWithKeypair, storeForm } from '../lib/walrus';
-import { useWallet } from '@suiet/wallet-kit';
+import { useWallet, WalletProvider } from '@suiet/wallet-kit';
 import { useWalletStore } from '../context/wallet';
 import './Builder.css';
 
@@ -30,7 +30,7 @@ interface Props {
   onSaved: () => void;
 }
 
-export function BuilderModal({ formId, workspaceId, onClose }: Props) {
+function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const address = getCurrentUserAddress();
   const wallet = useWallet();
 
@@ -354,5 +354,13 @@ export function BuilderModal({ formId, workspaceId, onClose }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+export function BuilderModal(props: Props) {
+  return (
+    <WalletProvider>
+      <BuilderModalInner {...props} />
+    </WalletProvider>
   );
 }

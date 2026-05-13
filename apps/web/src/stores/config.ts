@@ -21,7 +21,7 @@ interface ConfigState {
   fetchConfig: () => Promise<void>;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const DEFAULT_WALRUS_URLS = {
   publisher: import.meta.env.VITE_WALRUS_PUBLISHER_URL || '',

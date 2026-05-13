@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Wallet, Cloud, RefreshCw, LogOut, Copy, Check, Loader2 } from 'lucide-react';
 import { useWalletStore } from '../context/wallet';
-import { useWallet } from '@suiet/wallet-kit';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
+import { WalletLogin } from './WalletLogin';
 import './Navbar.css';
 
 function formatAddress(addr: string) {
@@ -16,14 +16,12 @@ function formatAddress(addr: string) {
 
 export function Navbar() {
   const { account, isConnected, isConnecting, connectWallet, disconnect } = useWalletStore();
-  const { address, select, connecting: walletConnecting, allAvailableWallets } = useWallet();
   const [copied, setCopied] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [showLogin, setShowLogin] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'zklogin' | 'wallet'>('zklogin');
-  const [pendingWalletName, setPendingWalletName] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,14 +29,6 @@ export function Navbar() {
       setCurrentUser(account.address);
     }
   }, [account?.address, isConnected]);
-
-  useEffect(() => {
-    if (!pendingWalletName || !address) return;
-    connectWallet(address, pendingWalletName);
-    setPendingWalletName(null);
-    setShowLogin(false);
-    navigate('/app/dashboard');
-  }, [address, connectWallet, navigate, pendingWalletName]);
 
   const handleZkLogin = async (provider: OAuthProvider) => {
     setConnecting(true);
@@ -136,17 +126,11 @@ export function Navbar() {
               </div>
             ) : (
               <div className="login-body">
-                {allAvailableWallets.map(wallet => (
-                  <button key={wallet.name} className="wallet-option" onClick={async () => {
-                    try {
-                      await select(wallet.name);
-                      setPendingWalletName(wallet.name);
-                    } catch { /* ignore */ }
-                  }} disabled={walletConnecting}>
-                    <Wallet size={18} />
-                    <span>{wallet.name}</span>
-                  </button>
-                ))}
+                <WalletLogin onConnected={(addr) => {
+                  connectWallet(addr, 'wallet-extension');
+                  setShowLogin(false);
+                  navigate('/app/dashboard');
+                }} />
               </div>
             )}
           </div>
