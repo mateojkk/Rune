@@ -911,11 +911,26 @@
     width: 100%;
     border-left: none;
     border-bottom: 1px solid var(--border);
-    max-height: 260px;
+    max-height: 220px;
   }
 
+  .b-sidebar-top { padding: 12px 12px 8px; }
+  .b-form-meta { padding: 8px 12px; gap: 8px; flex-direction: row; flex-wrap: wrap; }
+  .b-form-meta .b-field { flex: 1; min-width: 140px; }
+  .b-field-palette { padding: 0 12px 8px; }
+  .b-palette-header { margin-bottom: 4px; }
+  .b-field-types { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+  .b-type-btn { padding: 6px 6px; font-size: 0.68rem; gap: 3px; flex-direction: column; }
+  .b-type-btn svg { width: 14px; height: 14px; }
+  .b-sidebar-bottom { padding: 6px 12px 10px; flex-direction: row; flex-wrap: wrap; }
+  .b-sidebar-bottom .b-save-btn,
+  .b-sidebar-bottom .b-create-btn,
+  .b-sidebar-bottom .b-view-btn { flex: 1; min-width: 0; padding: 8px; font-size: 0.72rem; }
+  .b-sidebar-bottom .b-error { width: 100%; }
+  .b-share-link { width: 100%; }
+
   .b-canvas {
-    padding: 20px;
+    padding: 16px;
   }
 
   .b-field-types {
@@ -928,68 +943,55 @@
 
   .b-cover-add { height: 80px; }
   .b-cover-wrap { height: 100px; }
+
+  .b-field-card { padding: 10px; gap: 8px; }
+  .b-field-label { font-size: 0.85rem; }
+  .b-field-preview { padding: 8px 10px; font-size: 0.78rem; }
+  .b-field-actions { opacity: 1; }
+  .b-field-drag { opacity: 1; }
+  .b-canvas-header { padding: 0; }
+  .b-canvas-header h1 { font-size: 1rem; }
+  .b-canvas-ws-badge { font-size: 0.6rem; }
+  .b-input { font-size: 0.8rem; padding: 7px 10px; }
+  .b-textarea { padding: 7px 10px; min-height: 50px; }
+  .b-label { font-size: 0.65rem; }
 }
 
 @media (max-width: 480px) {
   .b-sidebar {
-    padding: 12px;
-    max-height: 200px;
+    max-height: 180px;
   }
 
-  .b-canvas {
-    padding: 14px;
-  }
+  .b-sidebar-top { padding: 8px 8px 4px; }
+  .b-back { font-size: 0.68rem; }
+  .b-form-meta { padding: 4px 8px; gap: 6px; flex-direction: row; flex-wrap: wrap; }
+  .b-form-meta .b-field { min-width: 120px; }
+  .b-field-palette { padding: 0 8px 6px; }
+  .b-field-types { grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .b-type-btn { padding: 4px 4px; font-size: 0.6rem; gap: 2px; }
+  .b-type-btn svg { width: 12px; height: 12px; }
+  .b-sidebar-bottom { padding: 4px 8px 8px; gap: 4px; }
+  .b-sidebar-bottom .b-save-btn,
+  .b-sidebar-bottom .b-create-btn,
+  .b-sidebar-bottom .b-view-btn { padding: 6px; font-size: 0.65rem; }
 
-  .b-field-types {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
-  }
+  .b-canvas { padding: 10px; }
 
-  .b-type-btn {
-    padding: 6px 8px;
-    font-size: 0.7rem;
-  }
-
-  .b-field-drag,
-  .b-field-actions {
-    opacity: 1;
-  }
-
-  .b-field-card {
-    padding: 10px;
-    gap: 8px;
-  }
-
-  .b-canvas-header h1 {
-    font-size: 1.1rem;
-  }
-
-  .b-canvas-ws-badge {
-    font-size: 0.65rem;
-  }
-
-  .b-cover-add { height: 60px; font-size: 0.75rem; }
-  .b-cover-wrap { height: 70px; }
-  .b-profile-img, .b-profile-add { width: 36px; height: 36px; }
-
-  .b-recent-card {
-    padding: 10px;
-  }
-
-  .b-recent-card-title {
-    font-size: 0.9rem;
-  }
-
-  .b-field-label {
-    font-size: 0.88rem;
-  }
-
-  .b-save-btn, .b-create-btn, .b-view-btn {
-    font-size: 0.75rem;
-    padding: 8px;
-  }
-
-  .b-sidebar-bottom {
-    padding: 10px;
-  }
+  .b-field-card { padding: 8px; gap: 6px; }
+  .b-field-label { font-size: 0.8rem; }
+  .b-field-preview { padding: 6px 8px; font-size: 0.72rem; }
+  .b-field-badge { font-size: 0.55rem; padding: 2px 6px; }
+  .b-field-index { font-size: 0.65rem; }
+  .b-canvas-header h1 { font-size: 0.92rem; }
+  .b-canvas-ws-badge { font-size: 0.55rem; padding: 2px 6px; }
+  .b-input { font-size: 0.75rem; padding: 6px 8px; }
+  .b-textarea { padding: 6px 8px; min-height: 40px; }
+  .b-label { font-size: 0.6rem; }
+  .b-cover-add { height: 50px; font-size: 0.68rem; }
+  .b-cover-wrap { height: 60px; }
+  .b-profile-img, .b-profile-add { width: 32px; height: 32px; }
+  .b-recent-card { padding: 8px; }
+  .b-recent-card-title { font-size: 0.82rem; }
+  .b-save-btn, .b-create-btn, .b-view-btn { font-size: 0.68rem; padding: 6px; }
+  .b-sidebar-bottom { padding: 6px; }
 }
