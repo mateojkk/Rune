@@ -131,32 +131,6 @@ export function AppPage() {
 
           <div className="app-sidebar-label-inline">My Workspace</div>
 
-          <div className="app-ws-mobile-picker" ref={pickerRef}>
-            <button className="app-ws-mobile-btn" onClick={() => setWsPickerOpen(!wsPickerOpen)}>
-              <span>{workspaces.find(w => w.id === currentWs)?.name || 'All Workspaces'}</span>
-              <ChevronDown size={12} className={`app-ws-mobile-chevron ${wsPickerOpen ? 'open' : ''}`} />
-            </button>
-            {wsPickerOpen && (
-              <div className="app-ws-mobile-options">
-                <button className={`app-ws-mobile-option ${!currentWs ? 'active' : ''}`} onClick={() => { navigate('/app/dashboard'); setWsPickerOpen(false); }}>
-                  All Workspaces
-                </button>
-                {workspaces.map(ws => (
-                  <button key={ws.id} className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
-                    <span className="app-ws-mobile-opt-dot" />
-                    <span>{ws.name}</span>
-                    <span className="app-ws-mobile-opt-count">{ws.formIds.length}</span>
-                  </button>
-                ))}
-                <div className="app-ws-mobile-divider" />
-                <button className="app-ws-mobile-option app-ws-mobile-opt-new" onClick={() => { setWsPickerOpen(false); setCreating(true); }}>
-                  <Plus size={13} />
-                  <span>New Workspace</span>
-                </button>
-              </div>
-            )}
-          </div>
-
           <div className="app-ws-desktop-list">
             {workspaces.map(ws => (
               <div key={ws.id} className="app-ws-row">
@@ -237,6 +211,54 @@ export function AppPage() {
           )}
         </nav>
         <main className="app-main">
+          <div className="app-ws-mobile-bar">
+            {creating ? (
+              <div className="app-ws-create">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Workspace name"
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') handleCreate();
+                    if (e.key === 'Escape') { setCreating(false); setNewName(''); }
+                  }}
+                  autoFocus
+                />
+                <button className="app-ws-btn confirm" onClick={handleCreate} disabled={creatingWs}>
+                  {creatingWs ? <Loader2 size={11} className="spin" /> : <Check size={11} />}
+                </button>
+                <button className="app-ws-btn" onClick={() => { setCreating(false); setNewName(''); }} disabled={creatingWs}><X size={11} /></button>
+              </div>
+            ) : (
+              <div className="app-ws-mobile-picker" ref={pickerRef}>
+                <button className="app-ws-mobile-btn" onClick={() => setWsPickerOpen(!wsPickerOpen)}>
+                  <span>{workspaces.find(w => w.id === currentWs)?.name || 'All Workspaces'}</span>
+                  <ChevronDown size={12} className={`app-ws-mobile-chevron ${wsPickerOpen ? 'open' : ''}`} />
+                </button>
+                {wsPickerOpen && (
+                  <div className="app-ws-mobile-options">
+                    <button className={`app-ws-mobile-option ${!currentWs ? 'active' : ''}`} onClick={() => { navigate('/app/dashboard'); setWsPickerOpen(false); }}>
+                      All Workspaces
+                    </button>
+                    {workspaces.map(ws => (
+                      <button key={ws.id} className={`app-ws-mobile-option ${currentWs === ws.id ? 'active' : ''}`} onClick={() => { navigate(`/app/dashboard?ws=${ws.id}`); setWsPickerOpen(false); }}>
+                        <span className="app-ws-mobile-opt-dot" />
+                        <span>{ws.name}</span>
+                        <span className="app-ws-mobile-opt-count">{ws.formIds.length}</span>
+                      </button>
+                    ))}
+                    <div className="app-ws-mobile-divider" />
+                    <button className="app-ws-mobile-option app-ws-mobile-opt-new" onClick={() => { setWsPickerOpen(false); setCreating(true); }}>
+                      <Plus size={13} />
+                      <span>New Workspace</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           <Outlet />
         </main>
       </div>

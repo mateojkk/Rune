@@ -296,7 +296,7 @@
   min-height: 0;
 }
 
-.app-main > * {
+.app-main > :not(.app-ws-mobile-bar) {
   flex: 1;
 }
 
@@ -349,59 +349,55 @@
   }
 
   .app-sidebar {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 6px 10px;
-    gap: 6px;
-  }
-
-  .app-nav-item {
-    padding: 6px 8px;
-    font-size: 0.78rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-    border-radius: var(--radius-sm);
+    display: none;
   }
 
   .app-sidebar-label-inline {
     display: none;
   }
 
+  .app-ws-mobile-bar {
+    display: block;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
   .app-ws-mobile-picker {
     display: block;
+  }
+
+  .app-ws-mobile-bar .app-ws-create {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .app-ws-mobile-bar .app-ws-create input {
     flex: 1;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    color: var(--text);
     min-width: 0;
+  }
+
+  .app-ws-mobile-bar .app-ws-create input:focus {
+    outline: none;
   }
 
   .app-ws-desktop-list,
   .app-ws-new {
     display: none;
   }
+}
 
-  .app-ws-create {
-    display: flex;
-    flex: 2;
-    align-items: center;
-    gap: 3px;
-    padding: 0 0 0 4px;
-    min-width: 0;
-  }
+/* ─── Mobile workspace bar ─── */
 
-  .app-ws-create input {
-    flex: 1;
-    font-size: 0.75rem;
-    padding: 4px 6px;
-    min-width: 0;
-  }
-
-  .app-ws-create .app-ws-btn {
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
-  }
+.app-ws-mobile-bar {
+  display: none;
 }
 
 /* ─── Mobile workspace picker ─── */

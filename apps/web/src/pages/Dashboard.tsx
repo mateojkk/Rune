@@ -389,10 +389,9 @@ export function Dashboard() {
                 const subCount = getCachedSubmissions(form.id).length;
                 return (
                   <div key={form.id} className="d-form-card">
-                    <FileText size={16} />
                     <div className="d-form-card-body">
                       <h3>{form.title || 'Untitled'}</h3>
-                      <span className="d-form-card-meta">{form.fields.length}f · {subCount}s</span>
+                      <div className="d-form-card-meta">{form.fields.length}f · {subCount}s</div>
                     </div>
                     <div className="d-form-card-actions">
                       <button className="btn btn-secondary btn-sm" onClick={() => openSubmissions(form)}>
