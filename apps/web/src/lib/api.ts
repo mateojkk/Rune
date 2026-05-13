@@ -109,3 +109,22 @@ export async function createSubmissionApi(formUuid: string, data: Record<string,
 export async function deleteSubmissionApi(address: string, uuid: string): Promise<void> {
   await req(`/submissions/${uuid}?address=${encodeURIComponent(address)}`, { method: 'DELETE' });
 }
+
+// --- Profile ---
+
+export interface ProfileDTO {
+  display_name?: string;
+  pfp?: string;
+  theme: string;
+}
+
+export async function getProfileApi(address: string): Promise<ProfileDTO> {
+  return req(`/profile?address=${encodeURIComponent(address)}`);
+}
+
+export async function updateProfileApi(address: string, data: Record<string, unknown>): Promise<ProfileDTO> {
+  return req(`/profile?address=${encodeURIComponent(address)}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}

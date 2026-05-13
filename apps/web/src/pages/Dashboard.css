@@ -661,43 +661,61 @@
   .b-field-label { font-size: 0.88rem; }
 }
 
-@media (max-width: 480px) {
-  .d-main { padding: 14px; }
-  .d-form-card { padding: 5px 8px; gap: 6px; }
-  .d-form-card svg { width: 14px; height: 14px; }
-  .d-form-card-body h3 { font-size: 0.75rem; }
-  .d-form-card-meta { font-size: 0.6rem; }
-  .d-ws-header { margin-bottom: 10px; padding-bottom: 8px; }
-  .d-ws-header h1 { font-size: 1rem; }
-  .d-home-header h1 { font-size: 1rem; }
+@media (max-width: 768px) {
+  .d-main { padding: 16px; }
+  .d-form-card { padding: 8px 10px; gap: 8px; }
+  .d-form-card-body h3 { font-size: 0.82rem; }
+  .d-form-card-meta { font-size: 0.68rem; }
+  .d-form-card-actions .btn { padding: 4px 8px; font-size: 0.72rem; }
+  .d-form-card-actions { opacity: 1; }
+  .d-form-card-del { opacity: 1; }
+  .d-ws-header { margin-bottom: 10px; }
+  .d-ws-header h1, .d-home-header h1 { font-size: 1.05rem; }
   .d-home-recent { grid-template-columns: 1fr; }
   .d-home-section-title { font-size: 0.75rem; margin: 14px 0 8px; }
-  .d-main-empty svg { width: 24px; height: 24px; }
-  .d-main-empty h3 { font-size: 0.9rem; }
-  .d-subs-header h1 { font-size: 0.9rem; }
-  .d-sub-header { flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 10px; }
-  .d-subs-back { font-size: 0.72rem; }
+  .d-main-empty svg { width: 28px; height: 28px; }
+  .d-main-empty h3 { font-size: 0.95rem; }
+  .d-subs-header { flex-wrap: wrap; gap: 6px; }
+  .d-subs-header h1 { font-size: 0.95rem; width: 100%; order: -1; }
+  .d-subs-header-actions .btn { padding: 6px 10px; font-size: 0.72rem; }
+  .d-sub-header { padding: 8px 10px; }
+  .d-sub-wallet { font-size: 0.78rem; }
+  .d-sub-date { font-size: 0.68rem; }
+  .d-search { max-width: 100%; }
+  .d-stats-row { font-size: 0.78rem; }
+}
 
-  .b-modal-sidebar { max-height: 160px; padding: 8px 8px; gap: 6px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+@media (max-width: 480px) {
+  .d-main { padding: 12px; }
+  .d-form-card { padding: 6px 8px; gap: 6px; }
+  .d-form-card svg { width: 14px; height: 14px; }
+  .d-form-card-body h3 { font-size: 0.72rem; }
+  .d-form-card-meta { font-size: 0.58rem; }
+  .d-ws-header { margin-bottom: 8px; }
+  .d-ws-header h1, .d-home-header h1 { font-size: 0.92rem; }
+  .d-home-section-title { font-size: 0.7rem; margin: 10px 0 6px; }
+  .d-main-empty svg { width: 22px; height: 22px; }
+  .d-main-empty h3 { font-size: 0.85rem; }
+  .d-subs-header h1 { font-size: 0.85rem; }
+  .d-sub-header { flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 8px; }
+  .d-subs-back { font-size: 0.68rem; }
+  .d-stats-row { font-size: 0.7rem; gap: 4px; }
+
+  .b-modal-sidebar { max-height: 140px; padding: 6px 8px; gap: 4px; }
   .b-field-types { grid-template-columns: repeat(2, 1fr); gap: 3px; }
-  .b-type-btn { padding: 7px 6px; font-size: 0.68rem; gap: 4px; }
-  .b-type-btn svg { width: 14px; height: 14px; }
-  .b-modal-canvas { padding: 10px; }
-  .b-modal-header { padding: 8px 10px; }
-  .b-modal-header h2 { font-size: 0.85rem; }
-  .b-field-card { padding: 8px; gap: 6px; }
-  .b-field-label { font-size: 0.82rem; }
-  .b-save-btn, .b-create-btn { font-size: 0.75rem; padding: 8px; }
-  .b-input { font-size: 0.8rem; padding: 7px 10px; }
-  .b-field { gap: 3px; }
-  .b-input { font-size: 0.8rem; padding: 7px 10px; }
-  .b-textarea { min-height: 50px; }
-  .b-field-label { font-size: 0.82rem; }
-  .b-cover-add { height: 60px; font-size: 0.75rem; }
-  .b-cover-wrap { height: 70px; }
-  .b-profile-img, .b-profile-add { width: 36px; height: 36px; }
-  .b-modal-sidebar { max-height: 160px; }
-  .b-modal-sidebar .b-field-palette { gap: 4px; }
+  .b-type-btn { padding: 6px 6px; font-size: 0.65rem; gap: 3px; }
+  .b-type-btn svg { width: 12px; height: 12px; }
+  .b-modal-canvas { padding: 8px; }
+  .b-modal-header { padding: 6px 8px; }
+  .b-modal-header h2 { font-size: 0.8rem; }
+  .b-field-card { padding: 6px; gap: 4px; }
+  .b-field-label { font-size: 0.78rem; }
+  .b-save-btn, .b-create-btn { font-size: 0.7rem; padding: 6px; }
+  .b-input { font-size: 0.75rem; padding: 6px 8px; }
+  .b-field { gap: 2px; }
+  .b-cover-add { height: 50px; font-size: 0.7rem; }
+  .b-cover-wrap { height: 60px; }
+  .b-profile-img, .b-profile-add { width: 32px; height: 32px; }
 }
 
 .d-fab {

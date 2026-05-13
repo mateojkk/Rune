@@ -17,6 +17,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     address = Column(String(128), unique=True, nullable=False, index=True)
+    display_name = Column(String(255), nullable=True)
+    pfp = Column(Text, nullable=True)
+    theme = Column(String(20), default="light")
     created_at = Column(DateTime, default=_now)
     updated_at = Column(DateTime, default=_now, onupdate=_now)
 

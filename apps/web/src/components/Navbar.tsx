@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, Cloud, RefreshCw, LogOut, Copy, Loader2, Settings, ChevronDown } from 'lucide-react';
+import { Wallet, LogOut, Copy, Loader2, Settings, ChevronDown } from 'lucide-react';
 import { useWalletStore } from '../context/wallet';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
@@ -27,8 +27,6 @@ export function Navbar() {
   const { displayName, pfp } = useProfileStore();
   const [showDropdown, setShowDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [showLogin, setShowLogin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -66,7 +64,6 @@ export function Navbar() {
     clearSession();
     disconnect();
     setShowDropdown(false);
-    setSyncStatus('idle');
   };
 
   const copyAddress = async () => {
@@ -74,20 +71,6 @@ export function Navbar() {
       await navigator.clipboard.writeText(account.address);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleSync = async () => {
-    if (!account?.address) return;
-    setSyncing(true);
-    setSyncStatus('syncing');
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSyncStatus('success');
-    } catch {
-      setSyncStatus('error');
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -129,10 +112,6 @@ export function Navbar() {
                     <button className="profile-dropdown-item" onClick={copyAddress}>
                       <Copy size={13} />
                       <span>{copied ? 'Copied!' : 'Copy Address'}</span>
-                    </button>
-                    <button className="profile-dropdown-item" onClick={handleSync} disabled={syncing}>
-                      {syncing ? <RefreshCw size={13} className="spin" /> : <Cloud size={13} />}
-                      <span>{syncing ? 'Syncing...' : syncStatus === 'success' ? 'Synced' : 'Sync to Walrus'}</span>
                     </button>
                     <button className="profile-dropdown-item" onClick={() => { setShowSettings(true); setShowDropdown(false); }}>
                       <Settings size={13} />

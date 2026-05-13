@@ -111,3 +111,13 @@ class SubmissionOut(BaseModel):
 
 class MoveFormRequest(BaseModel):
     workspace_uuid: str
+
+class ProfileUpdate(BaseModel):
+    display_name: Optional[str] = None
+    pfp: Optional[str] = None
+    theme: Optional[str] = None
+
+class ProfileOut(BaseModel):
+    display_name: Optional[str] = None
+    pfp: Optional[str] = None
+    theme: str = "light"

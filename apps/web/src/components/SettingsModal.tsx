@@ -2,17 +2,31 @@ import { useState } from 'react';
 import { X, Sun, Moon, Image } from 'lucide-react';
 import { useProfileStore } from '../stores/profile';
 import { useWalletStore } from '../context/wallet';
+import { saveProfile } from '../lib/forms';
 import './SettingsModal.css';
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { displayName, pfp, theme, setDisplayName, setPfp, toggleTheme } = useProfileStore();
+  const { displayName, pfp, theme, setDisplayName, setPfp, setTheme } = useProfileStore();
   const account = useWalletStore(s => s.account);
   const [name, setName] = useState(displayName);
   const [pfpUrl, setPfpUrl] = useState(pfp);
+  const [currentTheme, setCurrentTheme] = useState(theme);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!account?.address) return;
+    setSaving(true);
     setDisplayName(name.trim());
-    if (pfpUrl.trim()) setPfp(pfpUrl.trim());
+    setPfp(pfpUrl.trim());
+    setTheme(currentTheme);
+    try {
+      await saveProfile(account.address, {
+        displayName: name.trim() || undefined,
+        pfp: pfpUrl.trim() || undefined,
+        theme: currentTheme,
+      });
+    } catch { /* fallback to local save */ }
+    setSaving(false);
     onClose();
   };
 
@@ -88,10 +102,10 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <div className="settings-section">
             <label className="settings-label">Preferences</label>
             <div className="settings-theme-row">
-              <span className="settings-theme-label">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
-              <button className="settings-theme-toggle" onClick={toggleTheme}>
-                {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
-                <span>{theme === 'dark' ? 'Dark' : 'Light'}</span>
+              <span className="settings-theme-label">{currentTheme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+              <button className="settings-theme-toggle" onClick={() => setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark')}>
+                {currentTheme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+                <span>{currentTheme === 'dark' ? 'Dark' : 'Light'}</span>
               </button>
             </div>
           </div>
@@ -99,7 +113,9 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
         <div className="settings-footer">
           <button className="btn btn-secondary btn-sm" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary btn-sm" onClick={handleSave}>Save</button>
+          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </div>
     </div>

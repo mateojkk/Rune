@@ -1,5 +1,5 @@
 import type { FormSchema, FormSubmission, FormField, UserProfile, Workspace } from '../types/form';
-import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi } from './api';
+import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi, getProfileApi, updateProfileApi } from './api';
 export type { Workspace };
 
 // --- Synchronous helpers (local state) ---
@@ -258,4 +258,27 @@ export function getCachedSubmissions(formId: string): FormSubmission[] {
 
 export async function deleteWorkspaceAndForms(workspaceId: string): Promise<void> {
   await deleteWorkspace(workspaceId);
+}
+
+// --- Profile ---
+
+export async function fetchProfile(address: string): Promise<{ displayName: string; pfp: string; theme: string }> {
+  try {
+    const data = await getProfileApi(address);
+    return {
+      displayName: data.display_name || '',
+      pfp: data.pfp || '',
+      theme: data.theme || 'light',
+    };
+  } catch {
+    return { displayName: '', pfp: '', theme: 'light' };
+  }
+}
+
+export async function saveProfile(address: string, profile: { displayName?: string; pfp?: string; theme?: string }): Promise<void> {
+  const body: Record<string, unknown> = {};
+  if (profile.displayName !== undefined) body.display_name = profile.displayName;
+  if (profile.pfp !== undefined) body.pfp = profile.pfp;
+  if (profile.theme !== undefined) body.theme = profile.theme;
+  await updateProfileApi(address, body);
 }

@@ -9,6 +9,7 @@ from server.models import (
     FormCreate, FormUpdate, FormOut,
     SubmissionCreate, SubmissionOut,
     MoveFormRequest,
+    ProfileUpdate, ProfileOut,
 )
 
 router = APIRouter(prefix="/api/data")
@@ -297,5 +298,47 @@ def delete_submission(uuid: str, address: str):
         db.delete(s)
         db.commit()
         return {"ok": True}
+    finally:
+        db.close()
+
+
+@router.get("/profile")
+def get_profile(address: str):
+    db = next(get_db())
+    try:
+        user = db.query(User).filter(User.address == address.lower()).first()
+        if not user:
+            return ProfileOut()
+        return ProfileOut(
+            display_name=user.display_name,
+            pfp=user.pfp,
+            theme=user.theme or "light",
+        )
+    finally:
+        db.close()
+
+
+@router.put("/profile")
+def update_profile(body: ProfileUpdate, address: str):
+    db = next(get_db())
+    try:
+        user = db.query(User).filter(User.address == address.lower()).first()
+        if not user:
+            user = User(address=address.lower())
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        if body.display_name is not None:
+            user.display_name = body.display_name
+        if body.pfp is not None:
+            user.pfp = body.pfp
+        if body.theme is not None:
+            user.theme = body.theme
+        db.commit()
+        return ProfileOut(
+            display_name=user.display_name,
+            pfp=user.pfp,
+            theme=user.theme or "light",
+        )
     finally:
         db.close()
