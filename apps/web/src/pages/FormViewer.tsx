@@ -5,7 +5,7 @@ import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
 import { getOAuthUrl } from '../lib/zklogin';
-import { storeBlobWithKeypair } from '../lib/walrus';
+import { encryptAndStore } from '../lib/encrypted-storage';
 import { getFormApi } from '../lib/api';
 import './FormViewer.css';
 
@@ -99,7 +99,8 @@ export function FormViewer() {
   const handleSubmit = async () => {
     if (!form || !validate() || !account?.address) return;
     try {
-      const blobData = { type: 'submission', version: '1.0', formId: form.id, data: formData, submittedAt: new Date().toISOString() };
+      const submissionData = { data: formData, submittedAt: new Date().toISOString() };
+      let blobId: string | undefined;
 
       if (account.method === 'zklogin') {
         const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
@@ -107,12 +108,18 @@ export function FormViewer() {
           try {
             const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
             const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-            await storeBlobWithKeypair(blobData, keypair, account.address);
-          } catch { /* walrus optional */ }
+            const result = await encryptAndStore(submissionData, form.walletAddress || account.address, keypair, account.address);
+            blobId = result.blobId;
+          } catch (e) { console.error('Walrus storage failed:', e); }
         }
       }
 
-      await addSubmission(form.id, formData);
+      if (blobId) {
+        await addSubmission(form.id, { blobId, submittedAt: submissionData.submittedAt }, account.address);
+      } else {
+        await addSubmission(form.id, formData);
+      }
+
       setSubmitted(true);
     } catch {
       alert('Failed to submit form');

@@ -3,6 +3,8 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft, Clock, Folder } from 'lucide-react';
 import type { FormSchema, FormSubmission } from '../types/form';
 import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
+import { useWalletStore } from '../context/wallet';
+import { downloadBlob, decryptAndRead } from '../lib/encrypted-storage';
 import type { Workspace } from '../types/form';
 import { BuilderModal } from './BuilderModal';
 import './Dashboard.css';
@@ -73,8 +75,27 @@ export function Dashboard() {
     setSearchQuery('');
     setExpandedSub(null);
     const subs = await getSubmissions(form.id);
-    cacheSubmissions(form.id, subs);
-    setSubmissions(subs);
+
+    // Decrypt any encrypted submissions
+    const decrypted = await Promise.all(subs.map(async (sub) => {
+      const blobData = sub.data as Record<string, unknown> | undefined;
+      if (!blobData?.blobId) return sub;
+      try {
+        const raw = await downloadBlob(blobData.blobId as string);
+        if (!raw) return sub;
+        const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
+        const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
+        if (!ephemeralKey) return sub;
+        const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
+        const decryptedData = await decryptAndRead(raw, keypair, getCurrentUserAddress()!);
+        return { ...sub, data: (decryptedData as any).data || {} };
+      } catch {
+        return sub;
+      }
+    }));
+
+    cacheSubmissions(form.id, decrypted);
+    setSubmissions(decrypted);
   };
 
   const closeSubmissions = () => {
