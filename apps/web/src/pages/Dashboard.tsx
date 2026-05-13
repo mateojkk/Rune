@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Plus, Trash2, Search, FileText, Wallet, X, Check, PenLine, Eye, ChevronDown, Calendar, Download, ArrowLeft, Clock, Folder, Copy } from 'lucide-react';
 import type { FormSchema, FormSubmission } from '../types/form';
 import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
@@ -337,7 +337,7 @@ export function Dashboard() {
                   const ws = workspaces.find(w => w.id === form.workspaceId);
                   const subCount = getCachedSubmissions(form.id).length;
                   return (
-                    <Link key={form.id} to={`/app/dashboard/${editingFormId === form.id ? '' : `?open=${form.id}`}`} className="d-home-card" onClick={e => { e.preventDefault(); startEditForm(form.id); }}>
+                    <div key={form.id} className="d-home-card" onClick={() => startEditForm(form.id)}>
                       <div className="d-home-card-top">
                         <FileText size={16} />
                         <span className="d-home-card-meta">{form.fields.length}f · {subCount}s</span>
@@ -346,9 +346,21 @@ export function Dashboard() {
                       {form.description && <p className="d-home-card-desc">{form.description}</p>}
                       <div className="d-home-card-footer">
                         {ws && <span><Folder size={11} />{ws.name}</span>}
-                        <span><Clock size={11} />{new Date(form.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <span><Clock size={11} />{new Date(form.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                          {confirmDelete === form.id ? (
+                            <span className="d-form-card-del-confirm" onClick={e => e.stopPropagation()}>
+                              <button className="d-icon-btn confirm-yes" onClick={() => handleDeleteForm(form.id)}><Check size={9} /></button>
+                              <button className="d-icon-btn confirm-no" onClick={() => setConfirmDelete(null)}><X size={9} /></button>
+                            </span>
+                          ) : (
+                            <button className="d-form-card-del" onClick={e => { e.stopPropagation(); setConfirmDelete(form.id); }} title="Delete">
+                              <Trash2 size={11} />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
