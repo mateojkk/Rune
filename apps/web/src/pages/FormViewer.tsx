@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Star, CheckSquare, Upload, FileText, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
@@ -81,8 +81,6 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
 
 export function FormViewer() {
   const { formId } = useParams();
-  const location = useLocation();
-  const isEmbedded = location.pathname.startsWith('/app/');
 
   const [walletAddr, setWalletAddr] = useState<string | null>(null);
   const [walletRef, setWalletRef] = useState<any>(null);
@@ -439,9 +437,4 @@ export function FormViewer() {
       </div>
     );
   }
-}
-        </div>
-      </div>
-    </div>
-  );
 }
