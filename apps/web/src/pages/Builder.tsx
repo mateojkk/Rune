@@ -138,10 +138,15 @@ function BuilderInner() {
     }
   };
 
-  const handleUpdateField = async (fieldId: string, updates: Partial<FormField>) => {
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleUpdateField = (fieldId: string, updates: Partial<FormField>) => {
     if (!currentFormId) return;
-    await updateField(currentFormId, fieldId, updates);
-    setFields(fields.map(f => f.id === fieldId ? { ...f, ...updates } : f));
+    setFields(fields => fields.map(f => f.id === fieldId ? { ...f, ...updates } : f));
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      updateField(currentFormId, fieldId, updates).catch(() => {});
+    }, 500);
   };
 
   const handleDeleteField = async (fieldId: string) => {

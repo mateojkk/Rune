@@ -378,4 +378,31 @@
   .app-ws-row .app-ws-actions {
     opacity: 1;
   }
+
+  .app-ws-mobile-select {
+    display: block;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .app-ws-desktop-list {
+    display: none;
+  }
+}
+
+/* ─── Mobile workspace select (base) ─── */
+
+.app-ws-mobile-select {
+  display: none;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.app-ws-desktop-list {
+  display: contents;
 }
