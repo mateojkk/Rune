@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,9 +8,14 @@ from server.handlers import store_blob, read_blob, encrypt, decrypt
 from server.handlers.data import router as data_router
 from server.database import init_db
 
-app = FastAPI(title="Rune Backend API")
 
-init_db()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="Rune Backend API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
