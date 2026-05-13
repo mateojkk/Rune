@@ -382,14 +382,25 @@
   }
 
   .app-ws-create {
-    flex: 1;
-    padding: 2px 0;
+    display: flex;
+    flex: 2;
+    align-items: center;
+    gap: 3px;
+    padding: 0 0 0 4px;
     min-width: 0;
   }
 
   .app-ws-create input {
+    flex: 1;
     font-size: 0.75rem;
-    padding: 3px 6px;
+    padding: 4px 6px;
+    min-width: 0;
+  }
+
+  .app-ws-create .app-ws-btn {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
   }
 }
 
