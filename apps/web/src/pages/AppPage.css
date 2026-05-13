@@ -300,6 +300,12 @@
   flex: 1;
 }
 
+/* ─── Mobile workspace bar (hidden on desktop) ─── */
+
+.app-ws-mobile-bar {
+  display: none;
+}
+
 /* ─── Auth Gate ─── */
 
 .app-gate {
@@ -392,12 +398,6 @@
   .app-ws-new {
     display: none;
   }
-}
-
-/* ─── Mobile workspace bar ─── */
-
-.app-ws-mobile-bar {
-  display: none;
 }
 
 /* ─── Mobile workspace picker ─── */
