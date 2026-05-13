@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2, Wallet, ExternalLink } from 'lucide-react';
+import { Star, CheckSquare, Upload, FileText, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
@@ -87,6 +87,7 @@ export function FormViewer() {
   const [walletAddr, setWalletAddr] = useState<string | null>(null);
   const [walletRef, setWalletRef] = useState<any>(null);
   const [showPicker, setShowPicker] = useState(false);
+  const [step, setStep] = useState(-1);
 
   const [form, setForm] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +98,7 @@ export function FormViewer() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
 
   useEffect(() => {
     if (!formId) return;
@@ -117,6 +119,10 @@ export function FormViewer() {
       setLoading(false);
     })();
   }, [formId]);
+
+  useEffect(() => {
+    if (step >= 0) inputRef.current?.focus();
+  }, [step]);
 
   const handleFieldChange = (fieldId: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
@@ -142,25 +148,41 @@ export function FormViewer() {
     }
   };
 
-  const validate = (): boolean => {
+  const validateField = (fieldId: string): boolean => {
     if (!form) return false;
-    const newErrors: Record<string, string> = {};
-    for (const field of form.fields) {
-      if (field.required) {
-        const value = formData[field.id];
-        if (value === undefined || value === null || value === '') {
-          newErrors[field.id] = 'This field is required';
-        } else if (Array.isArray(value) && value.length === 0) {
-          newErrors[field.id] = 'This field is required';
-        }
-      }
+    const field = form.fields.find(f => f.id === fieldId);
+    if (!field?.required) return true;
+    const value = formData[fieldId];
+    if (value === undefined || value === null || value === '') {
+      setErrors(prev => ({ ...prev, [fieldId]: 'This field is required' }));
+      return false;
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (Array.isArray(value) && value.length === 0) {
+      setErrors(prev => ({ ...prev, [fieldId]: 'This field is required' }));
+      return false;
+    }
+    return true;
+  };
+
+  const goNext = () => {
+    if (!form) return;
+    if (step < 0) { setStep(0); return; }
+    const field = form.fields[step];
+    if (field && !validateField(field.id)) return;
+    if (step < form.fields.length - 1) {
+      setStep(step + 1);
+    }
+  };
+
+  const goBack = () => {
+    if (step > 0) setStep(step - 1);
+    else setStep(-1);
   };
 
   const handleSubmit = async () => {
-    if (!form || !validate() || !walletAddr || !walletRef) return;
+    if (!form || !walletAddr || !walletRef) return;
+    const last = form.fields[form.fields.length - 1];
+    if (last && !validateField(last.id)) return;
     setSubmitting(true);
     try {
       const submissionData = { data: formData, submittedAt: new Date().toISOString() };
@@ -188,6 +210,19 @@ export function FormViewer() {
     setShowPicker(false);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (step >= 0 && form && step === form.fields.length - 1 && walletAddr) {
+        handleSubmit();
+      } else {
+        goNext();
+      }
+    }
+  };
+
+  const progress = form ? ((step + 1) / (form.fields.length + 1)) * 100 : 0;
+
   if (loading) {
     return <div className="fv-loading"><FileText size={32} /><p>Loading form...</p></div>;
   }
@@ -210,150 +245,160 @@ export function FormViewer() {
         <h2>Thank you!</h2>
         <p>Your response has been submitted</p>
         <p style={{ fontSize: '0.8rem', color: 'var(--subtle)', marginTop: 4 }}>
-          Powered by <strong>Rune</strong> — decentralized feedback forms on Walrus
+          Powered by <strong>Rune</strong>
         </p>
-        <a href="https://runeso.vercel.app" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-sm" style={{ marginTop: 8 }}>
-          Try Rune
-        </a>
       </div>
     );
   }
 
+  if (step < 0) {
+    return (
+      <div className="form-viewer">
+        <div className="fv-container">
+          <div className="fv-intro">
+            {coverPicture && (
+              <div className="fv-cover-wrap">
+                <img src={coverPicture} alt="" className="fv-cover-img" />
+              </div>
+            )}
+            <div className="fv-title-row" style={{ justifyContent: 'center', textAlign: 'center', marginTop: coverPicture ? 24 : 0 }}>
+              {profilePicture && <img src={profilePicture} alt="" className="fv-profile-img" />}
+              <div>
+                <h1>{form.title}</h1>
+                {form.description && <p>{form.description}</p>}
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{form.fields.length} question{form.fields.length !== 1 ? 's' : ''}</span>
+              <button className="fv-start-btn" onClick={() => { setStep(0); setTimeout(() => inputRef.current?.focus(), 100); }}>
+                Start
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const field = form.fields[step];
+  const isLast = step === form.fields.length - 1;
+
   return (
-    <div className="form-viewer">
-      <div className="fv-container">
-        <header className="fv-header">
-          {isEmbedded && (
-            <Link to="/app/dashboard" className="fv-back">
-              <ArrowLeft size={14} />
-              Back to Dashboard
-            </Link>
+    <div className="form-viewer fv-flow" onKeyDown={handleKeyDown}>
+      <div className="fv-progress-bar">
+        <div className="fv-progress-fill" style={{ width: `${progress}%` }} />
+      </div>
+
+      <div className="fv-container fv-flow-container">
+        {step > 0 && (
+          <button className="fv-flow-back" onClick={goBack}>
+            <ArrowLeft size={16} />
+          </button>
+        )}
+
+        <div className="fv-flow-field">
+          {field.type !== 'checkbox' && (
+            <label className="fv-label">
+              {field.label}
+              {field.required && <span className="fv-required">*</span>}
+            </label>
           )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <img src="/runelogo.png" alt="Rune" style={{ height: 16, filter: 'invert(1)' }} />
-          </div>
-          {coverPicture && (
-            <div className="fv-cover-wrap">
-              <img src={coverPicture} alt="" className="fv-cover-img" />
+          {field.description && field.type !== 'checkbox' && (
+            <p className="fv-desc">{field.description}</p>
+          )}
+
+          {field.type === 'text' && (
+            <input ref={inputRef as any} type="text" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
+              value={formData[field.id] as string || ''}
+              onChange={e => handleFieldChange(field.id, e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+          )}
+
+          {field.type === 'number' && (
+            <input ref={inputRef as any} type="number" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
+              value={formData[field.id] as number || ''}
+              onChange={e => handleFieldChange(field.id, Number(e.target.value))}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+          )}
+
+          {field.type === 'url' && (
+            <input ref={inputRef as any} type="url" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
+              value={formData[field.id] as string || ''}
+              onChange={e => handleFieldChange(field.id, e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+          )}
+
+          {field.type === 'textarea' && (
+            <textarea ref={inputRef as any} className="fv-line-input fv-textarea" placeholder={field.placeholder || 'Type your answer...'} rows={3}
+              value={formData[field.id] as string || ''}
+              onChange={e => handleFieldChange(field.id, e.target.value)} />
+          )}
+
+          {field.type === 'richtext' && (
+            <textarea ref={inputRef as any} className="fv-line-input fv-textarea" placeholder={field.placeholder || 'Type your answer...'} rows={4}
+              value={formData[field.id] as string || ''}
+              onChange={e => handleFieldChange(field.id, e.target.value)} />
+          )}
+
+          {field.type === 'dropdown' && (
+            <select ref={inputRef as any} className="fv-line-input fv-select"
+              value={formData[field.id] as string || ''}
+              onChange={e => { handleFieldChange(field.id, e.target.value); setTimeout(goNext, 200); }}>
+              <option value="">Select an option</option>
+              {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          )}
+
+          {field.type === 'checkbox' && (
+            <label className="fv-checkbox">
+              <input type="checkbox" checked={!!formData[field.id]}
+                onChange={e => { handleFieldChange(field.id, e.target.checked); setTimeout(goNext, 200); }} />
+              <span>{field.label}{field.required && <span className="fv-required">*</span>}</span>
+            </label>
+          )}
+
+          {field.type === 'multiselect' && (
+            <div className="fv-multiselect">
+              {field.options?.map(opt => (
+                <label key={opt} className="fv-multi-opt">
+                  <input type="checkbox"
+                    checked={(formData[field.id] as string[])?.includes(opt) || false}
+                    onChange={() => handleCheckbox(field.id, formData[field.id], opt)} />
+                  <span>{opt}</span>
+                </label>
+              ))}
             </div>
           )}
-          <div className="fv-title-row">
-            {profilePicture && <img src={profilePicture} alt="" className="fv-profile-img" />}
-            <div>
-              <h1>{form.title}</h1>
-              {form.description && <p>{form.description}</p>}
-            </div>
-          </div>
-        </header>
 
-        <div className="fv-fields">
-          {form.fields.map(field => (
-            <div key={field.id} className={`fv-field ${errors[field.id] ? 'error' : ''}`}>
-              {field.type !== 'checkbox' && (
-                <label className="fv-label">
-                  {field.label}
-                  {field.required && <span className="fv-required">*</span>}
-                </label>
-              )}
-
-              {field.type === 'text' && (
-                <input type="text" className="fv-input" placeholder={field.placeholder}
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)} />
-              )}
-
-              {field.type === 'number' && (
-                <input type="number" className="fv-input" placeholder={field.placeholder}
-                  value={formData[field.id] as number || ''}
-                  onChange={e => handleFieldChange(field.id, Number(e.target.value))} />
-              )}
-
-              {field.type === 'url' && (
-                <input type="url" className="fv-input" placeholder={field.placeholder}
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)} />
-              )}
-
-              {field.type === 'textarea' && (
-                <textarea className="fv-input fv-textarea" placeholder={field.placeholder} rows={4}
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)} />
-              )}
-
-              {field.type === 'richtext' && (
-                <textarea className="fv-input fv-textarea fv-richtext" placeholder={field.placeholder} rows={6}
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)} />
-              )}
-
-              {field.type === 'dropdown' && (
-                <select className="fv-input fv-select"
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)}>
-                  <option value="">Select an option</option>
-                  {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                </select>
-              )}
-
-              {field.type === 'checkbox' && (
-                <label className="fv-checkbox">
-                  <input type="checkbox" checked={!!formData[field.id]}
-                    onChange={e => handleFieldChange(field.id, e.target.checked)} />
-                  <span>{field.label}{field.required && <span className="fv-required">*</span>}</span>
-                </label>
-              )}
-
-              {field.type === 'multiselect' && (
-                <div className="fv-multiselect">
-                  {field.options?.map(opt => (
-                    <label key={opt} className="fv-multi-opt">
-                      <input type="checkbox"
-                        checked={(formData[field.id] as string[])?.includes(opt) || false}
-                        onChange={() => handleCheckbox(field.id, formData[field.id], opt)} />
-                      <span>{opt}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {field.type === 'starRating' && (
-                <div className="fv-stars">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <button key={star} type="button"
-                      className={`fv-star-btn ${(formData[field.id] as number) >= star ? 'filled' : ''}`}
-                      onClick={() => handleStarRating(field.id, star)}>
-                      <Star size={28} fill={(formData[field.id] as number) >= star ? 'var(--accent)' : 'none'} stroke="var(--accent)" />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {(field.type === 'file' || field.type === 'image' || field.type === 'video') && (
-                <label className="fv-file">
-                  <Upload size={20} />
-                  <span>{fileNames[field.id] || `Upload ${field.type}`}</span>
-                  <input type="file" accept={field.type === 'image' ? 'image/*' : field.type === 'video' ? 'video/*' : undefined}
-                    onChange={e => handleFile(field.id, e.target.files?.[0] || null)} />
-                </label>
-              )}
-
-              {field.description && field.type !== 'checkbox' && (
-                <p className="fv-desc">{field.description}</p>
-              )}
-              {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
-            </div>
-          ))}
-          {form.fields.length > 0 && (
-            <div className="fv-actions">
-              {walletAddr ? (
-                <button className="fv-submit" onClick={handleSubmit} disabled={submitting}>
-                  {submitting ? <Loader2 size={16} className="spin" /> : null}
-                  {submitting ? 'Submitting...' : 'Submit'}
+          {field.type === 'starRating' && (
+            <div className="fv-stars">
+              {[1, 2, 3, 4, 5].map(star => (
+                <button key={star} type="button"
+                  className={`fv-star-btn ${(formData[field.id] as number) >= star ? 'filled' : ''}`}
+                  onClick={() => { handleStarRating(field.id, star); setTimeout(goNext, 300); }}>
+                  <Star size={32} fill={(formData[field.id] as number) >= star ? 'var(--accent)' : 'none'} stroke="var(--accent)" />
                 </button>
-              ) : (
+              ))}
+            </div>
+          )}
+
+          {(field.type === 'file' || field.type === 'image' || field.type === 'video') && (
+            <label className="fv-file">
+              <Upload size={20} />
+              <span>{fileNames[field.id] || `Upload ${field.type}`}</span>
+              <input type="file" accept={field.type === 'image' ? 'image/*' : field.type === 'video' ? 'video/*' : undefined}
+                onChange={e => { handleFile(field.id, e.target.files?.[0] || null); setTimeout(goNext, 300); }} />
+            </label>
+          )}
+
+          {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
+
+          {field.type !== 'dropdown' && field.type !== 'checkbox' && field.type !== 'multiselect' && field.type !== 'starRating' && !field.type?.startsWith('file') && field.type !== 'image' && field.type !== 'video' && (
+            <div className="fv-flow-actions">
+              {!walletAddr && isLast ? (
                 <div className="fv-connect-wrap">
-                  <button className="fv-submit" onClick={() => setShowPicker(!showPicker)}>
-                    <Wallet size={16} />
+                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
+                    <Wallet size={15} />
                     Connect Wallet
                   </button>
                   {showPicker && (
@@ -364,12 +409,83 @@ export function FormViewer() {
                     </div>
                   )}
                 </div>
+              ) : (
+                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
+                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
+                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
+                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
+                </button>
               )}
             </div>
           )}
-          <div className="fv-powered" style={{ textAlign: 'center', marginTop: 20, fontSize: '0.72rem', color: 'var(--subtle)' }}>
-            submissions stored on walrus. <span style={{ opacity: 0.5 }}>powered by rune</span>
-          </div>
+
+          {field.type === 'dropdown' && (
+            <div className="fv-flow-actions">
+              <button className="fv-flow-skip" onClick={goNext}>
+                Skip <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
+
+          {field.type === 'multiselect' && (
+            <div className="fv-flow-actions">
+              {!walletAddr && isLast ? (
+                <div className="fv-connect-wrap">
+                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
+                    <Wallet size={15} />
+                    Connect Wallet
+                  </button>
+                  {showPicker && (
+                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
+                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
+                        <WalletConnection onConnected={onWalletConnected} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
+                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
+                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
+                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
+                </button>
+              )}
+            </div>
+          )}
+
+          {field.type === 'starRating' && (
+            <div className="fv-flow-actions">
+              <button className="fv-flow-skip" onClick={goNext}>
+                Skip <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
+
+          {(field.type === 'file' || field.type === 'image' || field.type === 'video') && (
+            <div className="fv-flow-actions">
+              {!walletAddr && isLast ? (
+                <div className="fv-connect-wrap">
+                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
+                    <Wallet size={15} />
+                    Connect Wallet
+                  </button>
+                  {showPicker && (
+                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
+                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
+                        <WalletConnection onConnected={onWalletConnected} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
+                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
+                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
+                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
