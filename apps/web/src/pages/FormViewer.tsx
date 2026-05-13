@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
-import { Star, CheckSquare, Upload, FileText, ArrowLeft, Wallet, Loader2 } from 'lucide-react';
+import { Star, CheckSquare, Upload, FileText, ArrowLeft, Loader2 } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
@@ -182,19 +182,6 @@ export function FormViewer() {
           </div>
         </header>
 
-        {!isConnected || !account?.address ? (
-          <div className="fv-gate">
-            <Wallet size={28} />
-            <h3>Sign in to submit</h3>
-            <p>Connect your wallet or sign in with Google to submit this form. You'll sign a Walrus storage transaction to store your response on-chain.</p>
-            <div className="fv-gate-actions">
-              <button className="btn btn-primary btn-sm" onClick={handleZkLogin} disabled={connecting}>
-                {connecting ? <Loader2 size={14} className="spin" /> : null}
-                Sign in with Google
-              </button>
-            </div>
-          </div>
-        ) : (
         <div className="fv-fields">
           {form.fields.map(field => (
             <div key={field.id} className={`fv-field ${errors[field.id] ? 'error' : ''}`}>
@@ -294,16 +281,22 @@ export function FormViewer() {
           ))}
           {form.fields.length > 0 && (
             <div className="fv-actions">
-              <button className="fv-submit" onClick={handleSubmit}>
-                Submit
-              </button>
+              {isConnected && account?.address ? (
+                <button className="fv-submit" onClick={handleSubmit}>
+                  Submit
+                </button>
+              ) : (
+                <button className="fv-submit" onClick={handleZkLogin} disabled={connecting}>
+                  {connecting ? <Loader2 size={16} className="spin" /> : null}
+                  Connect Wallet
+                </button>
+              )}
             </div>
           )}
           <div className="fv-powered" style={{ textAlign: 'center', marginTop: 20, fontSize: '0.72rem', color: 'var(--subtle)' }}>
             submissions stored on walrus. <span style={{ opacity: 0.5 }}>powered by rune</span>
           </div>
         </div>
-        )}
       </div>
     </div>
   );
