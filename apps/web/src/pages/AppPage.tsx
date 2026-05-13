@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
-import { Home, Plus, Check, X, Wallet, Trash2, PenLine } from 'lucide-react';
+import { Home, Plus, Check, X, Wallet, Trash2, PenLine, Loader2 } from 'lucide-react';
 import { getWorkspaces, createWorkspace, deleteWorkspace, renameWorkspace, type Workspace } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
 import './AppPage.css';
@@ -20,7 +20,9 @@ export function AppPage() {
   const [newName, setNewName] = useState('');
   const [renamingWs, setRenamingWs] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [creatingWs, setCreatingWs] = useState(false);
   const [deletingWs, setDeletingWs] = useState<string | null>(null);
+  const [renamingLoading, setRenamingLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const renameRef = useRef<HTMLInputElement>(null);
 
@@ -36,24 +38,38 @@ export function AppPage() {
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
-    await createWorkspace(newName.trim());
-    setNewName('');
-    setCreating(false);
-    refresh();
+    setCreatingWs(true);
+    try {
+      await createWorkspace(newName.trim());
+      setNewName('');
+      setCreating(false);
+      await refresh();
+    } finally {
+      setCreatingWs(false);
+    }
   };
 
   const handleDeleteWorkspace = async (wsId: string) => {
-    await deleteWorkspace(wsId);
-    setDeletingWs(null);
-    refresh();
+    setDeletingWs(wsId);
+    try {
+      await deleteWorkspace(wsId);
+      await refresh();
+    } finally {
+      setDeletingWs(null);
+    }
   };
 
   const handleRename = async (wsId: string) => {
     if (!renameValue.trim()) return;
-    await renameWorkspace(wsId, renameValue.trim());
-    setRenamingWs(null);
-    setRenameValue('');
-    refresh();
+    setRenamingLoading(true);
+    try {
+      await renameWorkspace(wsId, renameValue.trim());
+      setRenamingWs(null);
+      setRenameValue('');
+      await refresh();
+    } finally {
+      setRenamingLoading(false);
+    }
   };
 
   const startRename = (ws: Workspace) => {
@@ -115,8 +131,10 @@ export function AppPage() {
                     onBlur={() => { setRenamingWs(null); setRenameValue(''); }}
                     autoFocus
                   />
-                  <button className="app-ws-btn confirm" onClick={() => handleRename(ws.id)}><Check size={10} /></button>
-                  <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }}><X size={10} /></button>
+                  <button className="app-ws-btn confirm" onClick={() => handleRename(ws.id)} disabled={renamingLoading}>
+                    {renamingLoading ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
+                  </button>
+                  <button className="app-ws-btn" onClick={() => { setRenamingWs(null); setRenameValue(''); }} disabled={renamingLoading}><X size={10} /></button>
                 </div>
               ) : (
                 <Link
@@ -130,7 +148,9 @@ export function AppPage() {
               )}
               {renamingWs !== ws.id && workspaces.length > 1 && deletingWs === ws.id ? (
                 <div className="app-ws-del-confirm">
-                  <button className="app-ws-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} title="Delete"><Check size={10} /></button>
+                  <button className="app-ws-del-yes" onClick={() => handleDeleteWorkspace(ws.id)} title="Delete">
+                    {deletingWs === ws.id ? <Loader2 size={10} className="spin" /> : <Check size={10} />}
+                  </button>
                   <button className="app-ws-del-no" onClick={() => setDeletingWs(null)} title="Cancel"><X size={10} /></button>
                 </div>
               ) : renamingWs !== ws.id && workspaces.length > 1 ? (
@@ -160,8 +180,10 @@ export function AppPage() {
                 }}
                 autoFocus
               />
-              <button className="app-ws-btn confirm" onClick={handleCreate}><Check size={11} /></button>
-              <button className="app-ws-btn" onClick={() => { setCreating(false); setNewName(''); }}><X size={11} /></button>
+              <button className="app-ws-btn confirm" onClick={handleCreate} disabled={creatingWs}>
+                {creatingWs ? <Loader2 size={11} className="spin" /> : <Check size={11} />}
+              </button>
+              <button className="app-ws-btn" onClick={() => { setCreating(false); setNewName(''); }} disabled={creatingWs}><X size={11} /></button>
             </div>
           ) : (
             <button className="app-nav-item app-ws-new" onClick={() => setCreating(true)}>
