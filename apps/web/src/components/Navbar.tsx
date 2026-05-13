@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, Cloud, RefreshCw, LogOut, Copy, Check, Loader2 } from 'lucide-react';
+import { Wallet, Cloud, RefreshCw, LogOut, Copy, Loader2, Settings, ChevronDown, User } from 'lucide-react';
 import { useWalletStore } from '../context/wallet';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
+import { useProfileStore } from '../stores/profile';
 import { WalletLogin } from './WalletLogin';
+import { SettingsModal } from './SettingsModal';
 import './Navbar.css';
 
 function formatAddress(addr: string) {
@@ -16,12 +18,16 @@ function formatAddress(addr: string) {
 
 export function Navbar() {
   const { account, isConnected, isConnecting, connectWallet, disconnect } = useWalletStore();
+  const { displayName, pfp } = useProfileStore();
+  const [showDropdown, setShowDropdown] = useState(false);
   const [copied, setCopied] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>('idle');
   const [showLogin, setShowLogin] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'zklogin' | 'wallet'>('zklogin');
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +35,16 @@ export function Navbar() {
       setCurrentUser(account.address);
     }
   }, [account?.address, isConnected]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    if (showDropdown) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showDropdown]);
 
   const handleZkLogin = async (provider: OAuthProvider) => {
     setConnecting(true);
@@ -43,6 +59,7 @@ export function Navbar() {
   const handleDisconnect = () => {
     clearSession();
     disconnect();
+    setShowDropdown(false);
     setSyncStatus('idle');
   };
 
@@ -77,26 +94,53 @@ export function Navbar() {
 
         <div className="navbar-actions">
           {isConnected && account ? (
-            <>
-              <button className="wallet-btn" onClick={copyAddress} title="Copy address">
-                <Wallet size={14} />
-                <span>{formatAddress(account.address)}</span>
-                {copied ? <Check size={12} /> : <Copy size={12} />}
+            <div className="profile-dropdown-wrap" ref={dropdownRef}>
+              <button className="profile-btn" onClick={() => setShowDropdown(!showDropdown)}>
+                <div className="profile-avatar">
+                  {pfp ? (
+                    <img src={pfp} alt="" />
+                  ) : (
+                    <User size={14} />
+                  )}
+                </div>
+                <span className="profile-name">{displayName || formatAddress(account.address)}</span>
+                <ChevronDown size={12} className={`profile-chevron ${showDropdown ? 'open' : ''}`} />
               </button>
-              <div className="wallet-actions">
-                <button
-                  className={`sidebar-icon-btn ${syncStatus}`}
-                  onClick={handleSync}
-                  disabled={syncing}
-                  title="Sync to Walrus"
-                >
-                  {syncing ? <RefreshCw size={13} className="spin" /> : <Cloud size={13} />}
-                </button>
-                <button className="sidebar-icon-btn" onClick={handleDisconnect} title="Disconnect">
-                  <LogOut size={13} />
-                </button>
-              </div>
-            </>
+
+              {showDropdown && (
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <div className="profile-dropdown-avatar">
+                      {pfp ? <img src={pfp} alt="" /> : <User size={18} />}
+                    </div>
+                    <div>
+                      <div className="profile-dropdown-name">{displayName || 'User'}</div>
+                      <div className="profile-dropdown-addr">{formatAddress(account.address)}</div>
+                    </div>
+                  </div>
+
+                  <div className="profile-dropdown-items">
+                    <button className="profile-dropdown-item" onClick={copyAddress}>
+                      <Copy size={13} />
+                      <span>{copied ? 'Copied!' : 'Copy Address'}</span>
+                    </button>
+                    <button className="profile-dropdown-item" onClick={handleSync} disabled={syncing}>
+                      {syncing ? <RefreshCw size={13} className="spin" /> : <Cloud size={13} />}
+                      <span>{syncing ? 'Syncing...' : syncStatus === 'success' ? 'Synced' : 'Sync to Walrus'}</span>
+                    </button>
+                    <button className="profile-dropdown-item" onClick={() => { setShowSettings(true); setShowDropdown(false); }}>
+                      <Settings size={13} />
+                      <span>Settings</span>
+                    </button>
+                    <div className="profile-dropdown-divider" />
+                    <button className="profile-dropdown-item profile-dropdown-danger" onClick={handleDisconnect}>
+                      <LogOut size={13} />
+                      <span>Disconnect</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <button className="connect-btn" onClick={() => setShowLogin(!showLogin)}>
               {isConnecting ? <Loader2 size={14} className="spin" /> : <Wallet size={14} />}
@@ -136,6 +180,8 @@ export function Navbar() {
           </div>
         </div>
       )}
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </nav>
   );
 }

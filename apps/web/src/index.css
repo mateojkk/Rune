@@ -34,6 +34,24 @@
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
+.dark {
+  --accent: #FFB38A;
+  --accent-hover: #FF9E6B;
+  --accent-bg: rgba(255, 179, 138, 0.1);
+  --bg: #141413;
+  --surface: #1F1F1E;
+  --surface-elevated: #2A2A28;
+  --text: #FAF9F5;
+  --muted: #9A9A95;
+  --subtle: #6A6A65;
+  --border: #2A2A28;
+  --border-light: rgba(255, 255, 255, 0.06);
+  --tag: #2A2A28;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
