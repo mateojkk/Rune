@@ -221,6 +221,18 @@ export function FormViewer() {
     }
   };
 
+  const handleInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (form && step === form.fields.length - 1 && walletAddr) {
+        handleSubmit();
+      } else {
+        goNext();
+      }
+    }
+  };
+
   const progress = form ? ((step + 1) / (form.fields.length + 1)) * 100 : 0;
 
   if (loading) {
@@ -284,7 +296,7 @@ export function FormViewer() {
   const isLast = step === form.fields.length - 1;
 
   return (
-    <div className="form-viewer fv-flow" onKeyDown={handleKeyDown}>
+    <div className="form-viewer fv-flow">
       <div className="fv-progress-bar">
         <div className="fv-progress-fill" style={{ width: `${progress}%` }} />
       </div>
@@ -311,33 +323,35 @@ export function FormViewer() {
             <input ref={inputRef as any} type="text" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
               value={formData[field.id] as string || ''}
               onChange={e => handleFieldChange(field.id, e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+              onKeyDown={handleInputKeyDown} />
           )}
 
           {field.type === 'number' && (
             <input ref={inputRef as any} type="number" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
               value={formData[field.id] as number || ''}
               onChange={e => handleFieldChange(field.id, Number(e.target.value))}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+              onKeyDown={handleInputKeyDown} />
           )}
 
           {field.type === 'url' && (
             <input ref={inputRef as any} type="url" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
               value={formData[field.id] as string || ''}
               onChange={e => handleFieldChange(field.id, e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); goNext(); } }} />
+              onKeyDown={handleInputKeyDown} />
           )}
 
           {field.type === 'textarea' && (
             <textarea ref={inputRef as any} className="fv-line-input fv-textarea" placeholder={field.placeholder || 'Type your answer...'} rows={3}
               value={formData[field.id] as string || ''}
-              onChange={e => handleFieldChange(field.id, e.target.value)} />
+              onChange={e => handleFieldChange(field.id, e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (form && step === form.fields.length - 1 && walletAddr) handleSubmit(); else goNext(); } }} />
           )}
 
           {field.type === 'richtext' && (
             <textarea ref={inputRef as any} className="fv-line-input fv-textarea" placeholder={field.placeholder || 'Type your answer...'} rows={4}
               value={formData[field.id] as string || ''}
-              onChange={e => handleFieldChange(field.id, e.target.value)} />
+              onChange={e => handleFieldChange(field.id, e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (form && step === form.fields.length - 1 && walletAddr) handleSubmit(); else goNext(); } }} />
           )}
 
           {field.type === 'dropdown' && (
@@ -393,99 +407,50 @@ export function FormViewer() {
 
           {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
 
-          {field.type !== 'dropdown' && field.type !== 'checkbox' && field.type !== 'multiselect' && field.type !== 'starRating' && !field.type?.startsWith('file') && field.type !== 'image' && field.type !== 'video' && (
-            <div className="fv-flow-actions">
-              {!walletAddr && isLast ? (
-                <div className="fv-connect-wrap">
-                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
-                    <Wallet size={15} />
-                    Connect Wallet
-                  </button>
-                  {showPicker && (
-                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
-                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
-                        <WalletConnection onConnected={onWalletConnected} />
-                      </div>
-                    </div>
-                  )}
+          {renderActions()}
+        </div>
+      </div>
+    </div>
+  );
+
+  function renderActions() {
+    const autoAdvance = ['dropdown', 'checkbox', 'starRating', 'file', 'image', 'video'];
+    if (autoAdvance.includes(field.type)) {
+      return field.type === 'dropdown' || field.type === 'starRating' ? (
+        <div className="fv-flow-actions">
+          <button className="fv-flow-skip" onClick={goNext}>
+            Skip <ArrowRight size={14} />
+          </button>
+        </div>
+      ) : null;
+    }
+    return (
+      <div className="fv-flow-actions">
+        {!walletAddr && isLast ? (
+          <div className="fv-connect-wrap">
+            <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
+              <Wallet size={15} />
+              Connect Wallet
+            </button>
+            {showPicker && (
+              <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
+                <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
+                  <WalletConnection onConnected={onWalletConnected} />
                 </div>
-              ) : (
-                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
-                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
-                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
-                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
-                </button>
-              )}
-            </div>
-          )}
-
-          {field.type === 'dropdown' && (
-            <div className="fv-flow-actions">
-              <button className="fv-flow-skip" onClick={goNext}>
-                Skip <ArrowRight size={14} />
-              </button>
-            </div>
-          )}
-
-          {field.type === 'multiselect' && (
-            <div className="fv-flow-actions">
-              {!walletAddr && isLast ? (
-                <div className="fv-connect-wrap">
-                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
-                    <Wallet size={15} />
-                    Connect Wallet
-                  </button>
-                  {showPicker && (
-                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
-                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
-                        <WalletConnection onConnected={onWalletConnected} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
-                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
-                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
-                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
-                </button>
-              )}
-            </div>
-          )}
-
-          {field.type === 'starRating' && (
-            <div className="fv-flow-actions">
-              <button className="fv-flow-skip" onClick={goNext}>
-                Skip <ArrowRight size={14} />
-              </button>
-            </div>
-          )}
-
-          {(field.type === 'file' || field.type === 'image' || field.type === 'video') && (
-            <div className="fv-flow-actions">
-              {!walletAddr && isLast ? (
-                <div className="fv-connect-wrap">
-                  <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
-                    <Wallet size={15} />
-                    Connect Wallet
-                  </button>
-                  {showPicker && (
-                    <div className="fv-picker-dropdown" onClick={() => setShowPicker(false)}>
-                      <div className="fv-picker-inner" onClick={e => e.stopPropagation()}>
-                        <WalletConnection onConnected={onWalletConnected} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
-                  {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
-                  {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
-                  {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
-                </button>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <button className="fv-flow-submit" onClick={isLast && walletAddr ? handleSubmit : goNext} disabled={submitting}>
+            {isLast && walletAddr ? (submitting ? <Loader2 size={15} className="spin" /> : null) : null}
+            {isLast && walletAddr ? (submitting ? 'Submitting...' : 'Submit') : 'OK'}
+            {!isLast || !walletAddr ? <ArrowRight size={15} /> : null}
+          </button>
+        )}
+      </div>
+    );
+  }
+}
         </div>
       </div>
     </div>

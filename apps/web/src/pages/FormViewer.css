@@ -12,6 +12,8 @@
   --subtle: #6A6A65;
   --border: #2A2A28;
   --tag: #2A2A28;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 300;
 }
 
 .fv-loading,
@@ -102,7 +104,7 @@
 
 .fv-intro h1 {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
   line-height: 1.2;
   margin-bottom: 8px;
@@ -199,7 +201,7 @@
 
 .fv-label {
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.3;
 }

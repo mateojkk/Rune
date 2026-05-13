@@ -93,6 +93,25 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   };
 
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const titleTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleTitleChange = (value: string) => {
+    setTitle(value);
+    if (!currentFormId) return;
+    clearTimeout(titleTimer.current);
+    titleTimer.current = setTimeout(() => {
+      updateForm(currentFormId, { title: value }).catch(() => {});
+    }, 500);
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setDescription(value);
+    if (!currentFormId) return;
+    clearTimeout(titleTimer.current);
+    titleTimer.current = setTimeout(() => {
+      updateForm(currentFormId, { description: value }).catch(() => {});
+    }, 500);
+  };
 
   const handleUpdateField = (fieldId: string, updates: Partial<FormField>) => {
     if (!currentFormId) return;
@@ -198,11 +217,11 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
             </div>
             <div className="b-field">
               <label className="b-label">Title</label>
-              <input type="text" className="b-input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Form title" />
+              <input type="text" className="b-input" value={title} onChange={e => handleTitleChange(e.target.value)} placeholder="Form title" />
             </div>
             <div className="b-field">
               <label className="b-label">Description</label>
-              <textarea className="b-input b-textarea" value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" rows={2} />
+              <textarea className="b-input b-textarea" value={description} onChange={e => handleDescriptionChange(e.target.value)} placeholder="Optional description" rows={2} />
             </div>
 
             <div className="b-field-palette">
