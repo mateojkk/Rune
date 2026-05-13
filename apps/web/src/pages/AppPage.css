@@ -306,6 +306,13 @@
   display: none;
 }
 
+/* ─── Mobile workspace picker (hidden on desktop) ─── */
+
+.app-ws-mobile-picker {
+  display: none;
+  position: relative;
+}
+
 /* ─── Auth Gate ─── */
 
 .app-gate {
@@ -398,13 +405,6 @@
   .app-ws-new {
     display: none;
   }
-}
-
-/* ─── Mobile workspace picker ─── */
-
-.app-ws-mobile-picker {
-  display: none;
-  position: relative;
 }
 
 .app-ws-mobile-btn {
