@@ -1,19 +1,17 @@
 .form-viewer,
 .fv-loading,
 .fv-center {
-  --accent: #E8753A;
-  --accent-hover: #D4652E;
-  --accent-bg: rgba(232, 117, 58, 0.1);
-  --bg: #fcfbf8;
-  --surface: rgba(255, 255, 255, 0.9);
-  --surface-elevated: #ffffff;
-  --text: #171512;
-  --muted: #6f675c;
-  --subtle: #b2aa9d;
-  --border: rgba(23, 21, 18, 0.1);
-  --tag: #f2ede6;
+  --accent: var(--text);
+  --accent-hover: var(--text);
+  --accent-bg: rgba(0, 0, 0, 0.06);
   font-family: var(--font-body);
   font-weight: 300;
+}
+
+.dark .form-viewer,
+.dark .fv-loading,
+.dark .fv-center {
+  --accent-bg: rgba(255, 255, 255, 0.08);
 }
 
 .fv-loading,
@@ -27,11 +25,10 @@
   min-height: 60vh;
   padding: 24px;
   color: var(--muted);
-  background: var(--bg);
 }
 
 .fv-center h2 {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 600;
 }
 
@@ -56,27 +53,24 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin-top: 8px;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.8rem;
 }
 
-.fv-brand-lockup,
-.fv-rune-mark {
+.fv-brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.fv-brand-lockup img,
-.fv-rune-mark img {
-  height: 24px;
+.fv-brand-lockup img {
+  height: 18px;
   width: auto;
 }
 
-.fv-brand-lockup strong,
-.fv-rune-mark span {
+.fv-brand-lockup strong {
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--text);
@@ -86,12 +80,8 @@
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top, rgba(232, 117, 58, 0.08), transparent 36%),
-    var(--bg);
+  background: var(--bg);
 }
-
-/* ─── Start Screen ─── */
 
 .fv-start {
   min-height: 100vh;
@@ -108,7 +98,7 @@
 .fv-start-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(rgba(252, 251, 248, 0.82), rgba(252, 251, 248, 0.94));
+  background: linear-gradient(rgba(20, 20, 19, 0.45), rgba(20, 20, 19, 0.7));
   z-index: 0;
 }
 
@@ -120,14 +110,9 @@
   align-items: center;
   text-align: center;
   gap: 12px;
-  max-width: 620px;
+  max-width: 760px;
   width: 100%;
-  padding: clamp(28px, 4vw, 48px);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 24px 80px rgba(113, 88, 56, 0.12);
+  padding: clamp(28px, 5vw, 56px) 24px;
 }
 
 .fv-start-profile {
@@ -135,22 +120,24 @@
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid rgba(255, 255, 255, 0.18);
   margin-bottom: 4px;
 }
 
 .fv-start-body h1 {
-  font-size: clamp(2.1rem, 6vw, 3.4rem);
-  font-weight: 600;
+  font-size: clamp(1.8rem, 4.8vw, 3rem);
+  font-weight: 300;
   letter-spacing: -0.03em;
-  line-height: 1.05;
+  line-height: 1.08;
   font-family: var(--font-display);
+  color: #fff;
+  max-width: 14ch;
 }
 
 .fv-start-body p {
-  font-size: 1rem;
-  color: var(--muted);
-  line-height: 1.5;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
   max-width: 44ch;
 }
 
@@ -164,7 +151,7 @@
 
 .fv-start-count {
   font-size: 0.82rem;
-  color: var(--subtle);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .fv-start-btn {
@@ -173,48 +160,34 @@
   justify-content: center;
   gap: 8px;
   padding: 14px 56px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.95rem;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.88rem;
   font-weight: 600;
   border: none;
-  border-radius: 18px;
+  border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s;
   min-width: 180px;
-  min-height: 54px;
-  box-shadow: 0 12px 30px rgba(232, 117, 58, 0.22);
+  min-height: 48px;
 }
 
 .fv-start-btn:hover {
-  background: var(--accent-hover);
+  background: var(--accent);
+  color: var(--bg);
 }
-
-@media (max-width: 768px) {
-  .fv-start { padding: 32px 16px; }
-  .fv-start-body h1 { font-size: 1.7rem; }
-  .fv-start-profile { width: 52px; height: 52px; }
-}
-
-@media (max-width: 480px) {
-  .fv-start-body h1 { font-size: 1.4rem; }
-  .fv-start-profile { width: 44px; height: 44px; }
-  .fv-start-btn { padding: 12px 40px; font-size: 0.85rem; }
-}
-
-/* ─── Back to Editor ─── */
 
 .fv-back-editor {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 30px;
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 500;
@@ -229,22 +202,17 @@
 }
 
 .fv-back-editor-flow {
-  top: 16px;
+  top: 14px;
 }
-
-/* ─── Progress Bar ─── */
 
 .fv-progress-bar {
   position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(760px, calc(100vw - 24px));
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(23, 21, 18, 0.08);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border);
   z-index: 100;
-  overflow: hidden;
 }
 
 .fv-progress-fill {
@@ -253,11 +221,9 @@
   transition: width 0.3s ease;
 }
 
-/* ─── Flow (one-at-a-time) ─── */
-
 .fv-flow {
   align-items: flex-start;
-  padding: 72px 0 24px;
+  padding-top: 60px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -265,7 +231,7 @@
 
 .fv-flow-container {
   width: 100%;
-  max-width: 760px;
+  max-width: 640px;
   margin: 0 auto;
   padding: 0 24px;
   position: relative;
@@ -280,13 +246,13 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.82);
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: 50%;
   color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .fv-flow-back:hover {
@@ -298,18 +264,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
   min-height: 0;
   animation: fv-fade-in 0.25s ease;
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: clamp(30px, 5vw, 52px) clamp(24px, 4.5vw, 56px) 28px;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
 }
 
 .fv-slide-forward {
@@ -347,15 +305,31 @@
   to { opacity: 1; }
 }
 
-/* ─── Field Label ─── */
+.fv-step-meta {
+  display: flex;
+  align-items: center;
+}
+
+.fv-step-count {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+}
 
 .fv-label {
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  font-weight: 500;
+  font-size: clamp(1.25rem, 3vw, 1.9rem);
+  font-weight: 300;
   letter-spacing: -0.01em;
-  line-height: 1.16;
+  line-height: 1.25;
   font-family: var(--font-display);
-  max-width: 22ch;
+  max-width: 24ch;
 }
 
 .fv-required {
@@ -363,57 +337,24 @@
   margin-left: 4px;
 }
 
-.fv-step-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.fv-step-count {
-  display: inline-flex;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.fv-rune-mark-inline img {
-  height: 20px;
-}
-
-.fv-rune-mark-inline span {
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-
 .fv-desc {
-  font-size: 0.95rem;
+  font-size: 0.84rem;
   color: var(--muted);
   line-height: 1.5;
   max-width: 52ch;
-  margin-bottom: 10px;
 }
-
-/* ─── Line Input (underline style) ─── */
 
 .fv-line-input {
   width: 100%;
-  padding: 18px 0 14px;
+  padding: 14px 0;
   background: transparent;
   border: none;
-  border-bottom: 1.5px solid rgba(23, 21, 18, 0.18);
+  border-bottom: 2px solid var(--border);
   color: var(--text);
-  font-size: clamp(1.3rem, 2.8vw, 2rem);
+  font-size: clamp(0.98rem, 1.8vw, 1.08rem);
   font-weight: 300;
   transition: border-color 0.2s;
   font-family: inherit;
-  max-width: min(100%, 560px);
 }
 
 .fv-line-input:focus {
@@ -422,14 +363,14 @@
 }
 
 .fv-line-input::placeholder {
-  color: #c5c0b7;
+  color: var(--subtle);
   font-size: inherit;
 }
 
 .fv-textarea {
   resize: none;
   line-height: 1.6;
-  min-height: 140px;
+  min-height: 100px;
 }
 
 .fv-select {
@@ -446,17 +387,14 @@
   color: var(--text);
 }
 
-/* ─── Checkbox / Multiselect ─── */
-
 .fv-checkbox {
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
   font-size: 1rem;
-  padding: 14px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
-  max-width: 560px;
 }
 
 .fv-checkbox input {
@@ -469,7 +407,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-width: 560px;
 }
 
 .fv-multi-opt {
@@ -478,7 +415,7 @@
   gap: 12px;
   cursor: pointer;
   font-size: 1rem;
-  padding: 14px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -488,13 +425,10 @@
   accent-color: var(--accent);
 }
 
-/* ─── Star Rating ─── */
-
 .fv-stars {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 18px 0 4px;
+  gap: 8px;
+  padding: 16px 0;
 }
 
 .fv-star-btn {
@@ -514,22 +448,18 @@
   display: block;
 }
 
-/* ─── File Upload ─── */
-
 .fv-file {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 18px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px dashed rgba(23, 21, 18, 0.18);
-  border-radius: 18px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
   color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.92rem;
-  width: 100%;
-  max-width: 560px;
+  font-size: 0.84rem;
 }
 
 .fv-file:hover {
@@ -541,20 +471,15 @@
   display: none;
 }
 
-/* ─── Errors ─── */
-
 .fv-error {
   font-size: 0.82rem;
   color: #e74c3c;
 }
 
-/* ─── Flow Actions ─── */
-
 .fv-flow-actions {
   margin-top: auto;
-  padding-top: 40px;
-  width: 100%;
-  max-width: 560px;
+  padding-top: 24px;
+  padding-bottom: 40px;
 }
 
 .fv-flow-submit {
@@ -562,23 +487,21 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 32px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 1rem;
+  padding: 12px 32px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.84rem;
   font-weight: 600;
   border: none;
-  border-radius: 16px;
+  border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 120px;
-  min-height: 56px;
-  width: 100%;
-  box-shadow: 0 16px 32px rgba(232, 117, 58, 0.24);
+  min-width: 100px;
 }
 
 .fv-flow-submit:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--accent);
+  color: var(--bg);
 }
 
 .fv-flow-submit:disabled {
@@ -593,7 +516,7 @@
   padding: 8px 16px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 40px;
   color: var(--muted);
   font-size: 0.82rem;
   cursor: pointer;
@@ -606,12 +529,9 @@
   color: var(--accent);
 }
 
-/* ─── Wallet Picker ─── */
-
 .fv-connect-wrap {
   position: relative;
-  display: inline-flex;
-  max-width: 100%;
+  display: inline-block;
 }
 
 .fv-picker-dropdown {
@@ -627,11 +547,10 @@
   transform: translateX(-50%);
   background: var(--surface-elevated);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 16px;
   box-shadow: var(--shadow-lg);
-  min-width: min(320px, calc(100vw - 32px));
-  max-width: calc(100vw - 32px);
+  min-width: 240px;
 }
 
 .fv-wallet-list {
@@ -646,7 +565,7 @@
   gap: 10px;
   width: 100%;
   padding: 10px 14px;
-  background: #fff;
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
@@ -667,107 +586,25 @@
   cursor: not-allowed;
 }
 
-/* ─── Responsive ─── */
-
 @media (max-width: 768px) {
-  .fv-start {
-    padding: 24px 16px;
-  }
-
-  .fv-start-body {
-    padding: 24px 20px;
-    border-radius: 22px;
-  }
-
-  .fv-flow {
-    padding-top: 56px;
-    padding-bottom: 20px;
-  }
-
-  .fv-flow-container {
-    padding: 0 16px;
-  }
-
-  .fv-flow-field {
-    padding: 18px 6px 12px;
-  }
-
-  .fv-back-editor {
-    top: 12px;
-    left: 12px;
-  }
-
-  .fv-back-editor span {
-    display: none;
-  }
-
-  .fv-step-count {
-    font-size: 0.68rem;
-  }
-
-  .fv-rune-mark-inline {
-    display: none;
-  }
-
-  .fv-flow-actions {
-    padding-top: 24px;
-  }
-
-  .fv-flow-submit,
-  .fv-connect-wrap,
-  .fv-connect-wrap .fv-flow-submit {
-    width: 100%;
-  }
-
-  .fv-picker-inner {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    transform: none;
-    width: auto;
-    min-width: 0;
-    max-width: none;
-  }
+  .fv-start { padding: 32px 16px; }
+  .fv-start-body { padding: 24px 12px; }
+  .fv-start-body h1 { font-size: 1.7rem; }
+  .fv-start-profile { width: 52px; height: 52px; }
+  .fv-flow { padding-top: 48px; }
+  .fv-flow-container { padding: 0 16px; }
+  .fv-label { font-size: 1.35rem; }
+  .fv-line-input { font-size: 1rem; }
 }
 
 @media (max-width: 480px) {
-  .fv-start-body {
-    background: rgba(255, 255, 255, 0.82);
-  }
-
-  .fv-start-body h1 {
-    font-size: 1.8rem;
-  }
-
-  .fv-start-body p {
-    font-size: 0.92rem;
-  }
-
-  .fv-start-btn {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .fv-label {
-    font-size: 1.95rem;
-    max-width: none;
-  }
-
-  .fv-desc {
-    font-size: 0.88rem;
-  }
-
-  .fv-line-input {
-    font-size: 1rem;
-  }
-
-  .fv-flow-submit {
-    padding: 10px 24px;
-    font-size: 0.85rem;
-    min-width: 80px;
-    min-height: 52px;
-  }
-
+  .fv-start-body h1 { font-size: 1.45rem; }
+  .fv-start-body p { font-size: 0.92rem; }
+  .fv-start-btn { padding: 12px 40px; font-size: 0.85rem; }
+  .fv-label { font-size: 1.15rem; }
+  .fv-desc { font-size: 0.88rem; }
+  .fv-line-input { font-size: 0.92rem; }
+  .fv-flow-submit { padding: 10px 24px; font-size: 0.85rem; min-width: 80px; }
   .fv-star-btn svg { width: 26px; height: 26px; }
-  .fv-file { padding: 14px; font-size: 0.85rem; }
+  .fv-file { padding: 12px; font-size: 0.85rem; }
 }

@@ -29,6 +29,7 @@ interface Props {
 
 function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const address = getCurrentUserAddress();
+  const workspacePickerRef = useRef<HTMLDivElement>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -38,13 +39,13 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [currentFormId, setCurrentFormId] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
-  const [publishedUrl, setPublishedUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId);
+  const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -53,6 +54,16 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
       setSelectedWorkspaceId(current => current || workspaceId || loaded[0]?.id || '');
     })();
   }, [workspaceId]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (workspacePickerRef.current && !workspacePickerRef.current.contains(e.target as Node)) {
+        setShowWorkspacePicker(false);
+      }
+    };
+    if (showWorkspacePicker) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showWorkspacePicker]);
 
   useEffect(() => {
     if (formId) {
@@ -85,7 +96,6 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
     if (!selectedWorkspaceId) { setError('Select a workspace first'); return; }
     const form = await createForm(title, description, selectedWorkspaceId);
     setCurrentFormId(form.id);
-    setPublishedUrl('');
     setError(null);
   };
 
@@ -152,7 +162,6 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
       if (!form) return;
       await updateForm(currentFormId, { title: form.title, description: form.description, fields: form.fields });
       setSaved(true);
-      setPublishedUrl(`${window.location.origin}/form/${currentFormId}`);
       setTimeout(() => setSaved(false), 4000);
     } catch (e) {
       setError(`Failed to save: ${e instanceof Error ? e.message : 'unknown error'}`);
@@ -160,8 +169,8 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   };
 
   const copyLink = async () => {
-    if (!publishedUrl) return;
-    try { await navigator.clipboard.writeText(publishedUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* */ }
+    if (!currentFormId) return;
+    try { await navigator.clipboard.writeText(`${window.location.origin}/form/${currentFormId}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* */ }
   };
 
   const handleImagePick = (type: 'profile' | 'cover') => {
@@ -238,14 +247,27 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
               <textarea className="b-input b-textarea" value={description} onChange={e => handleDescriptionChange(e.target.value)} placeholder="Optional description" rows={2} />
             </div>
             {!currentFormId && (
-              <div className="b-field">
+              <div className="b-field" ref={workspacePickerRef}>
                 <label className="b-label">Workspace</label>
-                <select className="b-input" value={selectedWorkspaceId} onChange={e => setSelectedWorkspaceId(e.target.value)}>
-                  <option value="" disabled>Select workspace</option>
-                  {workspaces.map(ws => (
-                    <option key={ws.id} value={ws.id}>{ws.name}</option>
-                  ))}
-                </select>
+                <button type="button" className="b-picker-trigger" onClick={() => setShowWorkspacePicker(v => !v)}>
+                  <span>{workspaces.find(ws => ws.id === selectedWorkspaceId)?.name || 'Select workspace'}</span>
+                  <ChevronDown size={14} />
+                </button>
+                {showWorkspacePicker && (
+                  <div className="b-picker-menu">
+                    {workspaces.map(ws => (
+                      <button
+                        key={ws.id}
+                        type="button"
+                        className={`b-picker-option ${selectedWorkspaceId === ws.id ? 'active' : ''}`}
+                        onClick={() => { setSelectedWorkspaceId(ws.id); setShowWorkspacePicker(false); }}
+                      >
+                        <span>{ws.name}</span>
+                        {selectedWorkspaceId === ws.id ? <Check size={14} /> : null}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -350,13 +372,13 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                 {showPublish && (
                   <div className="b-modal-footer-actions">
                     <button className={`b-save-btn ${saved ? 'saved' : ''}`} onClick={handleSaveToWalrus} disabled={saving}>
-                      {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Publish</>}
+                      {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Save Form</>}
                     </button>
-                    {publishedUrl && (
+                    {currentFormId && (
                       <div className="b-share-link">
-                        <span className="b-share-label">Shareable link</span>
+                        <span className="b-share-label">Form link</span>
                         <div className="b-share-row">
-                          <input type="text" className="b-share-input" value={publishedUrl} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
+                          <input type="text" className="b-share-input" value={`${window.location.origin}/form/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
                           <button className="b-share-copy" onClick={copyLink}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
                         </div>
                       </div>

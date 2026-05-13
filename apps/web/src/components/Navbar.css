@@ -2,18 +2,15 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 10px 24px;
+  padding: 10px 24px 10px 10px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
 .navbar-container {
-  width: min(1120px, 100%);
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
 }
 
 .navbar-brand {
@@ -24,7 +21,7 @@
 }
 
 .navbar-logo {
-  height: 50px;
+  height: 36px;
   width: auto;
   display: block;
 }
@@ -417,7 +414,7 @@
   }
 
   .navbar-brand img {
-    height: 32px !important;
+    height: 30px !important;
   }
 
   .profile-name {
@@ -456,7 +453,7 @@
   }
 
   .navbar-brand img {
-    height: 28px !important;
+    height: 26px !important;
   }
 
   .connect-btn {

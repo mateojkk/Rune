@@ -119,10 +119,15 @@ export function FormViewer() {
       const f = await getFormApi(formId);
       if (f) {
         setForm({
-          id: f.id, title: f.title, description: f.description,
-          workspaceId: f.workspaceId, fields: f.fields as FormField[],
-          createdAt: f.createdAt, updatedAt: f.updatedAt,
-          blobId: f.blobId, profilePicture: f.profilePicture,
+          id: f.id,
+          title: f.title,
+          description: f.description,
+          workspaceId: f.workspaceId,
+          fields: f.fields as FormField[],
+          createdAt: f.createdAt,
+          updatedAt: f.updatedAt,
+          blobId: f.blobId,
+          profilePicture: f.profilePicture,
           coverPicture: f.coverPicture,
         });
         setProfilePicture(f.profilePicture || '');
@@ -178,7 +183,10 @@ export function FormViewer() {
 
   const goNext = () => {
     if (!form) return;
-    if (step < 0) { setStep(0); return; }
+    if (step < 0) {
+      setStep(0);
+      return;
+    }
     const field = form.fields[step];
     if (field && !validateField(field.id)) return;
     if (step < form.fields.length - 1) {
@@ -191,8 +199,9 @@ export function FormViewer() {
     if (step > 0) {
       directionRef.current = 'backward';
       setStep(step - 1);
+    } else {
+      setStep(-1);
     }
-    else setStep(-1);
   };
 
   const handleSubmit = async () => {
@@ -280,10 +289,6 @@ export function FormViewer() {
         <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
           <div className="fv-start-overlay" />
           <div className="fv-start-body">
-            <div className="fv-rune-mark">
-              <img src="/runelogo.png" alt="Rune" />
-              <span>Rune form</span>
-            </div>
             {profilePicture && <img src={profilePicture} alt="" className="fv-start-profile" />}
             <h1>{form.title}</h1>
             {form.description && <p>{form.description}</p>}
@@ -322,10 +327,6 @@ export function FormViewer() {
         <div key={step} className={`fv-flow-field fv-slide-${directionRef.current}`}>
           <div className="fv-step-meta">
             <span className="fv-step-count">Question {step + 1} of {form.fields.length}</span>
-            <div className="fv-rune-mark fv-rune-mark-inline">
-              <img src="/runelogo.png" alt="Rune" />
-              <span>Rune</span>
-            </div>
           </div>
           {field.type !== 'checkbox' && (
             <label className="fv-label">

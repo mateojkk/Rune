@@ -41,7 +41,6 @@ function BuilderInner() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [submissionCounts, setSubmissionCounts] = useState<Record<string, number>>({});
   const [currentWorkspaceId, setCurrentWorkspaceId] = useState('');
-  const [publishedUrl, setPublishedUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
@@ -76,8 +75,7 @@ function BuilderInner() {
           setCurrentWorkspaceId(form.workspaceId || '');
           setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
-          setPublishedUrl(`${window.location.origin}/form/${formId}`);
-          setSaved(true);
+          setSaved(false);
         }
       }
     };
@@ -115,7 +113,6 @@ function BuilderInner() {
     const form = await createForm(title, description, targetWorkspaceId);
     setCurrentFormId(form.id);
     setCurrentWorkspaceId(form.workspaceId || '');
-    setPublishedUrl('');
     setError(null);
     navigate(`/app/builder/${form.id}`);
   };
@@ -170,7 +167,6 @@ function BuilderInner() {
 
       await updateForm(currentFormId, { title: form.title, description: form.description, fields: form.fields });
       setSaved(true);
-      setPublishedUrl(`${window.location.origin}/form/${currentFormId}`);
       setTimeout(() => { setSaved(false); }, 4000);
     } catch (e) {
       setError(`Failed to save: ${e instanceof Error ? e.message : 'unknown error'}`);
@@ -180,9 +176,9 @@ function BuilderInner() {
   };
 
   const copyLink = async () => {
-    if (!publishedUrl) return;
+    if (!currentFormId) return;
     try {
-      await navigator.clipboard.writeText(publishedUrl);
+      await navigator.clipboard.writeText(`${window.location.origin}/form/${currentFormId}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* */ }
@@ -354,19 +350,8 @@ function BuilderInner() {
                 onClick={handleSaveToWalrus}
                 disabled={saving}
               >
-                {saving ? 'Saving...' : publishedUrl ? <><CheckSquare size={15} /> Share Link</> : <><Save size={15} /> Publish</>}
+                {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Save Form</>}
               </button>
-              {publishedUrl && (
-                <div className="b-share-link">
-                  <span className="b-share-label">Shareable link</span>
-                  <div className="b-share-row">
-                    <input type="text" className="b-share-input" value={publishedUrl} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
-                    <button className="b-share-copy" onClick={copyLink} title="Copy link">
-                      {copied ? <Check size={14} /> : <Copy size={14} />}
-                    </button>
-                  </div>
-                </div>
-              )}
               <Link to={`/app/form/${currentFormId}`} className="b-view-btn">
                 <Eye size={15} />
                 Preview Form
@@ -564,6 +549,24 @@ function BuilderInner() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {currentFormId && (
+              <div className="b-share-link" style={{ marginTop: 18 }}>
+                <span className="b-share-label">Form link</span>
+                <div className="b-share-row">
+                  <input
+                    type="text"
+                    className="b-share-input"
+                    value={`${window.location.origin}/form/${currentFormId}`}
+                    readOnly
+                    onClick={e => (e.target as HTMLInputElement).select()}
+                  />
+                  <button className="b-share-copy" onClick={copyLink} title="Copy link">
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
               </div>
             )}
           </>

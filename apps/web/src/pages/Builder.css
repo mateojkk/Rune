@@ -1,8 +1,15 @@
 .builder {
+  --accent: var(--text);
+  --accent-hover: var(--text);
+  --accent-bg: rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: row-reverse;
   min-height: 100%;
   background: var(--bg);
+}
+
+.dark .builder {
+  --accent-bg: rgba(255, 255, 255, 0.08);
 }
 
 /* ─── Empty (no wallet) ─── */
@@ -111,7 +118,7 @@
 .b-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255, 179, 138, 0.08);
+  box-shadow: none;
 }
 
 .b-input::placeholder {
@@ -209,6 +216,61 @@
   background: rgba(255, 107, 107, 0.08);
   border: 1px solid rgba(255, 107, 107, 0.15);
   border-radius: var(--radius);
+}
+
+.b-picker-trigger,
+.b-picker-option {
+  font-family: var(--font-body);
+}
+
+.b-picker-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 300;
+  text-align: left;
+}
+
+.b-picker-menu {
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-elevated);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.b-picker-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 300;
+  text-align: left;
+}
+
+.b-picker-option:last-child {
+  border-bottom: none;
+}
+
+.b-picker-option.active {
+  background: var(--surface);
+  font-weight: 400;
 }
 
 .b-save-btn,
@@ -549,7 +611,7 @@
 }
 
 .b-recent-card:hover {
-  border-color: rgba(255, 179, 138, 0.3);
+  border-color: var(--text);
   box-shadow: var(--shadow);
 }
 
@@ -669,9 +731,9 @@
 }
 
 .b-field-card.editing {
-  border-color: rgba(255, 179, 138, 0.35);
-  box-shadow: 0 0 0 1px rgba(255, 179, 138, 0.12);
-  background: rgba(255, 179, 138, 0.03);
+  border-color: var(--text);
+  box-shadow: 0 0 0 1px var(--border);
+  background: var(--surface);
 }
 
 .b-field-drag {
@@ -906,7 +968,13 @@
   .builder {
     flex-direction: column;
     background:
-      linear-gradient(180deg, rgba(232, 117, 58, 0.04), transparent 180px),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.04), transparent 180px),
+      var(--bg);
+  }
+
+  .dark .builder {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 180px),
       var(--bg);
   }
 
