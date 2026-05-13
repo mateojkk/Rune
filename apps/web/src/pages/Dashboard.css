@@ -637,11 +637,11 @@
   .d-sub-date { font-size: 0.7rem; }
   .d-search { max-width: 100%; }
 
-  .b-modal { width: 100vw; height: 100vh; border-radius: 0; }
+  .b-modal { width: 100vw; height: 100dvh; border-radius: 0; }
   .b-modal-body { flex-direction: column; }
   .b-modal-sidebar {
     width: 100%;
-    max-height: 180px;
+    max-height: 200px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     border-right: none;
@@ -651,14 +651,25 @@
   }
   .b-modal-sidebar.closed { display: none; }
   .b-modal-sidebar .b-field-palette { flex-shrink: 0; }
-  .b-field-types { grid-template-columns: repeat(3, 1fr); gap: 4px; }
-  .b-type-btn { padding: 8px 8px; font-size: 0.74rem; gap: 5px; }
+  .b-field-types { grid-template-columns: repeat(4, 1fr); gap: 3px; }
+  .b-type-btn { padding: 6px 6px; font-size: 0.68rem; gap: 3px; flex-direction: column; }
+  .b-type-btn svg { width: 14px; height: 14px; }
   .b-sidebar-toggle-open { display: flex; }
   .b-modal-sidebar-header .b-sidebar-toggle-close { display: flex; }
-  .b-modal-canvas { padding: 14px; }
-  .b-modal-footer-actions { margin-top: 10px; padding-top: 8px; }
-  .b-field-card { padding: 10px; }
-  .b-field-label { font-size: 0.88rem; }
+  .b-modal-canvas { padding: 12px; }
+  .b-modal-footer-actions { margin-top: 8px; padding-top: 6px; gap: 6px; }
+  .b-field-card { padding: 8px; gap: 6px; }
+  .b-field-label { font-size: 0.85rem; }
+  .b-input { font-size: 0.8rem; padding: 7px 10px; }
+  .b-textarea { min-height: 40px; }
+  .b-label { font-size: 0.65rem; }
+  .b-cover-add { height: 60px; font-size: 0.72rem; }
+  .b-cover-wrap { height: 70px; }
+  .b-field-badge { font-size: 0.58rem; padding: 2px 6px; }
+  .b-field-preview { padding: 8px 10px; font-size: 0.78rem; }
+  .b-modal-footer-actions .b-save-btn,
+  .b-modal-footer-actions .b-view-btn { padding: 8px; font-size: 0.72rem; }
+  .b-share-link input { font-size: 0.72rem; }
 }
 
 @media (max-width: 768px) {
@@ -701,18 +712,24 @@
   .d-subs-back { font-size: 0.68rem; }
   .d-stats-row { font-size: 0.7rem; gap: 4px; }
 
-  .b-modal-sidebar { max-height: 140px; padding: 6px 8px; gap: 4px; }
-  .b-field-types { grid-template-columns: repeat(2, 1fr); gap: 3px; }
-  .b-type-btn { padding: 6px 6px; font-size: 0.65rem; gap: 3px; }
+  .b-modal-sidebar { max-height: 160px; padding: 4px 8px; gap: 3px; }
+  .b-field-types { grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .b-type-btn { padding: 4px 4px; font-size: 0.6rem; gap: 2px; }
   .b-type-btn svg { width: 12px; height: 12px; }
-  .b-modal-canvas { padding: 8px; }
-  .b-modal-header { padding: 6px 8px; }
-  .b-modal-header h2 { font-size: 0.8rem; }
-  .b-field-card { padding: 6px; gap: 4px; }
-  .b-field-label { font-size: 0.78rem; }
-  .b-save-btn, .b-create-btn { font-size: 0.7rem; padding: 6px; }
-  .b-input { font-size: 0.75rem; padding: 6px 8px; }
+  .b-modal-canvas { padding: 6px; }
+  .b-modal-header { padding: 4px 8px; }
+  .b-modal-header h2 { font-size: 0.78rem; }
+  .b-field-card { padding: 5px; gap: 3px; }
+  .b-field-label { font-size: 0.75rem; }
+  .b-save-btn, .b-create-btn { font-size: 0.65rem; padding: 5px; }
+  .b-input { font-size: 0.72rem; padding: 5px 7px; }
   .b-field { gap: 2px; }
+  .b-cover-add { height: 44px; font-size: 0.65rem; }
+  .b-cover-wrap { height: 50px; }
+  .b-profile-img, .b-profile-add { width: 28px; height: 28px; }
+  .b-field-preview { padding: 6px 8px; font-size: 0.7rem; }
+  .b-field-badge { font-size: 0.52rem; padding: 1px 5px; }
+  .b-canvas-ws-badge { font-size: 0.55rem; }
   .b-cover-add { height: 50px; font-size: 0.7rem; }
   .b-cover-wrap { height: 60px; }
   .b-profile-img, .b-profile-add { width: 32px; height: 32px; }
