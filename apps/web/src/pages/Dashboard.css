@@ -85,15 +85,15 @@
 
 .d-home-recent {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
 }
 
 .d-home-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px;
+  gap: 8px;
+  padding: 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -104,7 +104,7 @@
 }
 
 .d-home-card:hover {
-  border-color: var(--accent);
+  border-color: var(--subtle);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
 
@@ -121,15 +121,15 @@
 }
 
 .d-home-card-title {
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 500;
   line-height: 1.3;
 }
 
 .d-home-card-desc {
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -157,15 +157,15 @@
 
 .d-form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
 }
 
 .d-form-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px;
+  gap: 10px;
+  padding: 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -173,7 +173,7 @@
 }
 
 .d-form-card:hover {
-  border-color: var(--accent);
+  border-color: var(--subtle);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
 
@@ -184,13 +184,13 @@
 }
 
 .d-form-card-body h3 {
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 500;
   line-height: 1.3;
 }
 
 .d-form-card-meta {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--muted);
   margin-top: 2px;
 }
@@ -659,7 +659,7 @@
   .b-modal-sidebar > .b-field-palette,
   .b-modal-footer-actions,
   .b-modal-sidebar-header {
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--surface-glass);
     border: 1px solid var(--border);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
@@ -691,7 +691,7 @@
   .b-field-badge { font-size: 0.58rem; padding: 2px 6px; }
   .b-field-preview { padding: 10px 12px; font-size: 0.78rem; }
   .b-modal-footer-actions .b-save-btn,
-  .b-modal-footer-actions .b-view-btn { padding: 10px 12px; font-size: 0.78rem; min-height: 44px; }
+  .b-modal-footer-actions .b-view-btn { padding: 8px 12px; font-size: 0.76rem; min-height: 40px; }
   .b-share-link input { font-size: 0.72rem; }
 }
 

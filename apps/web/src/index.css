@@ -25,10 +25,11 @@
   --border: #E5E5E3;
   --border-light: rgba(0, 0, 0, 0.06);
   --tag: #EDEDEB;
+  --surface-glass: rgba(255, 255, 255, 0.9);
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 8px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -48,6 +49,7 @@
   --border: #2A2A28;
   --border-light: rgba(255, 255, 255, 0.06);
   --tag: #2A2A28;
+  --surface-glass: rgba(31, 31, 30, 0.85);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
@@ -128,13 +130,13 @@ input, textarea, select {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0.72rem 1.6rem;
-  font-size: 0.82rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.78rem;
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: 0.01em;
   border-radius: var(--radius);
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   border: none;
 }
 
@@ -144,8 +146,7 @@ input, textarea, select {
 }
 
 .btn-primary:hover {
-  background: var(--accent);
-  color: #fff;
+  opacity: 0.85;
 }
 
 .btn-outline {
@@ -155,8 +156,9 @@ input, textarea, select {
 }
 
 .btn-outline:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
+  box-shadow: 0 0 0 2px var(--border);
 }
 
 .btn-secondary {
@@ -166,8 +168,9 @@ input, textarea, select {
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
+  box-shadow: 0 0 0 2px var(--border);
 }
 
 .btn-sm {
@@ -189,7 +192,8 @@ input, textarea, select {
 
 .input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--subtle);
+  box-shadow: 0 0 0 3px var(--border);
 }
 
 .label {
@@ -214,7 +218,7 @@ input, textarea, select {
 }
 
 .card:hover {
-  border-color: var(--accent);
+  border-color: var(--subtle);
   box-shadow: var(--shadow);
   transform: translateY(-2px);
 }

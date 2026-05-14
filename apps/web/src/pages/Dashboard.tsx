@@ -73,8 +73,13 @@ export function Dashboard() {
       const wsId = workspaceFilter || '';
       setWorkspaceId(wsId);
       await refreshForms(wsId || undefined);
+
+      const editId = searchParams.get('edit');
+      if (editId) {
+        setEditingFormId(editId);
+      }
     })();
-  }, [workspaceFilter]);
+  }, [workspaceFilter, searchParams]);
 
   const openSubmissions = async (form: FormSchema) => {
     setViewingSubs(form);

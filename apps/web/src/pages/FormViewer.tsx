@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Star, CheckSquare, Upload, FileText, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink } from 'lucide-react';
 import type { FormSchema, FormField } from '../types/form';
 import { addSubmission } from '../lib/forms';
@@ -94,6 +94,7 @@ function BrandFooter() {
 
 export function FormViewer() {
   const { formId } = useParams();
+  const navigate = useNavigate();
 
   const [walletAddr, setWalletAddr] = useState<string | null>(null);
   const [walletRef, setWalletRef] = useState<any>(null);
@@ -294,9 +295,10 @@ export function FormViewer() {
   if (step < 0) {
     return (
       <div className="form-viewer">
-        <Link to={`/app/builder/${formId}`} className="fv-back-editor">
+        <button className="fv-back-editor" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}
+          style={{ background: 'none', border: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'inherit' }}>
           <ArrowLeft size={13} /> Editor
-        </Link>
+        </button>
         <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
           <div className="fv-start-overlay" />
           <div className="fv-start-body">
@@ -321,9 +323,10 @@ export function FormViewer() {
 
   return (
     <div className="form-viewer fv-flow">
-      <Link to={`/app/builder/${formId}`} className="fv-back-editor fv-back-editor-flow">
+      <button className="fv-back-editor fv-back-editor-flow" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}
+        style={{ background: 'none', border: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'inherit' }}>
         <ArrowLeft size={13} /> Editor
-      </Link>
+      </button>
       <div className="fv-progress-bar">
         <div className="fv-progress-fill" style={{ width: `${progress}%` }} />
       </div>

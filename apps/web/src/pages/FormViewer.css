@@ -197,8 +197,8 @@
 }
 
 .fv-back-editor:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .fv-back-editor-flow {
@@ -256,8 +256,8 @@
 }
 
 .fv-flow-back:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .fv-flow-field {
@@ -359,7 +359,7 @@
 
 .fv-line-input:focus {
   outline: none;
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--muted);
 }
 
 .fv-line-input::placeholder {
@@ -463,8 +463,8 @@
 }
 
 .fv-file:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .fv-file input {
@@ -548,8 +548,8 @@
 }
 
 .fv-flow-skip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .fv-connect-wrap {
@@ -601,7 +601,7 @@
 
 .wallet-option:hover:not(:disabled) {
   background: var(--accent-bg);
-  border-color: var(--accent);
+  border-color: var(--muted);
 }
 
 .wallet-option:disabled {

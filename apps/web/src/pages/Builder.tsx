@@ -52,6 +52,16 @@ function BuilderInner() {
   const paletteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Redirect desktop users to the dashboard modal
+    if (window.innerWidth >= 900) {
+      if (formId) {
+        navigate(`/app/dashboard?edit=${formId}`);
+      } else {
+        navigate('/app/dashboard');
+      }
+      return;
+    }
+
     const load = async () => {
       const [ws, all] = await Promise.all([getWorkspaces(), getAllForms()]);
       setWorkspaces(ws);
@@ -84,7 +94,7 @@ function BuilderInner() {
       }
     };
     load();
-  }, [formId]);
+  }, [formId, navigate]);
 
   useEffect(() => {
     if (showFieldPalette) {

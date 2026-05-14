@@ -117,8 +117,8 @@
 
 .b-input:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: none;
+  border-color: var(--subtle);
+  box-shadow: 0 0 0 3px var(--border);
 }
 
 .b-input::placeholder {
@@ -178,8 +178,8 @@
 }
 
 .b-type-btn:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
   background: var(--accent-bg);
 }
 
@@ -281,11 +281,11 @@
   justify-content: center;
   gap: 6px;
   width: 100%;
-  padding: 10px;
-  font-size: 0.82rem;
-  font-weight: 600;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   text-decoration: none;
   border-radius: var(--radius);
 }
@@ -318,8 +318,9 @@
 }
 
 .b-view-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
+  box-shadow: 0 0 0 2px var(--border);
 }
 
 /* ─── Share link ─── */
@@ -359,7 +360,8 @@
 
 .b-share-input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--subtle);
+  box-shadow: 0 0 0 2px var(--border);
 }
 
 .b-share-copy {
@@ -378,8 +380,8 @@
 }
 
 .b-share-copy:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 /* ─── Canvas ─── */
@@ -482,8 +484,8 @@
 }
 
 .b-cover-add:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .b-title-row {
@@ -521,8 +523,8 @@
 }
 
 .b-profile-add:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
 }
 
 .b-img-remove {
@@ -726,7 +728,7 @@
 }
 
 .b-field-card:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--subtle);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1007,17 +1009,10 @@
   .builder .b-form-meta,
   .builder .b-field-palette,
   .builder .b-sidebar-bottom {
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--surface-glass);
     border: 1px solid var(--border);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
-  }
-
-  .dark .builder .b-sidebar-top,
-  .dark .builder .b-form-meta,
-  .dark .builder .b-field-palette,
-  .dark .builder .b-sidebar-bottom {
-    background: var(--surface);
   }
 
   .builder .b-sidebar-top {
@@ -1090,9 +1085,9 @@
   .builder .b-sidebar-bottom .b-view-btn {
     flex: initial;
     min-width: 0;
-    min-height: 46px;
-    padding: 11px 14px;
-    font-size: 0.82rem;
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
   }
 
   .builder .b-sidebar-bottom .b-error,
@@ -1113,15 +1108,10 @@
   .builder .b-canvas-header {
     margin-bottom: 18px;
     padding: 18px;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--surface-glass);
     border: 1px solid var(--border);
     border-radius: 22px;
     box-shadow: var(--shadow-sm);
-  }
-
-  .dark .builder .b-workspace-header,
-  .dark .builder .b-canvas-header {
-    background: var(--surface);
   }
 
   .builder .b-cover-add {
