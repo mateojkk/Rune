@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, CheckSquare, Upload, FileText, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink, Clock, AlertTriangle, Check } from 'lucide-react';
-import type { FormSchema, FormField } from '../types/form';
+import { Star, Upload, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink, Clock, AlertTriangle, Check } from 'lucide-react';
+import type { FormSchema } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
 import { getFormApi } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
 import { getSuiChain } from '../lib/network';
-import { useWalletStore } from '../context/wallet';
-import { downloadBlob, decryptAndRead } from '../lib/encrypted-storage';
 import './FormViewer.css';
 
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
@@ -122,7 +120,7 @@ export function FormViewer() {
       try {
         const data = await getFormApi(formId);
         if (data) {
-          setForm(data);
+          setForm(data as any);
           setProfilePicture(data.profilePicture || '');
           setCoverPicture(data.coverPicture || '');
         }
@@ -203,17 +201,16 @@ export function FormViewer() {
         if (field.type === 'file' || field.type === 'image' || field.type === 'video') {
           const file = formData[field.id];
           if (file instanceof File) {
-            const blobId = await storeBlobWithWallet(file, walletRef);
+            const { blobId } = await storeBlobWithWallet(file, walletAddr, walletRef.signAndExecuteTransaction);
             finalData[field.id] = blobId;
           }
         }
       }
 
       await addSubmission(form.id, {
-        formId: form.id,
         data: finalData,
         walletAddress: walletAddr,
-        createdAt: new Date().toISOString(),
+        submittedAt: new Date().toISOString(),
       });
       setSubmitted(true);
     } catch (e) {
