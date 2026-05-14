@@ -4,6 +4,7 @@ import { Star, Upload, ArrowLeft, ArrowRight, Wallet, ExternalLink, Clock, Alert
 import type { FormSchema } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
+import { encryptAndStoreWithWallet } from '../lib/encrypted-storage';
 import { getFormApi } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
 import { getSuiChain } from '../lib/network';
@@ -206,14 +207,26 @@ export function FormViewer() {
         if (field.type === 'file' || field.type === 'image' || field.type === 'video') {
           const file = formData[field.id];
           if (file instanceof File) {
-            const { blobId } = await storeBlobWithWallet(file, walletAddr, walletRef.signAndExecuteTransaction);
-            finalData[field.id] = blobId;
+            const { blobId: fileBlobId } = await storeBlobWithWallet(file, walletAddr, walletRef.signAndExecuteTransaction);
+            finalData[field.id] = fileBlobId;
           }
         }
       }
 
+      // ENCRYPT main data using Seal for the form owner
+      const ownerAddress = form.walletAddress;
+      if (!ownerAddress) throw new Error('Form owner address not found. Cannot encrypt.');
+
+      const { blobId } = await encryptAndStoreWithWallet(
+        finalData,
+        ownerAddress,
+        walletAddr,
+        walletRef.signAndExecuteTransaction
+      );
+
       await addSubmission(form.id, {
-        data: finalData,
+        blobId,
+        data: {}, // Data is now safely encrypted on Walrus
         walletAddress: walletAddr,
         submittedAt: new Date().toISOString(),
       });

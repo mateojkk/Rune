@@ -1,7 +1,7 @@
 import { SealClient, SessionKey } from '@mysten/seal';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { Transaction } from '@mysten/sui/transactions';
-import { storeBlobWithKeypair } from './walrus';
+import { storeBlobWithKeypair, storeBlobWithWallet } from './walrus';
 import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
 
 const SEAL_PACKAGE_ID = import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7';
@@ -46,6 +46,25 @@ export async function encryptAndStore(
   });
 
   return storeBlobWithKeypair(encryptedObject, keypair, submitterAddress);
+}
+
+export async function encryptAndStoreWithWallet(
+  data: unknown,
+  ownerAddress: string,
+  submitterAddress: string,
+  signAndExecute: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+): Promise<{ blobId: string }> {
+  const suiClient = getSuiClient();
+  const sealClient = getSealClient(suiClient);
+
+  const { encryptedObject } = await sealClient.encrypt({
+    threshold: 1,
+    packageId: SEAL_PACKAGE_ID,
+    id: ownerAddress,
+    data: new TextEncoder().encode(JSON.stringify(data)),
+  });
+
+  return storeBlobWithWallet(encryptedObject, submitterAddress, signAndExecute);
 }
 
 export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {

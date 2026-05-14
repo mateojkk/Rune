@@ -16,8 +16,11 @@ async function writeBlobFlow(
   signTx: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
 ): Promise<string> {
   const client = await getWalrusClient();
-  const jsonStr = JSON.stringify(data);
-  const flow = client.walrus.writeBlobFlow({ blob: new TextEncoder().encode(jsonStr) });
+  const blob = data instanceof Uint8Array 
+    ? data 
+    : new TextEncoder().encode(JSON.stringify(data));
+    
+  const flow = client.walrus.writeBlobFlow({ blob });
   await flow.encode();
 
   const regTx = flow.register({ epochs: 2, owner: address, deletable: false });

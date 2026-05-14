@@ -102,7 +102,7 @@ export function Dashboard() {
         if (!ephemeralKey) return sub;
         const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
         const decryptedData = await decryptAndRead(raw, keypair, getCurrentUserAddress()!);
-        return { ...sub, data: (decryptedData as any).data || {} };
+        return { ...sub, data: decryptedData as any };
       } catch {
         return sub;
       }
