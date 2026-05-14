@@ -36,6 +36,10 @@ function BuilderInner() {
   const [currentFormId, setCurrentFormId] = useState<string | undefined>(formId);
   const [error, setError] = useState<string | null>(null);
   const [showFieldPalette, setShowFieldPalette] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  // Per-field raw option text for multiselect/dropdown editing
+  const [optionDraft, setOptionDraft] = useState<Record<string, string>>({});
 
   const [recentForms, setRecentForms] = useState<FormSchema[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -472,10 +476,27 @@ function BuilderInner() {
                 {fields.map((field, idx) => (
                   <div
                     key={field.id}
-                    className={`b-field-card ${editingField === field.id ? 'editing' : ''}`}
+                    className={`b-field-card ${editingField === field.id ? 'editing' : ''} ${dragIndex === idx ? 'dragging' : ''} ${dragOverIndex === idx && dragIndex !== idx ? 'drag-over' : ''}`}
+                    draggable
+                    onDragStart={e => { setDragIndex(idx); e.dataTransfer.effectAllowed = 'move'; }}
+                    onDragEnd={() => { setDragIndex(null); setDragOverIndex(null); }}
+                    onDragOver={e => { e.preventDefault(); if (dragOverIndex !== idx) setDragOverIndex(idx); }}
+                    onDrop={e => {
+                      e.preventDefault();
+                      if (dragIndex === null || dragIndex === idx) return;
+                      const next = [...fields];
+                      const [moved] = next.splice(dragIndex, 1);
+                      next.splice(idx, 0, moved);
+                      setFields(next);
+                      setDragIndex(null);
+                      setDragOverIndex(null);
+                      if (currentFormId) {
+                        updateField(currentFormId, moved.id, { order: idx } as any).catch(() => {});
+                      }
+                    }}
                     onClick={() => setEditingField(field.id)}
                   >
-                    <div className="b-field-drag">
+                    <div className="b-field-drag" title="Drag to reorder">
                       <GripVertical size={14} />
                     </div>
 
@@ -502,10 +523,22 @@ function BuilderInner() {
                           <label className="b-label">Options (one per line)</label>
                           <textarea
                             className="b-input b-textarea b-options-input"
-                            value={field.options?.join('\n') || ''}
-                            onChange={e => handleUpdateField(field.id, {
-                              options: e.target.value.split('\n').filter(o => o.trim())
-                            })}
+                            value={optionDraft[field.id] ?? (field.options?.join('\n') || '')}
+                            onChange={e => {
+                              const raw = e.target.value;
+                              setOptionDraft(d => ({ ...d, [field.id]: raw }));
+                              handleUpdateField(field.id, {
+                                options: raw.split('\n').filter(o => o.trim())
+                              });
+                            }}
+                            onBlur={() => {
+                              // normalise draft on blur
+                              setOptionDraft(d => {
+                                const next = { ...d };
+                                delete next[field.id];
+                                return next;
+                              });
+                            }}
                             placeholder="Option 1&#10;Option 2&#10;Option 3"
                             rows={3}
                             onClick={e => e.stopPropagation()}

@@ -696,64 +696,70 @@
 }
 
 @media (max-width: 768px) {
-  .d-main { padding: 16px; }
-  .d-form-card { padding: 12px; }
-  .d-form-card-body h3 { font-size: 0.82rem; }
-  .d-form-card-meta { font-size: 0.68rem; }
-  .d-form-card-actions .btn { padding: 4px 8px; font-size: 0.72rem; }
+  .d-main { padding: 14px; }
+  .d-form-card { padding: 10px; }
+  .d-form-card-body h3 { font-size: 0.78rem; }
+  .d-form-card-meta { font-size: 0.64rem; }
+  .d-form-card-actions .btn { padding: 4px 7px; font-size: 0.68rem; }
   .d-form-card-actions { opacity: 1; }
   .d-form-card-del { opacity: 1; }
-  .d-ws-header { margin-bottom: 10px; }
-  .d-ws-header h1, .d-home-header h1 { font-size: 1.05rem; }
+  .d-ws-header { margin-bottom: 8px; }
+  .d-ws-header h1, .d-home-header h1 { font-size: 0.95rem; }
   .d-home-recent { grid-template-columns: 1fr; }
-  .d-home-section-title { font-size: 0.75rem; margin: 14px 0 8px; }
-  .d-main-empty svg { width: 28px; height: 28px; }
-  .d-main-empty h3 { font-size: 0.95rem; }
+  .d-home-section-title { font-size: 0.68rem; margin: 12px 0 6px; }
+  .d-main-empty svg { width: 26px; height: 26px; }
+  .d-main-empty h3 { font-size: 0.88rem; }
   .d-subs-header { flex-wrap: wrap; gap: 6px; }
-  .d-subs-header h1 { font-size: 0.95rem; width: 100%; order: -1; }
-  .d-subs-header-actions .btn { padding: 6px 10px; font-size: 0.72rem; }
-  .d-sub-header { padding: 8px 10px; }
-  .d-sub-wallet { font-size: 0.78rem; }
-  .d-sub-date { font-size: 0.68rem; }
+  .d-subs-header h1 { font-size: 0.88rem; width: 100%; order: -1; }
+  .d-subs-header-actions .btn { padding: 5px 8px; font-size: 0.68rem; }
+  .d-sub-header { padding: 7px 10px; }
+  .d-sub-wallet { font-size: 0.72rem; }
+  .d-sub-date { font-size: 0.64rem; }
+  .d-sub-field-value { font-size: 0.78rem; }
   .d-search { max-width: 100%; }
-  .d-stats-row { font-size: 0.78rem; }
+  .d-search input { font-size: 0.76rem; }
+  .d-stats-row { font-size: 0.72rem; }
 }
 
 @media (max-width: 480px) {
-  .d-main { padding: 12px; }
-  .d-form-card { padding: 10px; }
-  .d-form-card-body h3 { font-size: 0.82rem; }
-  .d-form-card-meta { font-size: 0.65rem; }
-  .d-ws-header { margin-bottom: 8px; }
-  .d-ws-header h1, .d-home-header h1 { font-size: 0.92rem; }
-  .d-home-section-title { font-size: 0.7rem; margin: 10px 0 6px; }
-  .d-main-empty svg { width: 22px; height: 22px; }
-  .d-main-empty h3 { font-size: 0.85rem; }
-  .d-subs-header h1 { font-size: 0.85rem; }
-  .d-sub-header { flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 8px; }
-  .d-subs-back { font-size: 0.68rem; }
-  .d-stats-row { font-size: 0.7rem; gap: 4px; }
+  .d-main { padding: 10px; }
+  .d-form-card { padding: 9px; }
+  .d-form-card-body h3 { font-size: 0.74rem; }
+  .d-form-card-meta { font-size: 0.6rem; }
+  .d-ws-header { margin-bottom: 6px; }
+  .d-ws-header h1, .d-home-header h1 { font-size: 0.84rem; }
+  .d-home-section-title { font-size: 0.62rem; margin: 8px 0 5px; }
+  .d-main-empty svg { width: 20px; height: 20px; }
+  .d-main-empty h3 { font-size: 0.78rem; }
+  .d-subs-header h1 { font-size: 0.78rem; }
+  .d-sub-header { flex-direction: column; align-items: flex-start; gap: 3px; padding: 5px 8px; }
+  .d-sub-wallet { font-size: 0.68rem; }
+  .d-sub-date { font-size: 0.6rem; }
+  .d-sub-field-value { font-size: 0.74rem; }
+  .d-sub-field-label { font-size: 0.58rem; }
+  .d-subs-back { font-size: 0.64rem; }
+  .d-stats-row { font-size: 0.66rem; gap: 3px; }
 
-  .b-modal-sidebar { padding: 10px; gap: 8px; }
+  .b-modal-sidebar { padding: 8px; gap: 6px; }
   .b-modal-sidebar > .b-field,
   .b-modal-sidebar > .b-field-palette,
   .b-modal-footer-actions,
-  .b-modal-sidebar-header { border-radius: 16px; }
-  .b-field-types { display: flex; gap: 8px; overflow-x: auto; }
-  .b-type-btn { min-width: 100px; min-height: 72px; padding: 8px 8px; font-size: 0.64rem; gap: 5px; flex: 0 0 auto; }
-  .b-type-btn svg { width: 14px; height: 14px; }
-  .b-modal-canvas { padding: 6px 10px 18px; }
-  .b-modal-header { padding: 10px 12px; }
-  .b-modal-header h2 { font-size: 0.86rem; }
-  .b-field-card { padding: 12px; gap: 8px; }
-  .b-field-label { font-size: 0.86rem; }
-  .b-save-btn, .b-create-btn { font-size: 0.74rem; padding: 9px 10px; }
-  .b-input { font-size: 0.8rem; padding: 8px 9px; }
-  .b-field { gap: 6px; }
-  .b-cover-add { height: 76px; font-size: 0.72rem; }
-  .b-cover-wrap { height: 88px; }
-  .b-profile-img, .b-profile-add { width: 36px; height: 36px; }
-  .b-field-preview { padding: 9px 10px; font-size: 0.74rem; }
-  .b-field-badge { font-size: 0.52rem; padding: 1px 5px; }
-  .b-canvas-ws-badge { font-size: 0.55rem; }
+  .b-modal-sidebar-header { border-radius: 14px; }
+  .b-field-types { display: flex; gap: 6px; overflow-x: auto; }
+  .b-type-btn { min-width: 90px; min-height: 66px; padding: 6px 6px; font-size: 0.58rem; gap: 4px; flex: 0 0 auto; }
+  .b-type-btn svg { width: 13px; height: 13px; }
+  .b-modal-canvas { padding: 5px 9px 16px; }
+  .b-modal-header { padding: 8px 10px; }
+  .b-modal-header h2 { font-size: 0.8rem; }
+  .b-field-card { padding: 10px; gap: 7px; }
+  .b-field-label { font-size: 0.8rem; }
+  .b-save-btn, .b-create-btn { font-size: 0.7rem; padding: 8px 9px; }
+  .b-input { font-size: 0.76rem; padding: 7px 8px; }
+  .b-field { gap: 5px; }
+  .b-cover-add { height: 68px; font-size: 0.66rem; }
+  .b-cover-wrap { height: 80px; }
+  .b-profile-img, .b-profile-add { width: 32px; height: 32px; }
+  .b-field-preview { padding: 7px 9px; font-size: 0.68rem; }
+  .b-field-badge { font-size: 0.46rem; padding: 1px 4px; }
+  .b-canvas-ws-badge { font-size: 0.5rem; }
 }

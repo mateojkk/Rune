@@ -157,11 +157,19 @@ export function Dashboard() {
     URL.revokeObjectURL(url);
   };
 
-  const getFieldValue = (sub: FormSubmission, fieldId: string) => {
-    const value = sub.data[fieldId];
-    if (value === undefined || value === null) return '—';
-    if (typeof value === 'object') return Array.isArray(value) ? value.join(', ') : JSON.stringify(value);
-    return String(value);
+  const renderFieldValue = (sub: FormSubmission, field: { id: string; type: string; label: string }) => {
+    const raw = sub.data[field.id];
+    if (raw === undefined || raw === null) return <span className="d-sub-field-value">—</span>;
+    if (field.type === 'image' && typeof raw === 'string' && raw.startsWith('data:image')) {
+      return <img src={raw} alt={field.label} style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, border: '1px solid var(--border)', marginTop: 4 }} />;
+    }
+    if (field.type === 'video' && typeof raw === 'string' && raw.startsWith('data:video')) {
+      return <video src={raw} controls style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, border: '1px solid var(--border)', marginTop: 4 }} />;
+    }
+    const text = typeof raw === 'object' ? (Array.isArray(raw) ? raw.join(', ') : JSON.stringify(raw)) : String(raw);
+    // Truncate very long base64 blobs gracefully
+    const display = text.startsWith('data:') ? '[file uploaded]' : text;
+    return <span className="d-sub-field-value">{display}</span>;
   };
 
   const handleFormSaved = () => {
@@ -282,7 +290,7 @@ export function Dashboard() {
                       {viewingSubs.fields.map(field => (
                         <div key={field.id} className="d-sub-field-group">
                           <span className="d-sub-field-label">{field.label}</span>
-                          <span className="d-sub-field-value">{getFieldValue(sub, field.id)}</span>
+                          {renderFieldValue(sub, field)}
                         </div>
                       ))}
                     </div>

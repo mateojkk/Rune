@@ -955,6 +955,20 @@
   background: rgba(255, 107, 107, 0.08);
 }
 
+/* ─── Drag states ─── */
+
+.b-field-card.dragging {
+  opacity: 0.45;
+  border-style: dashed;
+}
+
+.b-field-card.drag-over {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--border);
+  transform: translateY(-2px);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
 /* ─── Animations ─── */
 
 @keyframes b-fadeIn {
@@ -997,6 +1011,13 @@
     border: 1px solid var(--border);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
+  }
+
+  .dark .builder .b-sidebar-top,
+  .dark .builder .b-form-meta,
+  .dark .builder .b-field-palette,
+  .dark .builder .b-sidebar-bottom {
+    background: var(--surface);
   }
 
   .builder .b-sidebar-top {
@@ -1098,6 +1119,11 @@
     box-shadow: var(--shadow-sm);
   }
 
+  .dark .builder .b-workspace-header,
+  .dark .builder .b-canvas-header {
+    background: var(--surface);
+  }
+
   .builder .b-cover-add {
     height: 96px;
     border-radius: 16px;
@@ -1165,25 +1191,37 @@
 
   .builder .b-canvas-header h1,
   .builder .b-workspace-header h1 {
-    font-size: 1.3rem;
+    font-size: 1.15rem;
   }
 
   .builder .b-canvas-ws-badge {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
   }
 
   .builder .b-input {
-    font-size: 0.92rem;
-    padding: 10px 12px;
+    font-size: 0.84rem;
+    padding: 8px 10px;
   }
 
   .builder .b-textarea {
-    padding: 10px 12px;
-    min-height: 72px;
+    padding: 8px 10px;
+    min-height: 64px;
   }
 
   .builder .b-label {
-    font-size: 0.68rem;
+    font-size: 0.62rem;
+  }
+
+  .builder .b-field-label {
+    font-size: 0.9rem;
+  }
+
+  .builder .b-type-btn {
+    font-size: 0.66rem;
+  }
+
+  .builder .b-field-badge {
+    font-size: 0.56rem;
   }
 }
 
@@ -1280,51 +1318,65 @@
     padding: 2px 6px;
   }
 
-  .builder .b-field-index { font-size: 0.65rem; }
+  .builder .b-field-index { font-size: 0.58rem; }
   .builder .b-canvas-header h1,
   .builder .b-workspace-header h1 {
-    font-size: 1.12rem;
+    font-size: 0.98rem;
   }
 
   .builder .b-canvas-ws-badge {
-    font-size: 0.58rem;
-    padding: 3px 7px;
+    font-size: 0.52rem;
+    padding: 2px 6px;
   }
 
   .builder .b-input {
-    font-size: 0.84rem;
-    padding: 9px 10px;
+    font-size: 0.78rem;
+    padding: 7px 9px;
   }
 
   .builder .b-textarea {
-    padding: 9px 10px;
-    min-height: 64px;
+    padding: 7px 9px;
+    min-height: 56px;
   }
 
   .builder .b-label {
-    font-size: 0.62rem;
+    font-size: 0.56rem;
+  }
+
+  .builder .b-field-label {
+    font-size: 0.84rem;
+  }
+
+  .builder .b-type-btn {
+    font-size: 0.6rem;
+    min-height: 66px;
+  }
+
+  .builder .b-field-badge {
+    font-size: 0.48rem;
+    padding: 1px 4px;
   }
 
   .builder .b-cover-add {
-    height: 82px;
-    font-size: 0.74rem;
+    height: 72px;
+    font-size: 0.68rem;
   }
 
   .builder .b-cover-wrap {
-    height: 96px;
+    height: 86px;
   }
 
   .builder .b-profile-img,
   .builder .b-profile-add {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
   }
 
   .builder .b-recent-card {
-    padding: 14px;
+    padding: 12px;
   }
 
   .builder .b-recent-card-title {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
 }

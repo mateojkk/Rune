@@ -12,12 +12,13 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  --accent: #E8753A;
-  --accent-hover: #D4652E;
-  --accent-bg: rgba(232, 117, 58, 0.1);
+  /* Greyscale brand — accent = text colour */
+  --accent: #1A1A18;
+  --accent-hover: #3A3A38;
+  --accent-bg: rgba(26, 26, 24, 0.07);
   --bg: #FFFFFF;
   --surface: #F5F5F4;
-  --surface-elevated: #F0F0EE;
+  --surface-elevated: #EFEFED;
   --text: #1A1A18;
   --muted: #6B6B68;
   --subtle: #A8A8A3;
@@ -35,9 +36,9 @@
 }
 
 .dark {
-  --accent: #FFB38A;
-  --accent-hover: #FF9E6B;
-  --accent-bg: rgba(255, 179, 138, 0.1);
+  --accent: #FAF9F5;
+  --accent-hover: #D8D7D3;
+  --accent-bg: rgba(250, 249, 245, 0.08);
   --bg: #141413;
   --surface: #1F1F1E;
   --surface-elevated: #2A2A28;
@@ -93,6 +94,14 @@ input, textarea, select {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 2.5rem;
+}
+
+@media (max-width: 768px) {
+  html { font-size: 14.5px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 13.5px; }
 }
 
 @media (max-width: 640px) {

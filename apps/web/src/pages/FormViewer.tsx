@@ -109,6 +109,7 @@ export function FormViewer() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({}); // fieldId -> data URL
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
   const directionRef = useRef<'forward' | 'backward'>('forward');
 
@@ -158,10 +159,20 @@ export function FormViewer() {
     setFormData(prev => ({ ...prev, [fieldId]: newValue }));
   };
 
-  const handleFile = (fieldId: string, file: File | null) => {
+  const handleFile = (fieldId: string, file: File | null, fieldType: string) => {
     if (file) {
       setFileNames(prev => ({ ...prev, [fieldId]: file.name }));
-      handleFieldChange(fieldId, file.name);
+      if (fieldType === 'image' || fieldType === 'video') {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const dataUrl = e.target?.result as string;
+          setFilePreviews(prev => ({ ...prev, [fieldId]: dataUrl }));
+          handleFieldChange(fieldId, dataUrl);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        handleFieldChange(fieldId, file.name);
+      }
     }
   };
 
@@ -416,12 +427,20 @@ export function FormViewer() {
           )}
 
           {(field.type === 'file' || field.type === 'image' || field.type === 'video') && (
-            <label className="fv-file">
-              <Upload size={20} />
-              <span>{fileNames[field.id] || `Upload ${field.type}`}</span>
-              <input type="file" accept={field.type === 'image' ? 'image/*' : field.type === 'video' ? 'video/*' : undefined}
-                onChange={e => { handleFile(field.id, e.target.files?.[0] || null); setTimeout(goNext, 300); }} />
-            </label>
+            <div className="fv-file-wrap">
+              {field.type === 'image' && filePreviews[field.id] && (
+                <img src={filePreviews[field.id]} alt="preview" className="fv-file-img-preview" />
+              )}
+              {field.type === 'video' && filePreviews[field.id] && (
+                <video src={filePreviews[field.id]} controls className="fv-file-video-preview" />
+              )}
+              <label className="fv-file">
+                <Upload size={20} />
+                <span>{fileNames[field.id] || `Upload ${field.type}`}</span>
+                <input type="file" accept={field.type === 'image' ? 'image/*' : field.type === 'video' ? 'video/*' : undefined}
+                  onChange={e => { handleFile(field.id, e.target.files?.[0] || null, field.type); if (!filePreviews[field.id]) setTimeout(goNext, 300); }} />
+              </label>
+            </div>
           )}
 
           {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}

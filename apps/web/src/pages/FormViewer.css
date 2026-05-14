@@ -471,6 +471,29 @@
   display: none;
 }
 
+.fv-file-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fv-file-img-preview {
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: var(--radius);
+  object-fit: contain;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.fv-file-video-preview {
+  width: 100%;
+  max-height: 240px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #000;
+}
+
 .fv-error {
   font-size: 0.82rem;
   color: #e74c3c;
@@ -587,24 +610,34 @@
 }
 
 @media (max-width: 768px) {
-  .fv-start { padding: 32px 16px; }
-  .fv-start-body { padding: 24px 12px; }
-  .fv-start-body h1 { font-size: 1.7rem; }
-  .fv-start-profile { width: 52px; height: 52px; }
-  .fv-flow { padding-top: 48px; }
-  .fv-flow-container { padding: 0 16px; }
-  .fv-label { font-size: 1.35rem; }
-  .fv-line-input { font-size: 1rem; }
+  .fv-start { padding: 28px 14px; }
+  .fv-start-body { padding: 20px 10px; }
+  .fv-start-body h1 { font-size: 1.45rem; }
+  .fv-start-body p { font-size: 0.82rem; }
+  .fv-start-profile { width: 46px; height: 46px; }
+  .fv-flow { padding-top: 44px; }
+  .fv-flow-container { padding: 0 14px; }
+  .fv-label { font-size: 1.15rem; }
+  .fv-desc { font-size: 0.78rem; }
+  .fv-line-input { font-size: 0.9rem; }
+  .fv-step-count { font-size: 0.66rem; padding: 4px 8px; }
+  .fv-flow-submit { padding: 10px 22px; font-size: 0.8rem; }
+  .fv-flow-skip { font-size: 0.76rem; padding: 7px 12px; }
+  .fv-start-btn { font-size: 0.82rem; padding: 12px 40px; }
 }
 
 @media (max-width: 480px) {
-  .fv-start-body h1 { font-size: 1.45rem; }
-  .fv-start-body p { font-size: 0.92rem; }
-  .fv-start-btn { padding: 12px 40px; font-size: 0.85rem; }
-  .fv-label { font-size: 1.15rem; }
-  .fv-desc { font-size: 0.88rem; }
-  .fv-line-input { font-size: 0.92rem; }
-  .fv-flow-submit { padding: 10px 24px; font-size: 0.85rem; min-width: 80px; }
-  .fv-star-btn svg { width: 26px; height: 26px; }
-  .fv-file { padding: 12px; font-size: 0.85rem; }
+  .fv-start-body h1 { font-size: 1.2rem; }
+  .fv-start-body p { font-size: 0.76rem; }
+  .fv-start-btn { padding: 10px 32px; font-size: 0.78rem; }
+  .fv-label { font-size: 1rem; }
+  .fv-desc { font-size: 0.74rem; }
+  .fv-line-input { font-size: 0.84rem; }
+  .fv-step-count { font-size: 0.6rem; }
+  .fv-flow-submit { padding: 9px 18px; font-size: 0.76rem; min-width: 70px; }
+  .fv-flow-skip { font-size: 0.7rem; padding: 6px 10px; }
+  .fv-star-btn svg { width: 24px; height: 24px; }
+  .fv-file { padding: 10px; font-size: 0.78rem; }
+  .fv-multi-opt { font-size: 0.84rem; }
+  .fv-checkbox { font-size: 0.84rem; }
 }
