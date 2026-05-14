@@ -48,6 +48,7 @@ function BuilderInner() {
   const [copied, setCopied] = useState(false);
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
+  const [isPublished, setIsPublished] = useState(false);
 
   const paletteRef = useRef<HTMLDivElement>(null);
 
@@ -87,8 +88,9 @@ function BuilderInner() {
           setFields(form.fields);
           setCurrentFormId(formId);
           setCurrentWorkspaceId(form.workspaceId || '');
-          setProfilePicture(form.profilePicture || '');
+           setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
+          setIsPublished(!!form.isPublished);
           setSaved(false);
         }
       }

@@ -57,7 +57,7 @@
   height: 100%;
   width: 40%;
   background: var(--text);
-  animation: fv-loading-slide 1.5s infinite ease-in-out;
+  animation: fv-loading-slide 3s infinite ease-in-out;
 }
 
 @keyframes fv-loading-slide {

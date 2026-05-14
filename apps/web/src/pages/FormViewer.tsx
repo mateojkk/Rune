@@ -110,6 +110,12 @@ export function FormViewer() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const directionRef = useRef<'next' | 'back'>('next');
+  const [minLoadingDone, setMinLoadingDone] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMinLoadingDone(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
@@ -227,7 +233,9 @@ export function FormViewer() {
     }
   };
 
-  if (loading) {
+  const isActuallyLoading = loading || !minLoadingDone;
+
+  if (isActuallyLoading) {
     return (
       <div className="dark">
         <div className="fv-loading">
