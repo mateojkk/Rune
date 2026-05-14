@@ -384,11 +384,17 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                             placeholder="Placeholder text" onClick={e => e.stopPropagation()} />
                         )}
                         {editingField === field.id && (
-                          <label className="b-required-toggle" onClick={e => e.stopPropagation()}>
-                            <input type="checkbox" checked={field.required}
-                              onChange={e => handleUpdateField(field.id, { required: e.target.checked })} />
-                            <span>Required</span>
-                          </label>
+                          <div className="b-required-toggle-wrap" onClick={e => e.stopPropagation()}>
+                            <label className="b-required-toggle">
+                              <input
+                                type="checkbox"
+                                checked={field.required}
+                                onChange={e => handleUpdateField(field.id, { required: e.target.checked })}
+                                onClick={e => e.stopPropagation()}
+                              />
+                              <span>Required</span>
+                            </label>
+                          </div>
                         )}
                         {editingField !== field.id && renderFieldPreview(field)}
                       </div>

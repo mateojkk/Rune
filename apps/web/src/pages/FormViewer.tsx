@@ -382,7 +382,7 @@ export function FormViewer() {
               )}
 
               {field.type === 'checkbox' && (
-                <label className="fv-checkbox">
+                <label className="fv-checkbox" onClick={e => e.stopPropagation()}>
                   <input type="checkbox" checked={!!formData[field.id]}
                     onChange={e => { handleFieldChange(field.id, e.target.checked); setTimeout(goNext, 200); }} />
                   <span>{field.label}{field.required && <span className="fv-required">*</span>}</span>
@@ -390,9 +390,9 @@ export function FormViewer() {
               )}
 
               {field.type === 'multiselect' && (
-                <div className="fv-multiselect">
+                <div className="fv-multiselect" onClick={e => e.stopPropagation()}>
                   {field.options?.map(opt => (
-                    <label key={opt} className="fv-multi-opt">
+                    <label key={opt} className="fv-multi-opt" onClick={e => e.stopPropagation()}>
                       <input type="checkbox"
                         checked={(formData[field.id] as string[])?.includes(opt) || false}
                         onChange={() => handleCheckbox(field.id, formData[field.id], opt)} />
