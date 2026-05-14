@@ -1,23 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
-  { type: 'text', label: 'Text Input', icon: <Hash size={16} /> },
-  { type: 'textarea', label: 'Text Area', icon: <FileText size={16} /> },
-  { type: 'richtext', label: 'Rich Text', icon: <FileText size={16} /> },
+  { type: 'text', label: 'Short Text', icon: <Hash size={16} /> },
+  { type: 'textarea', label: 'Long Text', icon: <FileText size={16} /> },
+  { type: 'email', label: 'Email Address', icon: <Mail size={16} /> },
+  { type: 'phone', label: 'Phone Number', icon: <Phone size={16} /> },
+  { type: 'date', label: 'Date Picker', icon: <Calendar size={16} /> },
+  { type: 'multipleChoice', label: 'Multiple Choice', icon: <CircleDot size={16} /> },
+  { type: 'scale', label: 'Opinion Scale', icon: <Sliders size={16} /> },
   { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={16} /> },
   { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
   { type: 'multiselect', label: 'Multi-Select', icon: <List size={16} /> },
   { type: 'starRating', label: 'Star Rating', icon: <Star size={16} /> },
   { type: 'file', label: 'File Upload', icon: <Upload size={16} /> },
-  { type: 'image', label: 'Image Upload', icon: <Upload size={16} /> },
-  { type: 'video', label: 'Video Upload', icon: <Upload size={16} /> },
-  { type: 'url', label: 'URL', icon: <LinkIcon size={16} /> },
-  { type: 'number', label: 'Number', icon: <Hash size={16} /> },
+  { type: 'url', label: 'Website URL', icon: <LinkIcon size={16} /> },
+  { type: 'number', label: 'Number Input', icon: <Hash size={16} /> },
 ];
 
 function BuilderInner() {
@@ -537,7 +539,7 @@ function BuilderInner() {
                         onClick={e => e.stopPropagation()}
                       />
 
-                      {(field.type === 'dropdown' || field.type === 'multiselect') && editingField === field.id && (
+                      {(field.type === 'dropdown' || field.type === 'multiselect' || field.type === 'multipleChoice' || field.type === 'scale') && editingField === field.id && (
                         <div className="b-field-options">
                           <label className="b-label">Options (one per line)</label>
                           <textarea
@@ -565,7 +567,7 @@ function BuilderInner() {
                         </div>
                       )}
 
-                      {(field.type === 'text' || field.type === 'number' || field.type === 'url') && editingField === field.id && (
+                      {(field.type === 'text' || field.type === 'number' || field.type === 'url' || field.type === 'email' || field.type === 'phone' || field.type === 'date') && editingField === field.id && (
                         <input
                           type="text"
                           className="b-input b-placeholder-input"

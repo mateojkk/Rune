@@ -282,32 +282,30 @@ export function FormViewer() {
   if (step < 0) {
     return (
       <div className="dark">
-        <div className="form-viewer">
+        <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
           <button className="fv-back-editor" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}>
             <ArrowLeft size={13} /> Editor
           </button>
-          <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
-            <div className="fv-start-overlay" />
-            <div className="fv-start-body">
-              {profilePicture && (
-                <div className="fv-start-profile">
-                  <img src={profilePicture} alt="Profile" />
-                </div>
-              )}
-              <h1 className="fv-start-title">{form.title}</h1>
-              {form.description && <p className="fv-start-desc">{form.description}</p>}
-              <div className="fv-start-actions">
-                <button className="fv-start-btn" onClick={() => setStep(0)}>
-                  Start <ArrowRight size={18} />
-                </button>
-                <div className="fv-start-count">
-                  <Clock size={13} style={{ marginRight: 4 }} />
-                  Takes 1 minute
-                </div>
+          <div className="fv-start-overlay" />
+          <div className="fv-start-body">
+            {profilePicture && (
+              <div className="fv-start-profile">
+                <img src={profilePicture} alt="Profile" />
               </div>
-              <BrandFooter />
+            )}
+            <h1 className="fv-start-title">{form.title}</h1>
+            {form.description && <p className="fv-start-desc">{form.description}</p>}
+            <div className="fv-start-actions">
+              <button className="fv-start-btn" onClick={() => setStep(0)}>
+                Start <ArrowRight size={18} />
+              </button>
+              <div className="fv-start-count">
+                <Clock size={13} style={{ marginRight: 4 }} />
+                Takes 1 minute
+              </div>
             </div>
           </div>
+          <BrandFooter />
         </div>
       </div>
     );
@@ -346,24 +344,22 @@ export function FormViewer() {
             {field.description && <p className="fv-desc">{field.description}</p>}
             
             <div className="fv-input-wrap">
-              {field.type === 'text' && (
-                <input ref={inputRef as any} type="text" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
+              {(field.type === 'text' || field.type === 'email' || field.type === 'url' || field.type === 'phone' || field.type === 'date') && (
+                <input 
+                  ref={inputRef as any} 
+                  type={field.type === 'email' ? 'email' : field.type === 'date' ? 'date' : field.type === 'phone' ? 'tel' : 'text'} 
+                  className="fv-line-input" 
+                  placeholder={field.placeholder || (field.type === 'email' ? 'name@example.com' : field.type === 'date' ? '' : 'Type your answer...')}
                   value={formData[field.id] as string || ''}
                   onChange={e => handleFieldChange(field.id, e.target.value)}
-                  onKeyDown={handleInputKeyDown} />
+                  onKeyDown={handleInputKeyDown} 
+                />
               )}
 
               {field.type === 'number' && (
                 <input ref={inputRef as any} type="number" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
                   value={formData[field.id] as number || ''}
                   onChange={e => handleFieldChange(field.id, Number(e.target.value))}
-                  onKeyDown={handleInputKeyDown} />
-              )}
-
-              {field.type === 'url' && (
-                <input ref={inputRef as any} type="url" className="fv-line-input" placeholder={field.placeholder || 'Type your answer...'}
-                  value={formData[field.id] as string || ''}
-                  onChange={e => handleFieldChange(field.id, e.target.value)}
                   onKeyDown={handleInputKeyDown} />
               )}
 
@@ -407,6 +403,28 @@ export function FormViewer() {
                         onChange={() => handleCheckbox(field.id, formData[field.id], opt)} />
                       <span>{opt}</span>
                     </label>
+                  ))}
+                </div>
+              )}
+
+              {field.type === 'multipleChoice' && (
+                <div className="fv-choice-list">
+                  {field.options?.map(opt => (
+                    <button key={opt} className={`fv-choice-btn ${formData[field.id] === opt ? 'active' : ''}`}
+                      onClick={() => { handleFieldChange(field.id, opt); setTimeout(goNext, 300); }}>
+                      <span className="fv-choice-label">{opt}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {field.type === 'scale' && (
+                <div className="fv-scale">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(val => (
+                    <button key={val} className={`fv-scale-btn ${formData[field.id] === val ? 'active' : ''}`}
+                      onClick={() => { handleFieldChange(field.id, val); setTimeout(goNext, 300); }}>
+                      {val}
+                    </button>
                   ))}
                 </div>
               )}
@@ -478,8 +496,8 @@ export function FormViewer() {
               )}
             </div>
           </div>
-          <BrandFooter />
         </div>
+        <BrandFooter />
       </div>
     </div>
   );
