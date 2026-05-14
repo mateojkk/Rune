@@ -222,22 +222,21 @@
 }
 
 .fv-flow {
-  align-items: flex-start;
-  padding-top: 60px;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 40px 24px;
 }
 
 .fv-flow-container {
   width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 24px;
+  max-width: 580px;
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  gap: 20px;
 }
 
 .fv-flow-back {
@@ -312,11 +311,11 @@
 
 .fv-step-count {
   display: inline-flex;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 999px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -324,12 +323,13 @@
 }
 
 .fv-label {
-  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   font-weight: 300;
   letter-spacing: -0.01em;
   line-height: 1.25;
   font-family: var(--font-display);
-  max-width: 28ch;
+  max-width: 32ch;
+  margin-top: 8px;
 }
 
 .fv-required {
@@ -338,24 +338,25 @@
 }
 
 .fv-desc {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   color: var(--muted);
   line-height: 1.5;
   max-width: 52ch;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .fv-line-input {
   width: 100%;
-  padding: 12px 0;
+  padding: 8px 0;
   background: transparent;
   border: none;
   border-bottom: 2px solid var(--border);
   color: var(--text);
-  font-size: clamp(0.9rem, 1.6vw, 1rem);
+  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
   font-weight: 300;
   transition: border-color 0.2s;
   font-family: inherit;
+  margin-top: 10px;
 }
 
 .fv-line-input:focus {
@@ -501,33 +502,38 @@
 }
 
 .fv-flow-actions {
-  margin-top: auto;
-  padding-top: 24px;
-  padding-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-bottom: 24px;
 }
 
+.fv-next-btn,
 .fv-flow-submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 32px;
+  padding: 8px 24px;
   background: var(--text);
   color: var(--bg);
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 500;
   border: none;
-  border-radius: 40px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
   min-width: 100px;
 }
 
+.fv-next-btn:hover:not(:disabled),
 .fv-flow-submit:hover:not(:disabled) {
   background: var(--accent);
   color: var(--bg);
 }
 
+.fv-next-btn:disabled,
 .fv-flow-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
