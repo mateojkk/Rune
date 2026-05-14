@@ -120,6 +120,8 @@
 .fv-brand-lockup img {
   width: 14px;
   height: 14px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
 }
 
 .fv-brand-lockup strong {
@@ -301,7 +303,6 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   gap: 20px;
 }
 
@@ -328,8 +329,7 @@
 .fv-flow-field {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  text-align: left;
   gap: 12px;
   width: 100%;
   animation: fv-fade-in 0.25s ease;
@@ -397,7 +397,6 @@
   font-family: var(--font-display);
   max-width: 38ch;
   margin-top: 8px;
-  text-align: center;
 }
 
 .fv-required {
@@ -411,7 +410,6 @@
   line-height: 1.5;
   max-width: 52ch;
   margin-top: 2px;
-  text-align: center;
 }
 
 .fv-line-input {
@@ -426,7 +424,6 @@
   transition: border-color 0.2s;
   font-family: inherit;
   margin-top: 14px;
-  text-align: center;
 }
 
 .fv-line-input:focus {
