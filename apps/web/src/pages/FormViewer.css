@@ -290,7 +290,7 @@
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  padding: 40px 24px;
+  padding: clamp(40px, 8vh, 80px) 24px;
 }
 
 .fv-flow-container {
@@ -299,6 +299,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 20px;
 }
 
@@ -325,10 +326,10 @@
 .fv-flow-field {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  text-align: center;
   gap: 12px;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
   animation: fv-fade-in 0.25s ease;
 }
 
@@ -386,13 +387,15 @@
 }
 
 .fv-label {
+  display: block;
   font-size: clamp(1rem, 2.2vw, 1.25rem);
-  font-weight: 300;
-  letter-spacing: -0.01em;
+  font-weight: 500;
+  color: var(--text);
   line-height: 1.25;
   font-family: var(--font-display);
-  max-width: 32ch;
+  max-width: 38ch;
   margin-top: 8px;
+  text-align: center;
 }
 
 .fv-required {
@@ -406,6 +409,7 @@
   line-height: 1.5;
   max-width: 52ch;
   margin-top: 2px;
+  text-align: center;
 }
 
 .fv-line-input {
@@ -419,7 +423,8 @@
   font-weight: 300;
   transition: border-color 0.2s;
   font-family: inherit;
-  margin-top: 10px;
+  margin-top: 14px;
+  text-align: center;
 }
 
 .fv-line-input:focus {
