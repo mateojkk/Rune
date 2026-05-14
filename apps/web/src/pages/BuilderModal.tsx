@@ -429,7 +429,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                       {isPublished ? 'Unpublish' : 'Publish'}
                     </button>
 
-                    {currentFormId && (
+                    {currentFormId && isPublished && (
                       <div className="b-share-link">
                         <span className="b-share-label">Form link</span>
                         <div className="b-share-row">
