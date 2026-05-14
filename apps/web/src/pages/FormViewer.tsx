@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, Upload, ArrowLeft, ArrowRight, Loader2, Wallet, ExternalLink, Clock, AlertTriangle, Check } from 'lucide-react';
+import { Star, Upload, ArrowLeft, ArrowRight, Wallet, ExternalLink, Clock, AlertTriangle, Check } from 'lucide-react';
 import type { FormSchema } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
