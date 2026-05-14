@@ -390,7 +390,7 @@
 
 .fv-label {
   display: block;
-  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  font-size: clamp(1.1rem, 2.8vw, 1.5rem);
   font-weight: 500;
   color: var(--text);
   line-height: 1.25;
@@ -414,12 +414,12 @@
 
 .fv-line-input {
   width: 100%;
-  padding: 8px 0;
+  padding: 10px 0;
   background: transparent;
   border: none;
   border-bottom: 2px solid var(--border);
   color: var(--text);
-  font-size: clamp(0.85rem, 1.4vw, 0.95rem);
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
   font-weight: 300;
   transition: border-color 0.2s;
   font-family: inherit;
