@@ -208,7 +208,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 32px;
 }
 
 .fv-start-count {
@@ -220,18 +220,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 32px;
+  gap: 6px;
+  padding: 8px 24px;
   background: var(--text);
   color: var(--bg);
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 600;
   border: none;
   border-radius: 40px;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 180px;
-  min-height: 48px;
+  min-width: 140px;
+  min-height: 40px;
 }
 
 .fv-start-btn:hover {
