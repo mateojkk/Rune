@@ -978,7 +978,7 @@
       var(--bg);
   }
 
-  .b-sidebar {
+  .builder .b-sidebar {
     width: 100%;
     border-left: none;
     border-bottom: none;
@@ -989,43 +989,43 @@
     gap: 12px;
   }
 
-  .b-sidebar-top,
-  .b-form-meta,
-  .b-field-palette,
-  .b-sidebar-bottom {
+  .builder .b-sidebar-top,
+  .builder .b-form-meta,
+  .builder .b-field-palette,
+  .builder .b-sidebar-bottom {
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid var(--border);
     border-radius: 18px;
     box-shadow: var(--shadow-sm);
   }
 
-  .b-sidebar-top {
+  .builder .b-sidebar-top {
     padding: 14px 16px 8px;
   }
 
-  .b-form-meta {
+  .builder .b-form-meta {
     padding: 14px 16px;
     gap: 12px;
     flex-direction: column;
     flex-wrap: nowrap;
   }
 
-  .b-form-meta .b-field {
+  .builder .b-form-meta .b-field {
     flex: initial;
     min-width: 0;
   }
 
-  .b-field-palette {
+  .builder .b-field-palette {
     padding: 14px 16px 16px;
     flex: initial;
     overflow: hidden;
   }
 
-  .b-palette-header {
+  .builder .b-palette-header {
     margin-bottom: 10px;
   }
 
-  .b-field-types {
+  .builder .b-field-types {
     display: grid;
     grid-template-columns: repeat(4, minmax(96px, 1fr));
     gap: 8px;
@@ -1034,11 +1034,11 @@
     scrollbar-width: none;
   }
 
-  .b-field-types::-webkit-scrollbar {
+  .builder .b-field-types::-webkit-scrollbar {
     display: none;
   }
 
-  .b-type-btn {
+  .builder .b-type-btn {
     min-height: 78px;
     padding: 10px 8px;
     font-size: 0.72rem;
@@ -1048,12 +1048,12 @@
     text-align: center;
   }
 
-  .b-type-btn svg {
+  .builder .b-type-btn svg {
     width: 16px;
     height: 16px;
   }
 
-  .b-sidebar-bottom {
+  .builder .b-sidebar-bottom {
     position: sticky;
     bottom: 0;
     z-index: 5;
@@ -1064,9 +1064,9 @@
     margin-bottom: 8px;
   }
 
-  .b-sidebar-bottom .b-save-btn,
-  .b-sidebar-bottom .b-create-btn,
-  .b-sidebar-bottom .b-view-btn {
+  .builder .b-sidebar-bottom .b-save-btn,
+  .builder .b-sidebar-bottom .b-create-btn,
+  .builder .b-sidebar-bottom .b-view-btn {
     flex: initial;
     min-width: 0;
     min-height: 46px;
@@ -1074,22 +1074,22 @@
     font-size: 0.82rem;
   }
 
-  .b-sidebar-bottom .b-error,
-  .b-share-link {
+  .builder .b-sidebar-bottom .b-error,
+  .builder .b-share-link {
     width: 100%;
   }
 
-  .b-canvas {
+  .builder .b-canvas {
     padding: 8px 14px 24px;
   }
 
-  .b-recent-card {
+  .builder .b-recent-card {
     padding: 18px;
     border-radius: 18px;
   }
 
-  .b-workspace-header,
-  .b-canvas-header {
+  .builder .b-workspace-header,
+  .builder .b-canvas-header {
     margin-bottom: 18px;
     padding: 18px;
     background: rgba(255, 255, 255, 0.92);
@@ -1098,132 +1098,132 @@
     box-shadow: var(--shadow-sm);
   }
 
-  .b-cover-add {
+  .builder .b-cover-add {
     height: 96px;
     border-radius: 16px;
   }
 
-  .b-cover-wrap {
+  .builder .b-cover-wrap {
     height: 120px;
     border-radius: 18px;
   }
 
-  .b-title-row {
+  .builder .b-title-row {
     align-items: center;
   }
 
-  .b-profile-img,
-  .b-profile-add {
+  .builder .b-profile-img,
+  .builder .b-profile-add {
     width: 44px;
     height: 44px;
   }
 
-  .b-fields {
+  .builder .b-fields {
     gap: 14px;
   }
 
-  .b-field-card {
+  .builder .b-field-card {
     flex-direction: column;
     gap: 12px;
     padding: 16px;
     border-radius: 20px;
   }
 
-  .b-field-drag,
-  .b-field-actions {
+  .builder .b-field-drag,
+  .builder .b-field-actions {
     opacity: 1;
   }
 
-  .b-field-drag {
+  .builder .b-field-drag {
     align-self: flex-start;
     padding-top: 0;
   }
 
-  .b-field-top {
+  .builder .b-field-top {
     flex-wrap: wrap;
   }
 
-  .b-field-label {
+  .builder .b-field-label {
     font-size: 1rem;
   }
 
-  .b-field-preview {
+  .builder .b-field-preview {
     padding: 12px 14px;
     font-size: 0.84rem;
     border-radius: 14px;
   }
 
-  .b-field-actions {
+  .builder .b-field-actions {
     width: 100%;
     justify-content: flex-end;
   }
 
-  .b-field-action-btn {
+  .builder .b-field-action-btn {
     width: 36px;
     height: 36px;
   }
 
-  .b-canvas-header h1,
-  .b-workspace-header h1 {
+  .builder .b-canvas-header h1,
+  .builder .b-workspace-header h1 {
     font-size: 1.3rem;
   }
 
-  .b-canvas-ws-badge {
+  .builder .b-canvas-ws-badge {
     font-size: 0.68rem;
   }
 
-  .b-input {
+  .builder .b-input {
     font-size: 0.92rem;
     padding: 10px 12px;
   }
 
-  .b-textarea {
+  .builder .b-textarea {
     padding: 10px 12px;
     min-height: 72px;
   }
 
-  .b-label {
+  .builder .b-label {
     font-size: 0.68rem;
   }
 }
 
 @media (max-width: 480px) {
-  .b-sidebar {
+  .builder .b-sidebar {
     padding: 10px 10px 0;
   }
 
-  .b-sidebar-top,
-  .b-form-meta,
-  .b-field-palette,
-  .b-sidebar-bottom {
+  .builder .b-sidebar-top,
+  .builder .b-form-meta,
+  .builder .b-field-palette,
+  .builder .b-sidebar-bottom {
     border-radius: 16px;
   }
 
-  .b-sidebar-top {
+  .builder .b-sidebar-top {
     padding: 12px 14px 8px;
   }
 
-  .b-back {
+  .builder .b-back {
     font-size: 0.68rem;
   }
 
-  .b-form-meta {
+  .builder .b-form-meta {
     padding: 12px 14px;
     gap: 10px;
   }
 
-  .b-field-palette {
+  .builder .b-field-palette {
     padding: 12px 14px 14px;
   }
 
-  .b-field-types {
+  .builder .b-field-types {
     display: flex;
     overflow-x: auto;
     gap: 8px;
     padding-bottom: 2px;
   }
 
-  .b-type-btn {
+  .builder .b-type-btn {
     min-width: 104px;
     min-height: 74px;
     padding: 8px 8px;
@@ -1232,99 +1232,99 @@
     flex: 0 0 auto;
   }
 
-  .b-type-btn svg {
+  .builder .b-type-btn svg {
     width: 14px;
     height: 14px;
   }
 
-  .b-sidebar-bottom {
+  .builder .b-sidebar-bottom {
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
     gap: 8px;
   }
 
-  .b-sidebar-bottom .b-save-btn,
-  .b-sidebar-bottom .b-create-btn,
-  .b-sidebar-bottom .b-view-btn {
+  .builder .b-sidebar-bottom .b-save-btn,
+  .builder .b-sidebar-bottom .b-create-btn,
+  .builder .b-sidebar-bottom .b-view-btn {
     padding: 10px 12px;
     font-size: 0.76rem;
     min-height: 44px;
   }
 
-  .b-canvas {
+  .builder .b-canvas {
     padding: 6px 10px 22px;
   }
 
-  .b-workspace-header,
-  .b-canvas-header {
+  .builder .b-workspace-header,
+  .builder .b-canvas-header {
     padding: 16px 14px;
     border-radius: 18px;
   }
 
-  .b-field-card {
+  .builder .b-field-card {
     padding: 14px;
     gap: 10px;
     border-radius: 18px;
   }
 
-  .b-field-label {
+  .builder .b-field-label {
     font-size: 0.92rem;
   }
 
-  .b-field-preview {
+  .builder .b-field-preview {
     padding: 10px 12px;
     font-size: 0.78rem;
   }
 
-  .b-field-badge {
+  .builder .b-field-badge {
     font-size: 0.56rem;
     padding: 2px 6px;
   }
 
-  .b-field-index { font-size: 0.65rem; }
-  .b-canvas-header h1,
-  .b-workspace-header h1 {
+  .builder .b-field-index { font-size: 0.65rem; }
+  .builder .b-canvas-header h1,
+  .builder .b-workspace-header h1 {
     font-size: 1.12rem;
   }
 
-  .b-canvas-ws-badge {
+  .builder .b-canvas-ws-badge {
     font-size: 0.58rem;
     padding: 3px 7px;
   }
 
-  .b-input {
+  .builder .b-input {
     font-size: 0.84rem;
     padding: 9px 10px;
   }
 
-  .b-textarea {
+  .builder .b-textarea {
     padding: 9px 10px;
     min-height: 64px;
   }
 
-  .b-label {
+  .builder .b-label {
     font-size: 0.62rem;
   }
 
-  .b-cover-add {
+  .builder .b-cover-add {
     height: 82px;
     font-size: 0.74rem;
   }
 
-  .b-cover-wrap {
+  .builder .b-cover-wrap {
     height: 96px;
   }
 
-  .b-profile-img,
-  .b-profile-add {
+  .builder .b-profile-img,
+  .builder .b-profile-add {
     width: 38px;
     height: 38px;
   }
 
-  .b-recent-card {
+  .builder .b-recent-card {
     padding: 14px;
   }
 
-  .b-recent-card-title {
+  .builder .b-recent-card-title {
     font-size: 0.9rem;
   }
 }
