@@ -101,14 +101,14 @@
 }
 
 .fv-brand-footer {
-  position: absolute;
-  bottom: 40px;
+  margin-top: auto;
+  padding-top: 40px;
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: 0.8;
+  opacity: 0.6;
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
 }
 
 .fv-brand-lockup {
@@ -140,14 +140,14 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   position: relative;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: var(--bg);
-  padding: 48px 24px;
+  padding: 60px 24px 40px;
 }
 
 .fv-start-overlay {
@@ -158,16 +158,17 @@
 }
 
 .fv-start-body {
-  position: relative;
-  z-index: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   gap: 12px;
   max-width: 760px;
   width: 100%;
-  padding: clamp(28px, 5vw, 56px) 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .fv-start-profile {
@@ -286,19 +287,20 @@
 .fv-flow {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   width: 100%;
   min-height: 100vh;
-  padding: clamp(40px, 8vh, 80px) 24px;
+  padding: 60px 24px 40px;
 }
 
 .fv-flow-container {
+  flex: 1;
   width: 100%;
   max-width: 580px;
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   gap: 20px;
 }
