@@ -417,7 +417,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                         </div>
                       </div>
                     )}
-                    <Link to={`/app/form/${currentFormId}`} className="b-view-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', transition: 'all 0.2s' }}>
+                    <Link to={`/form/${currentFormId}`} className="b-view-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', transition: 'all 0.2s' }}>
                       <Eye size={15} /> Preview Form
                     </Link>
                   </div>

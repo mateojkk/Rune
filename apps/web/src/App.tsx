@@ -17,7 +17,6 @@ function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="dashboard/:formId" element={<Dashboard />} />
         <Route path="auth/callback" element={<AuthCallback />} />
-        <Route path="form/:formId" element={<FormViewer />} />
         <Route index element={<Navigate to="/app/dashboard" replace />} />
       </Route>
       <Route path="/form/:formId" element={<FormViewer />} />

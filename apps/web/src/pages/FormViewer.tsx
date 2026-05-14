@@ -231,8 +231,13 @@ export function FormViewer() {
     return (
       <div className="dark">
         <div className="fv-loading">
-          <Loader2 className="fv-loading-spinner" />
-          <p>Loading form...</p>
+          <div className="fv-loading-brand">
+            <span>powered by</span>
+            <strong>Rune</strong>
+          </div>
+          <div className="fv-loading-bar-wrap">
+            <div className="fv-loading-bar-fill" />
+          </div>
         </div>
       </div>
     );
