@@ -297,6 +297,40 @@
   border: none;
 }
 
+.b-save-btn.saved {
+  background: #27ae60;
+  border-color: #27ae60;
+  color: white;
+}
+
+.b-publish-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.b-publish-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.b-publish-btn.active {
+  background: rgba(39, 174, 96, 0.1);
+  border-color: #27ae60;
+  color: #27ae60;
+}
+
+.b-publish-btn.active:hover {
+  background: rgba(39, 174, 96, 0.2);
+}
+
 .b-create-btn:hover,
 .b-save-btn:hover:not(:disabled) {
   background: var(--accent);

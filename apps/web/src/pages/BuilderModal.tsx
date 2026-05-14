@@ -49,6 +49,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [optionDraft, setOptionDraft] = useState<Record<string, string>>({});
+  const [isPublished, setIsPublished] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -80,6 +81,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
           setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
           setSelectedWorkspaceId(form.workspaceId || '');
+          setIsPublished(!!form.isPublished);
         }
       })();
     } else {
@@ -90,6 +92,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
       setProfilePicture('');
       setCoverPicture('');
       setSelectedWorkspaceId(workspaceId);
+      setIsPublished(false);
     }
   }, [formId]);
 
@@ -149,6 +152,13 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
     }, 500);
   };
 
+  const handlePublish = async () => {
+    if (!currentFormId) return;
+    const next = !isPublished;
+    setIsPublished(next);
+    await updateForm(currentFormId, { isPublished: next });
+  };
+
   const handleDeleteField = async (fieldId: string) => {
     if (!currentFormId) return;
     await deleteField(currentFormId, fieldId);
@@ -173,7 +183,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
   const copyLink = async () => {
     if (!currentFormId) return;
-    try { await navigator.clipboard.writeText(`${window.location.origin}/form/${currentFormId}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* */ }
+    try { await navigator.clipboard.writeText(`${window.location.origin}/${currentFormId}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* */ }
   };
 
   const handleImagePick = (type: 'profile' | 'cover') => {
@@ -414,16 +424,21 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                     <button className={`b-save-btn ${saved ? 'saved' : ''}`} onClick={handleSaveToWalrus} disabled={saving}>
                       {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Save Form</>}
                     </button>
+                    
+                    <button className={`b-publish-btn ${isPublished ? 'active' : ''}`} onClick={handlePublish}>
+                      {isPublished ? 'Unpublish' : 'Publish'}
+                    </button>
+
                     {currentFormId && (
                       <div className="b-share-link">
                         <span className="b-share-label">Form link</span>
                         <div className="b-share-row">
-                          <input type="text" className="b-share-input" value={`${window.location.origin}/form/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
+                          <input type="text" className="b-share-input" value={`${window.location.origin}/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
                           <button className="b-share-copy" onClick={copyLink}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
                         </div>
                       </div>
                     )}
-                    <Link to={`/form/${currentFormId}`} className="b-view-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', transition: 'all 0.2s' }}>
+                    <Link to={`/${currentFormId}?preview=true`} className="b-view-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', transition: 'all 0.2s' }}>
                       <Eye size={15} /> Preview Form
                     </Link>
                   </div>

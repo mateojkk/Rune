@@ -43,6 +43,7 @@ export interface FormSchema {
   blobId?: string;
   profilePicture?: string;
   coverPicture?: string;
+  isPublished?: boolean;
 }
 
 export interface FormSubmission {

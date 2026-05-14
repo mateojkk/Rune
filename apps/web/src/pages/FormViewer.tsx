@@ -243,13 +243,15 @@ export function FormViewer() {
     );
   }
 
-  if (!form) {
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+
+  if (!form || (!form.isPublished && !isPreview)) {
     return (
       <div className="dark">
         <div className="fv-center">
           <AlertTriangle size={32} />
-          <h2>Form not found</h2>
-          <p>This form doesn't exist or has been removed</p>
+          <h2>{!form ? 'Form not found' : 'Form not published'}</h2>
+          <p>{!form ? "This form doesn't exist or has been removed" : "The creator hasn't published this form yet"}</p>
         </div>
       </div>
     );

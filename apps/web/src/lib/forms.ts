@@ -124,6 +124,7 @@ export async function getAllForms(): Promise<FormSchema[]> {
       blobId: f.blobId,
       profilePicture: f.profilePicture,
       coverPicture: f.coverPicture,
+      isPublished: f.is_published,
       walletAddress: address(),
     }));
     return _formCache;
@@ -143,7 +144,7 @@ export async function getForm(formId: string): Promise<FormSchema | null> {
       workspaceId: f.workspaceId, fields: f.fields as FormField[],
       createdAt: f.createdAt, updatedAt: f.updatedAt,
       blobId: f.blobId, profilePicture: f.profilePicture,
-      coverPicture: f.coverPicture, walletAddress: address(),
+      coverPicture: f.coverPicture, isPublished: f.is_published, walletAddress: address(),
     };
   } catch {
     return null;
@@ -169,7 +170,7 @@ export async function createForm(title: string, description: string, workspaceId
     workspaceId: f.workspaceId, fields: f.fields as FormField[],
     createdAt: f.createdAt, updatedAt: f.updatedAt,
     blobId: f.blobId, profilePicture: f.profilePicture,
-    coverPicture: f.coverPicture, walletAddress: address(),
+    coverPicture: f.coverPicture, isPublished: f.is_published, walletAddress: address(),
   };
   _formCache.push(form);
   return form;
@@ -183,6 +184,7 @@ export async function updateForm(formId: string, updates: Partial<FormSchema>): 
   if (updates.blobId !== undefined) body.blob_id = updates.blobId;
   if (updates.profilePicture !== undefined) body.profile_picture = updates.profilePicture;
   if (updates.coverPicture !== undefined) body.cover_picture = updates.coverPicture;
+  if (updates.isPublished !== undefined) body.is_published = updates.isPublished;
   const updated = await updateFormApi(address(), formId, body);
   const idx = _formCache.findIndex(f => f.id === formId);
   if (idx !== -1) {

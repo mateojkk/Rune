@@ -33,6 +33,7 @@ export interface FormDTO {
   blobId?: string;
   profilePicture?: string;
   coverPicture?: string;
+  is_published?: boolean;
   createdAt: string;
   updatedAt: string;
 }

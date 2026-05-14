@@ -19,7 +19,7 @@ function App() {
         <Route path="auth/callback" element={<AuthCallback />} />
         <Route index element={<Navigate to="/app/dashboard" replace />} />
       </Route>
-      <Route path="/form/:formId" element={<FormViewer />} />
+      <Route path="/:formId" element={<FormViewer />} />
     </Routes>
   );
 }
