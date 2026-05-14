@@ -85,7 +85,6 @@ function BrandFooter() {
     <div className="fv-brand-footer">
       <span>Powered by</span>
       <div className="fv-brand-lockup">
-        <img src="/runelogo.png" alt="Rune" />
         <strong>Rune</strong>
       </div>
     </div>

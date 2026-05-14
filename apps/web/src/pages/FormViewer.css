@@ -102,13 +102,15 @@
 
 .fv-brand-footer {
   margin-top: auto;
-  padding-top: 40px;
+  padding-top: 60px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  opacity: 0.6;
+  opacity: 0.85;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  width: 100%;
 }
 
 .fv-brand-lockup {
