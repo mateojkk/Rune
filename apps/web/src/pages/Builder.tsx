@@ -191,10 +191,17 @@ function BuilderInner() {
     }
   };
 
+  const handlePublish = async () => {
+    if (!currentFormId) return;
+    const next = !isPublished;
+    setIsPublished(next);
+    await updateForm(currentFormId, { isPublished: next });
+  };
+
   const copyLink = async () => {
     if (!currentFormId) return;
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/form/${currentFormId}`);
+      await navigator.clipboard.writeText(`${window.location.origin}/${currentFormId}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* */ }
@@ -597,14 +604,14 @@ function BuilderInner() {
               </div>
             )}
 
-            {currentFormId && (
+            {currentFormId && isPublished && (
               <div className="b-share-link" style={{ marginTop: 18 }}>
                 <span className="b-share-label">Form link</span>
                 <div className="b-share-row">
                   <input
                     type="text"
                     className="b-share-input"
-                    value={`${window.location.origin}/form/${currentFormId}`}
+                    value={`${window.location.origin}/${currentFormId}`}
                     readOnly
                     onClick={e => (e.target as HTMLInputElement).select()}
                   />
@@ -612,6 +619,17 @@ function BuilderInner() {
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                   </button>
                 </div>
+              </div>
+            )}
+            
+            {currentFormId && (
+              <div className="b-mobile-actions" style={{ display: 'flex', gap: 10, marginTop: 24, marginBottom: 40 }}>
+                <button className={`b-publish-btn ${isPublished ? 'active' : ''}`} onClick={handlePublish} style={{ flex: 1 }}>
+                  {isPublished ? 'Unpublish' : 'Publish'}
+                </button>
+                <Link to={`/${currentFormId}?preview=true`} className="b-view-btn" style={{ flex: 1, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)' }}>
+                  <Eye size={15} /> Preview
+                </Link>
               </div>
             )}
           </>
