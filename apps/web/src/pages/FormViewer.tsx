@@ -160,7 +160,7 @@ export function FormViewer() {
   const handleFile = async (fieldId: string, file: File | null, type: string) => {
     if (!file) return;
     setFileNames(prev => ({ ...prev, [fieldId]: file.name }));
-    
+
     if (type === 'image' || type === 'video') {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -370,17 +370,17 @@ export function FormViewer() {
               {field.required && <span className="fv-required">*</span>}
             </label>
             {field.description && <p className="fv-desc">{field.description}</p>}
-            
+
             <div className="fv-input-wrap">
               {(field.type === 'text' || field.type === 'email' || field.type === 'url' || field.type === 'phone' || field.type === 'date') && (
-                <input 
-                  ref={inputRef as any} 
-                  type={field.type === 'email' ? 'email' : field.type === 'date' ? 'date' : field.type === 'phone' ? 'tel' : 'text'} 
-                  className="fv-line-input" 
+                <input
+                  ref={inputRef as any}
+                  type={field.type === 'email' ? 'email' : field.type === 'date' ? 'date' : field.type === 'phone' ? 'tel' : 'text'}
+                  className="fv-line-input"
                   placeholder={field.placeholder || (field.type === 'email' ? 'name@example.com' : field.type === 'date' ? '' : 'Type your answer...')}
                   value={formData[field.id] as string || ''}
                   onChange={e => handleFieldChange(field.id, e.target.value)}
-                  onKeyDown={handleInputKeyDown} 
+                  onKeyDown={handleInputKeyDown}
                 />
               )}
 
@@ -508,7 +508,7 @@ export function FormViewer() {
                   )}
                 </div>
               ) : (
-                <button 
+                <button
                   className="fv-next-btn"
                   onClick={goNext}
                   disabled={submitting}
