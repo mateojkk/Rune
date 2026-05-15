@@ -1,3 +1,4 @@
+/* ── Base tokens ───────────────────────────────────────── */
 .form-viewer,
 .fv-loading,
 .fv-center {
@@ -14,6 +15,7 @@
   --accent-bg: rgba(255, 255, 255, 0.08);
 }
 
+/* ── Loading screen ────────────────────────────────────── */
 .fv-loading {
   display: flex;
   flex-direction: column;
@@ -52,8 +54,7 @@
 
 .fv-loading-bar-fill {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   height: 100%;
   width: 40%;
   background: var(--text);
@@ -61,21 +62,12 @@
 }
 
 @keyframes fv-loading-slide {
-  0% {
-    left: -40%;
-    width: 30%;
-  }
-
-  50% {
-    width: 60%;
-  }
-
-  100% {
-    left: 100%;
-    width: 30%;
-  }
+  0%   { left: -40%; width: 30%; }
+  50%  { width: 60%; }
+  100% { left: 100%; width: 30%; }
 }
 
+/* ── Center (error / success) ──────────────────────────── */
 .fv-center {
   display: flex;
   flex-direction: column;
@@ -88,52 +80,39 @@
   color: var(--muted);
 }
 
-.fv-center h2 {
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-
-.fv-center p {
-  font-size: 0.88rem;
-  color: var(--muted);
-}
+.fv-center h2 { font-size: 1.15rem; font-weight: 600; }
+.fv-center p  { font-size: 0.88rem; color: var(--muted); }
 
 .fv-success-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
   background: var(--accent-bg);
   border-radius: 50%;
   color: var(--accent);
   margin-bottom: 8px;
 }
 
+/* ── Brand footer ──────────────────────────────────────── */
 .fv-brand-footer {
   margin-top: auto;
-  padding-top: 60px;
+  padding-top: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  opacity: 0.85;
+  opacity: 0.6;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   width: 100%;
 }
 
 .fv-brand-lockup {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: flex; align-items: center; gap: 6px;
 }
 
 .fv-brand-lockup img {
-  width: 14px;
-  height: 14px;
+  width: 14px; height: 14px;
   filter: brightness(0) invert(1) contrast(2);
-  opacity: 1;
 }
 
 .fv-brand-lockup strong {
@@ -142,6 +121,7 @@
   color: var(--text);
 }
 
+/* ── Outer shell ───────────────────────────────────────── */
 .form-viewer {
   display: flex;
   justify-content: center;
@@ -150,6 +130,7 @@
   background: var(--bg);
 }
 
+/* ── START SCREEN ──────────────────────────────────────── */
 .fv-start {
   min-height: 100vh;
   width: 100%;
@@ -162,17 +143,14 @@
   background-position: center;
   background-repeat: no-repeat;
   background-color: var(--bg);
-  padding: 40px 24px;
+  padding: 80px 24px 48px;
   overflow: hidden;
 }
 
 .fv-start-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
   z-index: 0;
 }
 
@@ -183,54 +161,61 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 16px;
-  max-width: 680px;
+  gap: 18px;
+  max-width: 620px;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
 .fv-start-profile {
-  width: 90px;
-  height: 90px;
+  width: 80px; height: 80px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--surface);
-  border: 1px solid var(--border);
-  margin-bottom: 8px;
+  border: 2px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
 }
 
 .fv-start-profile img {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
 }
 
-.fv-start-body h1 {
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
-  font-weight: 500;
-  color: var(--text);
+.fv-start-title {
+  font-size: clamp(1.7rem, 5vw, 2.8rem);
+  font-weight: 600;
+  color: #fff;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 1.15;
   margin: 0;
 }
 
-.fv-start-body p {
-  font-size: 1.1rem;
-  color: var(--muted);
-  max-width: 48ch;
-  line-height: 1.5;
+.fv-start-desc {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  color: rgba(255,255,255,0.7);
+  max-width: 44ch;
+  line-height: 1.6;
   margin: 0;
+}
+
+.fv-start-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
 }
 
 .fv-start-btn {
-  height: 48px;
-  padding: 0 32px;
-  font-size: 0.9rem;
+  height: 50px;
+  padding: 0 36px;
+  font-size: 0.92rem;
   font-weight: 600;
   border-radius: 12px;
-  background: var(--text);
-  color: var(--bg);
+  background: #fff;
+  color: #111;
   border: none;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -241,56 +226,137 @@
 
 .fv-start-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  filter: brightness(1.1);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+  filter: brightness(0.96);
 }
 
+.fv-start-count {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ── Wallet UI on start screen ─────────────────────────── */
+.fv-start-wallet-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  width: 100%;
+}
+
+.fv-wallet-connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.fv-wallet-connect-btn:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.32);
+  transform: translateY(-1px);
+}
+
+.fv-start-picker {
+  background: rgba(18,18,20,0.97);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  padding: 14px;
+  width: 100%;
+  max-width: 280px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: fv-fade-in 0.15s ease-out;
+  backdrop-filter: blur(12px);
+}
+
+.fv-start-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.fv-start-picker-header span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Wallet badge ──────────────────────────────────────── */
+.fv-wallet-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.78rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.fv-wallet-badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade80;
+  margin-left: 2px;
+}
+
+.fv-wallet-badge-sm {
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  background: var(--accent-bg);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* ── QUESTION FLOW ─────────────────────────────────────── */
 .fv-flow {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;        /* center the container */
   justify-content: flex-start;
   width: 100%;
   min-height: 100vh;
-  padding: 120px 80px;
+  padding: 80px 24px 60px;   /* was 120px 80px — too large */
   background: var(--bg);
-}
-
-.fv-input-wrap {
-  margin-top: 40px;
-  width: 100%;
-}
-
-.fv-flow-field {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 16px;
-  width: 100%;
-  animation: fv-fade-in 0.3s ease-out;
-}
-
-@keyframes fv-fade-in {
-  from { opacity: 0; transform: translateX(-15px); }
-  to { opacity: 1; transform: translateX(0); }
 }
 
 .fv-flow-container {
   width: 100%;
-  max-width: 800px;
-  position: relative;
+  max-width: 680px;           /* was 800px — tighten for readability */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 24px;
+  gap: 0;
 }
 
 .fv-flow-header {
   width: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 32px;
+  min-height: 40px;
+  margin-bottom: 48px;
 }
 
 .fv-flow-back {
@@ -299,48 +365,78 @@
   color: var(--muted);
   cursor: pointer;
   padding: 8px;
-  margin-left: -12px;
+  margin-left: -8px;
   transition: color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 6px;
 }
 
-.fv-flow-back:hover {
-  color: var(--text);
+.fv-flow-back:hover { color: var(--text); }
+
+.fv-flow-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  animation: fv-fade-in 0.28s ease-out;
 }
 
-.fv-step-meta {
-  margin-bottom: 8px;
-  opacity: 0.6;
+@keyframes fv-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+@keyframes fv-slide-in-next {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fv-slide-in-back {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.fv-slide-next { animation: fv-slide-in-next 0.28s ease-out; }
+.fv-slide-back { animation: fv-slide-in-back 0.28s ease-out; }
+
+.fv-step-meta { margin-bottom: 12px; }
 
 .fv-step-count {
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--muted);
+  opacity: 0.7;
 }
 
 .fv-label {
   display: block;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);  /* was up to 2.6rem — trimmed */
   font-weight: 500;
   color: var(--text);
   line-height: 1.2;
   margin: 0;
-  max-width: 90%;
-  text-align: left;
+  max-width: 100%;
 }
 
+.fv-required { color: var(--muted); margin-left: 2px; }
+
 .fv-desc {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: var(--muted);
-  margin-top: 8px;
-  line-height: 1.5;
-  max-width: 60ch;
-  text-align: left;
+  margin-top: 10px;
+  line-height: 1.6;
+  max-width: 54ch;
+}
+
+/* ── Inputs ────────────────────────────────────────────── */
+.fv-input-wrap {
+  margin-top: 36px;
+  width: 100%;
 }
 
 .fv-line-input {
@@ -350,12 +446,11 @@
   border: none;
   border-bottom: 2px solid var(--border);
   color: var(--text);
-  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+  font-size: clamp(1rem, 2vw, 1.25rem);
   font-weight: 300;
   transition: border-color 0.2s;
   font-family: inherit;
-  margin-top: 18px;
-  text-align: center;
+  text-align: left;            /* was center — awkward on long text */
 }
 
 .fv-line-input:focus {
@@ -363,20 +458,47 @@
   border-bottom-color: var(--text);
 }
 
+.fv-line-input[type="date"] { min-height: 44px; }
+
+.fv-textarea {
+  resize: vertical;
+  min-height: 80px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.fv-textarea:focus {
+  border-color: var(--text);
+  box-shadow: none;
+}
+
+.fv-select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: left;
+  appearance: auto;
+}
+
+/* ── Actions row ───────────────────────────────────────── */
 .fv-flow-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 48px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 40px;
 }
 
 .fv-next-btn,
 .fv-flow-submit {
-  height: 44px;
+  height: 46px;
   padding: 0 28px;
   font-size: 0.88rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--text);
   color: var(--bg);
   border: none;
@@ -384,12 +506,13 @@
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .fv-next-btn:hover:not(:disabled),
 .fv-flow-submit:hover:not(:disabled) {
-  opacity: 0.9;
+  opacity: 0.88;
   transform: translateY(-1px);
 }
 
@@ -400,7 +523,7 @@
 }
 
 .fv-flow-skip {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   font-weight: 500;
   color: var(--muted);
   background: transparent;
@@ -410,16 +533,21 @@
   transition: color 0.2s;
 }
 
-.fv-flow-skip:hover {
-  color: var(--text);
+.fv-flow-skip:hover { color: var(--text); }
+
+.fv-error {
+  font-size: 0.78rem;
+  color: #e05252;
+  margin-top: 6px;
 }
 
+/* ── Editor back button ────────────────────────────────── */
 .fv-back-editor {
   position: absolute;
-  top: 24px;
-  left: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  top: 20px;
+  left: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.14);
   color: #fff;
   padding: 6px 14px;
   border-radius: 6px;
@@ -434,46 +562,62 @@
 }
 
 .fv-back-editor:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.24);
 }
 
 .fv-back-editor-flow {
-  top: 40px;
-  left: 40px;
+  top: 20px;
+  left: 20px;
   background: var(--surface);
   border-color: var(--border);
   color: var(--text);
 }
 
 .fv-back-editor-flow:hover {
-  background: var(--surface-hover);
+  background: var(--surface-elevated);
 }
 
+/* ── Progress bar ──────────────────────────────────────── */
+.fv-progress-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: rgba(128,128,128,0.12);
+  z-index: 1000;
+}
+
+.fv-progress-fill {
+  height: 100%;
+  background: var(--text);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Wallet picker (last-step modal) ───────────────────── */
 .fv-connect-wrap {
   position: relative;
   display: inline-block;
 }
 
-/* Wallet picker modal (floats above content at last step) */
 .fv-picker-modal {
   position: absolute;
-  bottom: calc(100% + 12px);
+  bottom: calc(100% + 10px);
   left: 0;
   z-index: 600;
   background: var(--surface-elevated, #1c1c1e);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  min-width: 260px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  border-radius: 14px;
+  padding: 14px;
+  min-width: 250px;
+  max-width: 90vw;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4);
   animation: fv-fade-in 0.15s ease-out;
 }
 
 .fv-picker-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .fv-picker-header {
@@ -484,13 +628,12 @@
 }
 
 .fv-picker-header h3 {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text);
+  color: var(--muted);
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.7;
+  letter-spacing: 0.06em;
 }
 
 .fv-picker-close {
@@ -500,182 +643,14 @@
   cursor: pointer;
   font-size: 1rem;
   line-height: 1;
-  padding: 0 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
   transition: color 0.15s;
 }
 
-.fv-picker-close:hover {
-  color: var(--text);
-}
+.fv-picker-close:hover { color: var(--text); }
 
-/* Wallet connect button on start screen */
-.fv-start-wallet-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  margin-top: 4px;
-}
-
-.fv-wallet-connect-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 50px;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(8px);
-}
-
-.fv-wallet-connect-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.28);
-  transform: translateY(-1px);
-}
-
-/* Wallet picker dropdown on start screen */
-.fv-start-picker {
-  background: rgba(20, 20, 22, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 14px;
-  min-width: 240px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-  animation: fv-fade-in 0.15s ease-out;
-  backdrop-filter: blur(12px);
-  margin-top: 4px;
-}
-
-.fv-start-picker-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.fv-start-picker-header span {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Connected wallet badge */
-.fv-wallet-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.78rem;
-  font-weight: 500;
-  backdrop-filter: blur(8px);
-}
-
-.fv-wallet-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 6px #4ade80;
-  margin-left: 2px;
-}
-
-/* Smaller wallet badge in the form flow action row */
-.fv-wallet-badge-sm {
-  padding: 5px 10px;
-  font-size: 0.72rem;
-  background: var(--accent-bg);
-  border-color: var(--border);
-  color: var(--muted);
-}
-
-.fv-line-input[type="date"] {
-  min-height: 44px;
-}
-
-.fv-choice-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  width: 100%;
-  margin-top: 12px;
-}
-
-.fv-choice-btn {
-  display: flex;
-  align-items: center;
-  padding: 14px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.fv-choice-btn:hover {
-  border-color: var(--muted);
-  background: var(--accent-bg);
-}
-
-.fv-choice-btn.active {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-
-.fv-scale {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
-  justify-content: center;
-}
-
-.fv-scale-btn {
-  width: clamp(34px, 8vw, 42px);
-  height: clamp(34px, 8vw, 42px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.fv-scale-btn:hover {
-  border-color: var(--muted);
-  color: var(--text);
-}
-
-.fv-scale-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-}
-
+/* ── Wallet list ───────────────────────────────────────── */
 .fv-wallet-list {
   display: flex;
   flex-direction: column;
@@ -709,141 +684,299 @@
   cursor: not-allowed;
 }
 
+/* ── Choice / multiselect ──────────────────────────────── */
+.fv-choice-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fv-choice-btn {
+  display: flex;
+  align-items: center;
+  padding: 13px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+  width: 100%;
+}
+
+.fv-choice-btn:hover {
+  border-color: var(--muted);
+  background: var(--accent-bg);
+}
+
+.fv-choice-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.fv-multiselect {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fv-multi-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.fv-multi-opt:hover { background: var(--accent-bg); }
+
+.fv-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 10px 0;
+}
+
+/* ── Scale ─────────────────────────────────────────────── */
+.fv-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.fv-scale-btn {
+  width: clamp(36px, 8vw, 44px);
+  height: clamp(36px, 8vw, 44px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fv-scale-btn:hover { border-color: var(--muted); color: var(--text); }
+.fv-scale-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+/* ── Stars ─────────────────────────────────────────────── */
+.fv-stars {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.fv-star-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.15s;
+  color: var(--accent);
+}
+
+.fv-star-btn:hover { transform: scale(1.15); }
+
+/* ── File upload ───────────────────────────────────────── */
+.fv-file-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.fv-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--muted);
+  transition: border-color 0.2s;
+}
+
+.fv-file:hover { border-color: var(--muted); color: var(--text); }
+.fv-file input[type="file"] { display: none; }
+
+.fv-file-img-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.fv-file-video-preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+
+/* ── Tablet / small desktop ────────────────────────────── */
 @media (max-width: 768px) {
   .fv-start {
-    padding: 28px 14px;
+    padding: 72px 20px 40px;
   }
 
   .fv-start-body {
-    padding: 20px 10px;
-  }
-
-  .fv-start-body h1 {
-    font-size: 1.45rem;
-  }
-
-  .fv-start-body p {
-    font-size: 0.82rem;
+    gap: 14px;
   }
 
   .fv-start-profile {
-    width: 46px;
-    height: 46px;
+    width: 60px;
+    height: 60px;
   }
 
   .fv-flow {
-    padding-top: 44px;
+    padding: 70px 20px 48px;
   }
 
-  .fv-flow-container {
-    padding: 0 14px;
+  .fv-flow-header {
+    margin-bottom: 32px;
   }
 
   .fv-label {
-    font-size: 1.15rem;
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
   }
 
-  .fv-desc {
-    font-size: 0.78rem;
-  }
-
-  .fv-line-input {
-    font-size: 0.9rem;
-  }
-
-  .fv-step-count {
-    font-size: 0.66rem;
-    padding: 4px 8px;
-  }
-
-  .fv-flow-submit {
-    padding: 10px 22px;
-    font-size: 0.8rem;
-  }
-
-  .fv-flow-skip {
-    font-size: 0.76rem;
-    padding: 7px 12px;
-  }
-
-  .fv-start-btn {
-    font-size: 0.82rem;
-    padding: 12px 40px;
+  .fv-flow-actions {
+    margin-top: 32px;
+    gap: 10px;
   }
 }
 
+/* ── Mobile ────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .fv-start-body h1 {
-    font-size: 1.2rem;
+  .fv-start {
+    padding: 64px 16px 36px;
   }
 
-  .fv-start-body p {
-    font-size: 0.76rem;
+  .fv-start-body {
+    gap: 12px;
+  }
+
+  .fv-start-title {
+    font-size: 1.5rem;
+  }
+
+  .fv-start-desc {
+    font-size: 0.85rem;
   }
 
   .fv-start-btn {
-    padding: 10px 32px;
-    font-size: 0.78rem;
+    height: 46px;
+    padding: 0 28px;
+    font-size: 0.88rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .fv-start-picker {
+    max-width: 100%;
+  }
+
+  .fv-flow {
+    padding: 60px 16px 40px;
+  }
+
+  .fv-flow-header {
+    margin-bottom: 24px;
   }
 
   .fv-label {
+    font-size: 1.25rem;
+  }
+
+  .fv-desc {
+    font-size: 0.85rem;
+  }
+
+  .fv-input-wrap {
+    margin-top: 24px;
+  }
+
+  .fv-line-input {
     font-size: 1rem;
   }
 
-  .fv-desc {
-    font-size: 0.74rem;
+  .fv-flow-actions {
+    margin-top: 28px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .fv-line-input {
-    font-size: 0.84rem;
-  }
-
-  .fv-step-count {
-    font-size: 0.6rem;
-  }
-
+  .fv-next-btn,
   .fv-flow-submit {
-    padding: 9px 18px;
-    font-size: 0.76rem;
-    min-width: 70px;
+    width: 100%;
+    justify-content: center;
+    height: 50px;
+    font-size: 0.92rem;
   }
 
   .fv-flow-skip {
-    font-size: 0.7rem;
-    padding: 6px 10px;
+    font-size: 0.8rem;
   }
 
-  .fv-star-btn svg {
-    width: 24px;
-    height: 24px;
+  .fv-wallet-badge-sm {
+    width: 100%;
+    justify-content: center;
   }
 
-  .fv-file {
-    padding: 10px;
+  /* Picker pops up above on mobile — prevent off-screen */
+  .fv-picker-modal {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .fv-scale {
+    gap: 5px;
+  }
+
+  .fv-scale-btn {
+    width: clamp(30px, 8vw, 36px);
+    height: clamp(30px, 8vw, 36px);
     font-size: 0.78rem;
   }
 
-  .fv-multi-opt {
-    font-size: 0.84rem;
+  .fv-star-btn svg {
+    width: 28px;
+    height: 28px;
   }
 
-  .fv-checkbox {
-    font-size: 0.84rem;
+  .fv-back-editor,
+  .fv-back-editor-flow {
+    top: 14px;
+    left: 14px;
   }
-}
-
-.fv-progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  z-index: 1000;
-}
-
-.fv-progress-fill {
-  height: 100%;
-  background: var(--text);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
