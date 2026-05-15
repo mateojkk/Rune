@@ -57,7 +57,7 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     isRedirecting = true;
     
     if (typeof window !== 'undefined') {
-      console.warn('[API] 401 detected. Clearing session and resetting...');
+      console.warn('[API] 401 detected. Clearing session...');
       
       // Crucial: Clear Zustand state in memory BEFORE clearing localStorage,
       // otherwise Zustand will write the stale token back to localStorage on page unload!
@@ -68,7 +68,10 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
 
       localStorage.removeItem('rune-wallet');
       sessionStorage.clear();
-      window.location.href = '/';
+      
+      // We no longer force a hard redirect to avoid infinite loops.
+      // The AppPage component will naturally show the "Sign in" gate when isConnected becomes false.
+      isRedirecting = false; 
     }
     throw new Error('Unauthorized');
   }
