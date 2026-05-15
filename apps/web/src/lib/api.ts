@@ -89,7 +89,10 @@ export async function loginApi(address: string, message: string, signature: stri
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ address, message, signature }),
   });
-  if (!res.ok) throw new Error('Login failed');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Login failed' }));
+    throw new Error(err.detail || 'Login failed');
+  }
   return res.json();
 }
 

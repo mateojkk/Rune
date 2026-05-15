@@ -35,8 +35,8 @@ async def login(body: LoginRequest):
             raise HTTPException(status_code=400, detail="Invalid message format")
         timestamp = int(parts[1])
         now = int(time.time() * 1000)
-        if abs(now - timestamp) > 300000:  # 5 minute window
-            raise HTTPException(status_code=401, detail="Signature expired — please try again")
+        if abs(now - timestamp) > 86400000:  # 24 hour window to allow for clock drift
+            raise HTTPException(status_code=401, detail="Signature timestamp is too far in the past or future — please check your system clock")
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid timestamp in message")
 
