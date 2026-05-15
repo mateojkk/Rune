@@ -3,9 +3,17 @@ import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { Transaction } from '@mysten/sui/transactions';
 import { storeBlobWithKeypair, storeBlobWithWallet } from './walrus';
 import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
+import { useConfigStore } from '../stores/config';
 
-const SEAL_PACKAGE_ID = import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7';
-const SEAL_KEY_SERVER_1 = import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6';
+function getSealConfig() {
+  const config = useConfigStore.getState().config;
+  return {
+    packageId: config?.seal?.packageId || import.meta.env.VITE_getSealConfig().packageId || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7',
+    keyServers: config?.seal?.keyServers || [
+      { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6', weight: 1 },
+    ],
+  };
+}
 
 let _suiClient: SuiJsonRpcClient | null = null;
 let _suiClientNetwork: string | null = null;
@@ -20,11 +28,10 @@ function getSuiClient() {
 }
 
 function getSealClient(suiClient: ReturnType<typeof getSuiClient>) {
+  const { keyServers } = getSealConfig();
   return new SealClient({
     suiClient,
-    serverConfigs: [
-      { objectId: SEAL_KEY_SERVER_1, weight: 1 },
-    ],
+    serverConfigs: keyServers,
     verifyKeyServers: false,
   });
 }
@@ -40,7 +47,7 @@ export async function encryptAndStore(
 
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
-    packageId: SEAL_PACKAGE_ID,
+    packageId: getSealConfig().packageId,
     id: ownerAddress,
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
@@ -59,7 +66,7 @@ export async function encryptAndStoreWithWallet(
 
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
-    packageId: SEAL_PACKAGE_ID,
+    packageId: getSealConfig().packageId,
     id: ownerAddress,
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
@@ -96,14 +103,14 @@ export async function decryptAndRead(
 
   const sessionKey = new (SessionKey as any)({
     address: ownerAddress,
-    packageId: SEAL_PACKAGE_ID,
+    packageId: getSealConfig().packageId,
     ttlMin: 5,
     signer: keypair,
     suiClient,
   });
 
   await sealClient.fetchKeys({
-    ids: [SEAL_PACKAGE_ID],
+    ids: getSealConfig().keyServers.map(s => s.objectId),
     txBytes,
     sessionKey,
     threshold: 1,
