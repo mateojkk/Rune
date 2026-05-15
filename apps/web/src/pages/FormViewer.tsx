@@ -266,7 +266,8 @@ export function FormViewer() {
       setSubmitted(true);
     } catch (e) {
       console.error('Submission failed:', e);
-      alert('Failed to submit form. Please ensure your wallet is connected and try again.');
+      const detail = e instanceof Error ? e.message : 'Unknown error';
+      alert(`Failed to submit form: ${detail}`);
     }
     setSubmitting(false);
   };

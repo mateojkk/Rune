@@ -1,5 +1,7 @@
 import { Secp256k1Keypair, Secp256k1PublicKey } from '@mysten/sui/keypairs/secp256k1';
 import { decodeJwt, generateNonce, generateRandomness, computeZkLoginAddress } from '@mysten/sui/zklogin';
+import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
+import { getSuiRpcUrl, getCurrentNetwork } from './network';
 
 export type OAuthProvider = 'google';
 
@@ -12,9 +14,11 @@ export interface ZkLoginConfig {
 export const DEFAULT_CONFIG: ZkLoginConfig = {
   network: import.meta.env.VITE_NETWORK === 'mainnet' ? 'mainnet' : 'testnet',
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your-google-client-id.apps.googleusercontent.com',
+  // Always derive redirect URL from the current origin at runtime.
+  // The VITE_REDIRECT_URL env var is baked at build time and may point to localhost
+  // even when deployed to production (e.g. Vercel).
   redirectUrl:
-    import.meta.env.VITE_REDIRECT_URL ||
-    (typeof window !== 'undefined' ? `${window.location.origin}/app/auth/callback` : ''),
+    typeof window !== 'undefined' ? `${window.location.origin}/app/auth/callback` : '',
 };
 
 export interface EphemeralKeyPair {
@@ -49,7 +53,13 @@ export async function createSession(): Promise<ZkLoginSession> {
   const privateKey = keypair.getSecretKey();
   const publicKey = new Secp256k1PublicKey(keypair.getPublicKey().toRawBytes());
   const randomness = generateRandomness();
-  const maxEpoch = Math.floor(Date.now() / 1000) + 3600;
+
+  // Fetch the current Sui epoch from the RPC — maxEpoch must be a real Sui
+  // epoch number (small integer, ~800 on mainnet), NOT a Unix timestamp.
+  const suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network: getCurrentNetwork() });
+  const { epoch } = await suiClient.getLatestSuiSystemState();
+  const maxEpoch = Number(epoch) + 10; // ~10 epochs ≈ ~10 days validity
+
   const nonce = generateNonce(publicKey, maxEpoch, randomness);
   
   return {
