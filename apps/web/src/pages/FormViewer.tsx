@@ -199,10 +199,15 @@ export function FormViewer() {
   };
 
   const handleSubmit = async () => {
-    if (!form || !walletAddr || !walletRef) return;
+    if (!form || !walletAddr || !walletRef) {
+      alert('Please connect your wallet to submit this form.');
+      return;
+    }
     setSubmitting(true);
     try {
       const finalData: Record<string, any> = { ...formData };
+
+      // Upload file fields to Walrus
       for (const field of form.fields) {
         if (field.type === 'file' || field.type === 'image' || field.type === 'video') {
           const file = formData[field.id];
@@ -217,6 +222,9 @@ export function FormViewer() {
       const ownerAddress = form.walletAddress;
       if (!ownerAddress) throw new Error('Form owner address not found. Cannot encrypt.');
 
+      // Import encryption helper from walrus lib
+      const { encryptAndStoreWithWallet } = await import('../lib/walrus');
+
       const { blobId } = await encryptAndStoreWithWallet(
         finalData,
         ownerAddress,
@@ -224,19 +232,22 @@ export function FormViewer() {
         walletRef.signAndExecuteTransaction
       );
 
+      // Store submission with the blob ID
       await addSubmission(form.id, {
         blobId,
-        data: {}, // Data is now safely encrypted on Walrus
+        data: {}, // Data is safely encrypted on Walrus
         walletAddress: walletAddr,
         submittedAt: new Date().toISOString(),
       });
+
       setSubmitted(true);
     } catch (e) {
       console.error('Submission failed:', e);
-      alert('Failed to submit form. Please try again.');
+      alert('Failed to submit form. Please ensure your wallet is connected and try again.');
     }
     setSubmitting(false);
   };
+
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

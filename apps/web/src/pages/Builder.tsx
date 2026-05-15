@@ -1,25 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
-  { type: 'text', label: 'Short Text', icon: <Hash size={16} /> },
-  { type: 'textarea', label: 'Long Text', icon: <FileText size={16} /> },
-  { type: 'email', label: 'Email Address', icon: <Mail size={16} /> },
+  { type: 'text', label: 'Short Text', icon: <FileText size={16} /> },
+  { type: 'textarea', label: 'Long Text', icon: <AlignLeft size={16} /> },
+  { type: 'richtext', label: 'Rich Text', icon: <FileText size={16} /> },
+  { type: 'email', label: 'Email', icon: <Mail size={16} /> },
   { type: 'phone', label: 'Phone Number', icon: <Phone size={16} /> },
-  { type: 'date', label: 'Date Picker', icon: <Calendar size={16} /> },
-  { type: 'multipleChoice', label: 'Multiple Choice', icon: <CircleDot size={16} /> },
-  { type: 'scale', label: 'Opinion Scale', icon: <Sliders size={16} /> },
-  { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={16} /> },
-  { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
-  { type: 'multiselect', label: 'Multi-Select', icon: <List size={16} /> },
-  { type: 'starRating', label: 'Star Rating', icon: <Star size={16} /> },
-  { type: 'file', label: 'File Upload', icon: <Upload size={16} /> },
+  { type: 'number', label: 'Number', icon: <Hash size={16} /> },
+  { type: 'date', label: 'Date', icon: <Calendar size={16} /> },
   { type: 'url', label: 'Website URL', icon: <LinkIcon size={16} /> },
-  { type: 'number', label: 'Number Input', icon: <Hash size={16} /> },
+  { type: 'multipleChoice', label: 'Multiple Choice', icon: <CircleDot size={16} /> },
+  { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
+  { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={16} /> },
+  { type: 'multiselect', label: 'Multi-Select', icon: <List size={16} /> },
+  { type: 'scale', label: 'Opinion Scale', icon: <Sliders size={16} /> },
+  { type: 'starRating', label: 'Star Rating', icon: <Star size={16} /> },
+  { type: 'image', label: 'Image Upload', icon: <ImageIcon size={16} /> },
+  { type: 'video', label: 'Video Upload', icon: <Upload size={16} /> },
+  { type: 'file', label: 'File Upload', icon: <Upload size={16} /> },
 ];
 
 function BuilderInner() {
@@ -247,6 +250,8 @@ function BuilderInner() {
 
   const renderFieldPreview = (field: FormField) => {
     switch (field.type) {
+      case 'textarea': case 'richtext':
+        return <textarea className="b-field-preview b-textarea-preview" placeholder={field.placeholder || 'Long answer text...'} rows={3} readOnly />;
       case 'dropdown':
         return (
           <div className="b-field-preview select-preview">

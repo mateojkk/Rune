@@ -1,25 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
 import type { FormField, FieldType, Workspace } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
-  { type: 'text', label: 'Short Text', icon: <Hash size={16} /> },
-  { type: 'textarea', label: 'Long Text', icon: <FileText size={16} /> },
-  { type: 'email', label: 'Email Address', icon: <Mail size={16} /> },
+  { type: 'text', label: 'Short Text', icon: <FileText size={16} /> },
+  { type: 'textarea', label: 'Long Text', icon: <AlignLeft size={16} /> },
+  { type: 'richtext', label: 'Rich Text', icon: <FileText size={16} /> },
+  { type: 'email', label: 'Email', icon: <Mail size={16} /> },
   { type: 'phone', label: 'Phone Number', icon: <Phone size={16} /> },
-  { type: 'date', label: 'Date Picker', icon: <Calendar size={16} /> },
-  { type: 'multipleChoice', label: 'Multiple Choice', icon: <CircleDot size={16} /> },
-  { type: 'scale', label: 'Opinion Scale', icon: <Sliders size={16} /> },
-  { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={16} /> },
-  { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
-  { type: 'multiselect', label: 'Multi-Select', icon: <List size={16} /> },
-  { type: 'starRating', label: 'Star Rating', icon: <Star size={16} /> },
-  { type: 'file', label: 'File Upload', icon: <Upload size={16} /> },
+  { type: 'number', label: 'Number', icon: <Hash size={16} /> },
+  { type: 'date', label: 'Date', icon: <Calendar size={16} /> },
   { type: 'url', label: 'Website URL', icon: <LinkIcon size={16} /> },
-  { type: 'number', label: 'Number Input', icon: <Hash size={16} /> },
+  { type: 'multipleChoice', label: 'Multiple Choice', icon: <CircleDot size={16} /> },
+  { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={16} /> },
+  { type: 'dropdown', label: 'Dropdown', icon: <ChevronDown size={16} /> },
+  { type: 'multiselect', label: 'Multi-Select', icon: <List size={16} /> },
+  { type: 'scale', label: 'Opinion Scale', icon: <Sliders size={16} /> },
+  { type: 'starRating', label: 'Star Rating', icon: <Star size={16} /> },
+  { type: 'image', label: 'Image Upload', icon: <ImageIcon size={16} /> },
+  { type: 'video', label: 'Video Upload', icon: <Upload size={16} /> },
+  { type: 'file', label: 'File Upload', icon: <Upload size={16} /> },
 ];
 
 interface Props {
@@ -215,16 +218,24 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
   const renderFieldPreview = (field: FormField) => {
     switch (field.type) {
+      case 'textarea': case 'richtext':
+        return <textarea className="b-field-preview b-textarea-preview" placeholder={field.placeholder || 'Long answer text...'} rows={3} readOnly />;
       case 'dropdown':
         return <div className="b-field-preview select-preview"><span className="select-placeholder">{field.placeholder || `Select ${field.label.toLowerCase()}`}</span><ChevronDown size={14} /></div>;
       case 'checkbox':
         return <div className="b-field-preview checkbox-preview"><div className="checkbox-fake" /><span>{field.label}</span></div>;
       case 'multiselect':
         return <div className="b-field-preview multiselect-preview">{(field.options?.length ? field.options : ['Option 1', 'Option 2']).map(opt => <label key={opt} className="multi-option"><div className="checkbox-fake" /><span>{opt}</span></label>)}</div>;
+      case 'multipleChoice':
+        return <div className="b-field-preview multiselect-preview">{(field.options?.length ? field.options : ['Option A', 'Option B']).map(opt => <label key={opt} className="multi-option"><div className="radio-fake" /><span>{opt}</span></label>)}</div>;
       case 'starRating':
         return <div className="b-field-preview stars-preview">{[1, 2, 3, 4, 5].map(s => <Star key={s} size={18} fill="var(--accent)" stroke="var(--accent)" opacity={s <= 3 ? 1 : 0.25} />)}</div>;
-      case 'file': case 'image': case 'video':
-        return <div className="b-field-preview upload-preview"><Upload size={16} /><span>{field.placeholder || `Upload ${field.type}`}</span></div>;
+      case 'file':
+        return <div className="b-field-preview upload-preview"><Upload size={16} /><span>{field.placeholder || 'Upload file'}</span></div>;
+      case 'image':
+        return <div className="b-field-preview upload-preview"><ImageIcon size={16} /><span>{field.placeholder || 'Upload image'}</span></div>;
+      case 'video':
+        return <div className="b-field-preview upload-preview"><Upload size={16} /><span>{field.placeholder || 'Upload video'}</span></div>;
       default:
         return <div className="b-field-preview text-preview">{field.placeholder || `Enter ${field.label.toLowerCase()}`}</div>;
     }
