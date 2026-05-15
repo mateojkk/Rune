@@ -1,7 +1,20 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = typeof window !== 'undefined' ? sessionStorage.getItem('rune_token') : null;
+  // Pull token from persisted Zustand storage to avoid source-of-truth mismatch
+  let token = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('rune-wallet-storage');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        token = parsed.state.jwt || parsed.state.token || null;
+      }
+    } catch (e) {
+      console.error('Failed to parse auth token:', e);
+    }
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options?.headers as any,
