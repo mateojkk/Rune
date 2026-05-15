@@ -92,6 +92,7 @@ class Settings(BaseSettings):
             },
             'seal': {
                 'packageId': self.seal_package,
+                'policyPackageId': self.seal_package,
                 'keyServers': self.seal_key_servers,
             },
         }

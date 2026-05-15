@@ -1,6 +1,7 @@
 import { SealClient, SessionKey } from '@mysten/seal';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { Transaction } from '@mysten/sui/transactions';
+import { fromHex } from '@mysten/bcs';
 import { storeBlobWithKeypair, storeBlobWithWallet } from './walrus';
 import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
 import { useConfigStore } from '../stores/config';
@@ -8,7 +9,8 @@ import { useConfigStore } from '../stores/config';
 function getSealConfig() {
   const config = useConfigStore.getState().config;
   return {
-    packageId: config?.seal?.packageId || import.meta.env.VITE_getSealConfig().packageId || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7',
+    packageId: config?.seal?.packageId || import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7',
+    policyPackageId: config?.seal?.policyPackageId || import.meta.env.VITE_SEAL_POLICY_PACKAGE_ID || '',
     keyServers: config?.seal?.keyServers || [
       { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6', weight: 1 },
     ],
@@ -45,9 +47,12 @@ export async function encryptAndStore(
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
+  const { packageId: sealPkg, policyPackageId } = getSealConfig();
+  const policyPkg = policyPackageId || sealPkg;
+
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
-    packageId: getSealConfig().packageId,
+    packageId: policyPkg,
     id: ownerAddress,
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
@@ -64,9 +69,12 @@ export async function encryptAndStoreWithWallet(
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
+  const { packageId: sealPkg, policyPackageId } = getSealConfig();
+  const policyPkg = policyPackageId || sealPkg;
+
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
-    packageId: getSealConfig().packageId,
+    packageId: policyPkg,
     id: ownerAddress,
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
@@ -84,30 +92,34 @@ export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {
   }
 }
 
-async function createApprovalTxBytes(keypair: { toSuiAddress(): string }): Promise<Uint8Array> {
-  const suiClient = getSuiClient();
-  const tx = new Transaction();
-  tx.setSender(keypair.toSuiAddress());
-  tx.setGasBudget(10000000n);
-  return tx.build({ client: suiClient });
-}
-
 export async function decryptAndRead(
   encryptedData: Uint8Array,
-  keypair: { toSuiAddress(): string; signPersonalMessage?(msg: Uint8Array): Promise<{ signature: string }> },
+  keypair: { toSuiAddress(): string; signPersonalMessage(msg: Uint8Array): Promise<{ signature: string }> },
   ownerAddress: string,
 ): Promise<unknown> {
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
-  const txBytes = await createApprovalTxBytes(keypair);
 
-  const sessionKey = new (SessionKey as any)({
+  const { packageId: sealPkg, policyPackageId } = getSealConfig();
+  const policyPkg = policyPackageId || sealPkg;
+
+  const sessionKey = await SessionKey.create({
     address: ownerAddress,
-    packageId: getSealConfig().packageId,
-    ttlMin: 5,
-    signer: keypair,
+    packageId: policyPkg,
+    ttlMin: 10,
     suiClient,
   });
+
+  const message = sessionKey.getPersonalMessage();
+  const { signature } = await keypair.signPersonalMessage(message);
+  sessionKey.setPersonalMessageSignature(signature);
+
+  const tx = new Transaction();
+  tx.moveCall({
+    target: `${policyPkg}::seal_approve`,
+    arguments: [tx.pure.vector('u8', Array.from(fromHex(ownerAddress)))],
+  });
+  const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
 
   await sealClient.fetchKeys({
     ids: getSealConfig().keyServers.map(s => s.objectId),

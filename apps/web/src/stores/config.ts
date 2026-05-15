@@ -9,6 +9,7 @@ export interface NetworkConfig {
   };
   seal: {
     packageId: string;
+    policyPackageId?: string;
     keyServers: Array<{ objectId: string; weight: number }>;
   };
 }
@@ -30,6 +31,7 @@ const DEFAULT_WALRUS_URLS = {
 
 const DEFAULT_SEAL_CONFIG = {
   packageId: import.meta.env.VITE_SEAL_PACKAGE_ID || '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7',
+  policyPackageId: import.meta.env.VITE_SEAL_POLICY_PACKAGE_ID || '',
   keyServers: [
     { objectId: import.meta.env.VITE_SEAL_KEY_SERVER_1 || '0x145540d931f182fef76467dd8074c9839aea126852d90d18e1556fcbbd1208b6', weight: 1 },
   ],
