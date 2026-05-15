@@ -455,23 +455,152 @@
   display: inline-block;
 }
 
-.fv-picker-dropdown {
-  position: fixed;
-  inset: 0;
-  z-index: 500;
+/* Wallet picker modal (floats above content at last step) */
+.fv-picker-modal {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  z-index: 600;
+  background: var(--surface-elevated, #1c1c1e);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 260px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  animation: fv-fade-in 0.15s ease-out;
 }
 
-.fv-picker-inner {
-  position: absolute;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--surface-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow-lg);
+.fv-picker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fv-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.fv-picker-header h3 {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.fv-picker-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.15s;
+}
+
+.fv-picker-close:hover {
+  color: var(--text);
+}
+
+/* Wallet connect button on start screen */
+.fv-start-wallet-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  margin-top: 4px;
+}
+
+.fv-wallet-connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.fv-wallet-connect-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+/* Wallet picker dropdown on start screen */
+.fv-start-picker {
+  background: rgba(20, 20, 22, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 14px;
   min-width: 240px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  animation: fv-fade-in 0.15s ease-out;
+  backdrop-filter: blur(12px);
+  margin-top: 4px;
+}
+
+.fv-start-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fv-start-picker-header span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Connected wallet badge */
+.fv-wallet-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}
+
+.fv-wallet-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade80;
+  margin-left: 2px;
+}
+
+/* Smaller wallet badge in the form flow action row */
+.fv-wallet-badge-sm {
+  padding: 5px 10px;
+  font-size: 0.72rem;
+  background: var(--accent-bg);
+  border-color: var(--border);
+  color: var(--muted);
 }
 
 .fv-line-input[type="date"] {

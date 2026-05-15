@@ -104,6 +104,7 @@ export function FormViewer() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const [pendingSubmitAfterConnect, setPendingSubmitAfterConnect] = useState(false);
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -191,6 +192,8 @@ export function FormViewer() {
     } else if (walletAddr) {
       handleSubmit();
     } else {
+      // Wallet not yet connected — open picker and submit once connected
+      setPendingSubmitAfterConnect(true);
       setShowPicker(true);
     }
   };
@@ -201,8 +204,24 @@ export function FormViewer() {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  const handleSubmit = async () => {
-    if (!form || !walletAddr || !walletRef) {
+  // Called when wallet connects anywhere in the form.
+  // If pendingSubmitAfterConnect is true (user clicked Next/Submit on last step
+  // before connecting), we auto-submit immediately using the fresh wallet values
+  // to avoid the stale-closure problem with React state.
+  const handleWalletConnected = (addr: string, ref: any) => {
+    setWalletAddr(addr);
+    setWalletRef(ref);
+    setShowPicker(false);
+    if (pendingSubmitAfterConnect) {
+      setPendingSubmitAfterConnect(false);
+      // Pass wallet values directly — state won't have flushed yet
+      doSubmit(addr, ref);
+    }
+  };
+
+  // Core submit logic — accepts wallet values directly to avoid stale closure.
+  const doSubmit = async (addr: string, ref: any) => {
+    if (!form || !addr || !ref) {
       alert('Please connect your wallet to submit this form.');
       return;
     }
@@ -215,7 +234,7 @@ export function FormViewer() {
         if (field.type === 'file' || field.type === 'image' || field.type === 'video') {
           const file = formData[field.id];
           if (file instanceof File) {
-            const { blobId: fileBlobId } = await storeBlobWithWallet(file, walletAddr, walletRef.signAndExecuteTransaction);
+            const { blobId: fileBlobId } = await storeBlobWithWallet(file, addr, ref.signAndExecuteTransaction);
             finalData[field.id] = fileBlobId;
           }
         }
@@ -230,9 +249,9 @@ export function FormViewer() {
       const { blobId } = await encryptAndStoreWithWallet(
         finalData,
         ownerAddress,
-        walletAddr,
+        addr,
         async (tx: any) => {
-          return await walletRef.signAndExecuteTransaction(tx);
+          return await ref.signAndExecuteTransaction(tx);
         }
       );
 
@@ -240,7 +259,7 @@ export function FormViewer() {
       await addSubmission(form.id, {
         blobId,
         data: {}, // Data is safely encrypted on Walrus
-        walletAddress: walletAddr,
+        walletAddress: addr,
         submittedAt: new Date().toISOString(),
       });
 
@@ -251,6 +270,9 @@ export function FormViewer() {
     }
     setSubmitting(false);
   };
+
+  // Convenience wrapper that uses current state values
+  const handleSubmit = () => doSubmit(walletAddr!, walletRef);
 
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
@@ -323,6 +345,37 @@ export function FormViewer() {
             )}
             <h1 className="fv-start-title">{form.title}</h1>
             {form.description && <p className="fv-start-desc">{form.description}</p>}
+
+            {/* Wallet connect on start screen */}
+            <div className="fv-start-wallet-section">
+              {walletAddr ? (
+                <div className="fv-wallet-badge">
+                  <Wallet size={14} />
+                  <span>{walletAddr.slice(0, 6)}…{walletAddr.slice(-4)}</span>
+                  <span className="fv-wallet-badge-dot" />
+                </div>
+              ) : (
+                <>
+                  <button
+                    className="fv-wallet-connect-btn"
+                    onClick={() => setShowPicker(!showPicker)}
+                  >
+                    <Wallet size={16} />
+                    Connect Wallet
+                  </button>
+                  {showPicker && (
+                    <div className="fv-start-picker">
+                      <div className="fv-start-picker-header">
+                        <span>Select your wallet</span>
+                        <button className="fv-picker-close" onClick={() => setShowPicker(false)}>✕</button>
+                      </div>
+                      <WalletConnection onConnected={handleWalletConnected} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
             <div className="fv-start-actions">
               <button className="fv-start-btn" onClick={() => setStep(0)}>
                 Start <ArrowRight size={18} />
@@ -490,19 +543,27 @@ export function FormViewer() {
             </div>
 
             <div className="fv-flow-actions">
+              {/* Wallet status badge shown in form flow */}
+              {walletAddr && (
+                <div className="fv-wallet-badge fv-wallet-badge-sm">
+                  <Wallet size={12} />
+                  <span>{walletAddr.slice(0, 6)}…{walletAddr.slice(-4)}</span>
+                </div>
+              )}
+
               {isLast && !walletAddr ? (
                 <div className="fv-connect-wrap">
                   <button className="fv-flow-submit" onClick={() => setShowPicker(!showPicker)}>
-                    Connect Wallet to Submit
+                    <Wallet size={16} /> Connect Wallet to Submit
                   </button>
                   {showPicker && (
                     <div className="fv-picker-modal">
                       <div className="fv-picker-content">
                         <div className="fv-picker-header">
                           <h3>Select Wallet</h3>
-                          <button onClick={() => setShowPicker(false)}>Close</button>
+                          <button className="fv-picker-close" onClick={() => setShowPicker(false)}>✕</button>
                         </div>
-                        <WalletConnection onConnected={(addr, ref) => { setWalletAddr(addr); setWalletRef(ref); setShowPicker(false); }} />
+                        <WalletConnection onConnected={handleWalletConnected} />
                       </div>
                     </div>
                   )}
