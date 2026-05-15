@@ -37,8 +37,12 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     'Content-Type': 'application/json',
     ...options?.headers as any,
   };
+  
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log(`[API] Req ${path} with token ${token.substring(0, 10)}...`);
+  } else {
+    console.log(`[API] Req ${path} WITHOUT token (isLoggingIn: ${isLoggingIn})`);
   }
 
   const res = await fetch(`${API_BASE}/api/data${path}`, {
