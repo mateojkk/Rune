@@ -17,8 +17,8 @@ export function getSuiChain(): `sui:${SuiNetwork}` {
 
 export function getSuiRpcUrl(): string {
   return getCurrentNetwork() === 'mainnet'
-    ? 'https://fullnode.mainnet.sui.io:443'
-    : 'https://fullnode.testnet.sui.io:443';
+    ? 'https://rpc.mainnet.sui.io'
+    : 'https://rpc.testnet.sui.io';
 }
 
 export function getWalrusAggregatorUrl(): string {

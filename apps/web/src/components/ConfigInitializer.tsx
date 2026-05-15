@@ -24,7 +24,7 @@ export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    if (!account?.address || (!jwt && !token) || isLoggingIn) return;
+    if (!account?.address || !token || isLoggingIn) return;
     (async () => {
       try {
         const p = await fetchProfile();

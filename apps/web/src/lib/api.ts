@@ -13,7 +13,8 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     isLoggingIn = !!sessionStorage.getItem('rune_is_logging_in');
 
     // 2. Try sessionStorage first (fastest, synchronous, set instantly on login)
-    token = sessionStorage.getItem('rune_token') || sessionStorage.getItem('rune_jwt');
+    //    Only use the backend JWT (rune_token) as Bearer token — never the Google ID token
+    token = sessionStorage.getItem('rune_token');
     
     // 3. Fallback to localStorage if the store hasn't mounted/hydrated yet
     if (!token && !isLoggingIn) {
@@ -21,7 +22,7 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
         const stored = localStorage.getItem('rune-wallet');
         if (stored) {
           const parsed = JSON.parse(stored);
-          token = parsed.state.jwt || parsed.state.token || null;
+          token = parsed.state.token || null;
           isLoggingIn = !!parsed.state.isLoggingIn;
         }
       } catch (e) {}
