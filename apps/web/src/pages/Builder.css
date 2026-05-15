@@ -1426,3 +1426,57 @@
   font-family: inherit;
   margin-top: 4px;
 }
+
+/* Premium Scrollbar Styling */
+.builder::-webkit-scrollbar,
+.b-modal-overlay::-webkit-scrollbar,
+.b-modal::-webkit-scrollbar,
+.b-modal-sidebar::-webkit-scrollbar,
+.b-modal-canvas::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.builder::-webkit-scrollbar-track,
+.b-modal-sidebar::-webkit-scrollbar-track,
+.b-modal-canvas::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.builder::-webkit-scrollbar-thumb,
+.b-modal-sidebar::-webkit-scrollbar-thumb,
+.b-modal-canvas::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.builder::-webkit-scrollbar-thumb:hover,
+.b-modal-sidebar::-webkit-scrollbar-thumb:hover,
+.b-modal-canvas::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Modal Layout Cleanup */
+.b-modal {
+  overflow: hidden !important; /* Prevent double scrollbars on the modal itself */
+  display: flex;
+  flex-direction: column;
+}
+
+.b-modal-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+}
+
+.b-modal-sidebar {
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+
+.b-modal-canvas {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px;
+  background: rgba(0,0,0,0.2);
+}

@@ -57,6 +57,7 @@ def _form_out(f: Form) -> FormOut:
         profilePicture=f.profile_picture,
         coverPicture=f.cover_picture,
         isPublished=f.is_published or False,
+        walletAddress=f.user_address,
         createdAt=f.created_at.isoformat(),
         updatedAt=f.updated_at.isoformat(),
     )
