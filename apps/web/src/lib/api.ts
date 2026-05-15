@@ -114,6 +114,7 @@ export interface FormDTO {
   profilePicture?: string;
   coverPicture?: string;
   isPublished?: boolean;
+  publishId?: string;
   walletAddress?: string;
   createdAt: string;
   updatedAt: string;
@@ -167,6 +168,14 @@ export async function getForms(workspaceId?: string): Promise<FormDTO[]> {
 export async function getFormApi(uuid: string): Promise<FormDTO | null> {
   try {
     return await req(`/forms/${uuid}`);
+  } catch {
+    return null;
+  }
+}
+
+export async function getFormByPublishId(publishId: string): Promise<FormDTO | null> {
+  try {
+    return await req(`/forms/by-publish/${publishId}`);
   } catch {
     return null;
   }

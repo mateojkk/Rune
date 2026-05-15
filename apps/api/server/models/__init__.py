@@ -56,6 +56,7 @@ class FormOut(BaseModel):
     profilePicture: Optional[str] = None
     coverPicture: Optional[str] = None
     isPublished: bool = False
+    publishId: Optional[str] = None
     walletAddress: Optional[str] = None
     createdAt: str
     updatedAt: str

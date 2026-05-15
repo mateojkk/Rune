@@ -55,6 +55,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [optionDraft, setOptionDraft] = useState<Record<string, string>>({});
   const [isPublished, setIsPublished] = useState(false);
+  const [publishId, setPublishId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -87,6 +88,7 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
           setCoverPicture(form.coverPicture || '');
           setSelectedWorkspaceId(form.workspaceId || '');
           setIsPublished(!!form.isPublished);
+          setPublishId(form.publishId);
         }
       })();
     } else {
@@ -188,7 +190,14 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
   const copyLink = async () => {
     if (!currentFormId) return;
-    try { await navigator.clipboard.writeText(`${window.location.origin}/${currentFormId}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* */ }
+    try {
+      const link = publishId
+        ? `${window.location.origin}/form/${publishId}`
+        : `${window.location.origin}/${currentFormId}`;
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* */ }
   };
 
   const handleImagePick = (type: 'profile' | 'cover') => {
@@ -446,13 +455,13 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
                       <div className="b-share-link">
                         <span className="b-share-label">Public Share Link</span>
                         <div className="b-share-row">
-                          <input type="text" className="b-share-input" value={`${window.location.origin}/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
+                          <input type="text" className="b-share-input" value={`${window.location.origin}/form/${publishId || currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
                           <button className="b-share-copy" onClick={copyLink} title="Copy public link">
                             {copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy Link</>}
                           </button>
                         </div>
                         <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                          <Link to={`/${currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none' }}>
+                          <Link to={`/form/${publishId || currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none' }}>
                             <ExternalLink size={14} /> View Live Form
                           </Link>
                           <Link to={`/${currentFormId}?preview=true`} className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', opacity: 0.7 }}>

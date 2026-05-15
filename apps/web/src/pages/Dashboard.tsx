@@ -43,8 +43,11 @@ export function Dashboard() {
   const searchRef = useRef<HTMLInputElement>(null);
   const activeWorkspaceId = workspaceFilter || workspaceId;
 
-  const copyFormLink = async (formId: string) => {
-    await navigator.clipboard.writeText(`${window.location.origin}/${formId}`);
+  const copyFormLink = async (formId: string, publishId?: string) => {
+    const link = publishId
+      ? `${window.location.origin}/form/${publishId}`
+      : `${window.location.origin}/${formId}`;
+    await navigator.clipboard.writeText(link);
     setCopiedFormId(formId);
     setTimeout(() => setCopiedFormId(null), 2000);
   };
@@ -427,7 +430,7 @@ export function Dashboard() {
                       <button className="btn btn-secondary btn-sm" onClick={() => openSubmissions(form)}>
                         <Eye size={12} /> {subCount}
                       </button>
-                      <button className="btn btn-secondary btn-sm" onClick={() => copyFormLink(form.id)} title="Copy form link">
+                      <button className="btn btn-secondary btn-sm" onClick={() => copyFormLink(form.id, form.publishId)} title="Copy form link">
                         {copiedFormId === form.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
                       <button className="btn btn-secondary btn-sm" onClick={() => startEditForm(form.id)}>

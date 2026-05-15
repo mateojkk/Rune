@@ -49,6 +49,7 @@ export interface FormSchema {
   profilePicture?: string;
   coverPicture?: string;
   isPublished?: boolean;
+  publishId?: string;
 }
 
 export interface FormSubmission {

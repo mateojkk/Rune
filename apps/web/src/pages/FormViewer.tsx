@@ -4,7 +4,7 @@ import { Star, Upload, ArrowLeft, ArrowRight, Wallet, ExternalLink, Clock, Alert
 import type { FormSchema } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
-import { getFormApi } from '../lib/api';
+import { getFormApi, getFormByPublishId } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
 import { getSuiChain } from '../lib/network';
 import './FormViewer.css';
@@ -92,7 +92,7 @@ function BrandFooter() {
 }
 
 export function FormViewer() {
-  const { formId } = useParams();
+  const { formId, publishId } = useParams();
   const navigate = useNavigate();
 
   const [walletAddr, setWalletAddr] = useState<string | null>(null);
@@ -125,10 +125,12 @@ export function FormViewer() {
   const [coverPicture, setCoverPicture] = useState('');
 
   useEffect(() => {
-    if (!formId) return;
+    if (!formId && !publishId) return;
     (async () => {
       try {
-        const data = await getFormApi(formId);
+        const data = publishId
+          ? await getFormByPublishId(publishId)
+          : await getFormApi(formId!);
         if (data) {
           setForm(data as any);
           setProfilePicture(data.profilePicture || '');
@@ -139,7 +141,7 @@ export function FormViewer() {
       }
       setLoading(false);
     })();
-  }, [formId]);
+  }, [formId, publishId]);
 
   const handleFieldChange = (fieldId: string, value: any) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
@@ -334,9 +336,11 @@ export function FormViewer() {
     return (
       <div className="dark">
         <div className="fv-start" style={coverPicture ? { backgroundImage: `url(${coverPicture})` } : {}}>
-          <button className="fv-back-editor" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}>
-            <ArrowLeft size={13} /> Editor
-          </button>
+          {isPreview && (
+            <button className="fv-back-editor" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}>
+              <ArrowLeft size={13} /> Editor
+            </button>
+          )}
           <div className="fv-start-overlay" />
           <div className="fv-start-body">
             {profilePicture && (
@@ -399,9 +403,11 @@ export function FormViewer() {
   return (
     <div className="dark">
       <div className="form-viewer fv-flow">
-        <button className="fv-back-editor fv-back-editor-flow" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}>
-          <ArrowLeft size={13} /> Editor
-        </button>
+        {isPreview && (
+          <button className="fv-back-editor fv-back-editor-flow" onClick={() => navigate(`/app/dashboard?edit=${formId}`)}>
+            <ArrowLeft size={13} /> Editor
+          </button>
+        )}
         <div className="fv-progress-bar">
           <div className="fv-progress-fill" style={{ width: `${progress}%` }} />
         </div>

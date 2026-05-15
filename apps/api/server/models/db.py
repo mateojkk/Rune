@@ -1,4 +1,5 @@
 import uuid
+import secrets
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, Text, DateTime, JSON, Integer, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
@@ -7,6 +8,10 @@ from server.database import Base
 
 def _uuid():
     return str(uuid.uuid4())
+
+
+def _publish_id():
+    return secrets.token_urlsafe(8)
 
 
 def _now():
@@ -57,6 +62,7 @@ class Form(Base):
     profile_picture = Column(Text, nullable=True)
     cover_picture = Column(Text, nullable=True)
     is_published = Column(Boolean, default=False)
+    publish_id = Column(String(32), unique=True, nullable=True, default=None)
     created_at = Column(DateTime, default=_now)
     updated_at = Column(DateTime, default=_now, onupdate=_now)
 

@@ -111,6 +111,7 @@ export async function getAllForms(): Promise<FormSchema[]> {
       profilePicture: f.profilePicture,
       coverPicture: f.coverPicture,
       isPublished: f.isPublished,
+      publishId: f.publishId,
       walletAddress: f.walletAddress || '',
     }));
     return _formCache;
@@ -131,6 +132,7 @@ export async function getForm(formId: string): Promise<FormSchema | null> {
       createdAt: f.createdAt, updatedAt: f.updatedAt,
       blobId: f.blobId, profilePicture: f.profilePicture,
       coverPicture: f.coverPicture, isPublished: f.isPublished,
+      publishId: f.publishId,
       walletAddress: f.walletAddress || '',
     };
   } catch {
@@ -158,6 +160,7 @@ export async function createForm(title: string, description: string, workspaceId
     createdAt: f.createdAt, updatedAt: f.updatedAt,
     blobId: f.blobId, profilePicture: f.profilePicture,
     coverPicture: f.coverPicture, isPublished: f.isPublished,
+    publishId: f.publishId,
     walletAddress: getCurrentUserAddress() || '',
   };
   _formCache.push(form);

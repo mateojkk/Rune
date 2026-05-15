@@ -57,6 +57,7 @@ function BuilderInner() {
   const [profilePicture, setProfilePicture] = useState('');
   const [coverPicture, setCoverPicture] = useState('');
   const [isPublished, setIsPublished] = useState(false);
+  const [publishId, setPublishId] = useState<string | undefined>(undefined);
 
   const paletteRef = useRef<HTMLDivElement>(null);
 
@@ -101,6 +102,7 @@ function BuilderInner() {
            setProfilePicture(form.profilePicture || '');
           setCoverPicture(form.coverPicture || '');
           setIsPublished(!!form.isPublished);
+          setPublishId(form.publishId);
           setSaved(false);
         }
       }
@@ -211,7 +213,10 @@ function BuilderInner() {
   const copyLink = async () => {
     if (!currentFormId) return;
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/${currentFormId}`);
+      const link = publishId
+        ? `${window.location.origin}/form/${publishId}`
+        : `${window.location.origin}/${currentFormId}`;
+      await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* */ }
@@ -396,11 +401,11 @@ function BuilderInner() {
                 <div className="b-share-link" style={{ marginTop: 12 }}>
                   <span className="b-share-label">Public Link</span>
                   <div className="b-share-row">
-                    <input type="text" className="b-share-input" value={`${window.location.origin}/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
+                    <input type="text" className="b-share-input" value={`${window.location.origin}/form/${publishId || currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
                     <button className="b-share-copy" onClick={copyLink}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
                   </div>
                   <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                    <Link to={`/${currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', fontSize: '0.7rem' }}>
+                    <Link to={`/form/${publishId || currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', fontSize: '0.7rem' }}>
                       <ExternalLink size={12} /> View Live
                     </Link>
                     <Link to={`/${currentFormId}?preview=true`} className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', fontSize: '0.7rem', opacity: 0.7 }}>
@@ -641,7 +646,7 @@ function BuilderInner() {
                   <input
                     type="text"
                     className="b-share-input"
-                    value={`${window.location.origin}/${currentFormId}`}
+                    value={`${window.location.origin}/form/${publishId || currentFormId}`}
                     readOnly
                     onClick={e => (e.target as HTMLInputElement).select()}
                   />

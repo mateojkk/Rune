@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import Optional
 
+import secrets
 from server.database import SessionLocal, init_db, get_db
 from server.handlers.auth import get_current_user_address
 from server.models.db import User, Workspace, Form, Submission as SubmissionModel
@@ -57,6 +58,7 @@ def _form_out(f: Form) -> FormOut:
         profilePicture=f.profile_picture,
         coverPicture=f.cover_picture,
         isPublished=f.is_published or False,
+        publishId=f.publish_id,
         walletAddress=f.user_address,
         createdAt=f.created_at.isoformat(),
         updatedAt=f.updated_at.isoformat(),
@@ -168,6 +170,16 @@ def create_form(body: FormCreate, db: Session = Depends(get_db), address: str = 
     return _form_out(f)
 
 
+@router.get("/forms/by-publish/{publish_id}", response_model=FormOut)
+def get_form_by_publish_id(publish_id: str, db: Session = Depends(get_db)):
+    f = db.query(Form).filter(Form.publish_id == publish_id).first()
+    if not f:
+        raise HTTPException(404, "Form not found")
+    if not f.is_published:
+        raise HTTPException(404, "Form not found")
+    return _form_out(f)
+
+
 @router.get("/forms/{uuid}", response_model=FormOut)
 def get_form(uuid: str, db: Session = Depends(get_db)):
     f = db.query(Form).filter(Form.uuid == uuid).first()
@@ -195,6 +207,10 @@ def update_form(uuid: str, body: FormUpdate, db: Session = Depends(get_db), addr
         f.cover_picture = body.cover_picture
     if body.is_published is not None:
         f.is_published = body.is_published
+        if body.is_published:
+            f.publish_id = secrets.token_urlsafe(8)
+        else:
+            f.publish_id = None
     db.commit()
     db.refresh(f)
     return _form_out(f)
