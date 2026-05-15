@@ -7,6 +7,8 @@ import { fetchProfile } from '../lib/forms';
 export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   const fetchConfig = useConfigStore((s) => s.fetchConfig);
   const account = useWalletStore((s) => s.account);
+  const jwt = useWalletStore((s) => s.jwt);
+  const token = useWalletStore((s) => s.token);
   const theme = useProfileStore((s) => s.theme);
   const setDisplayName = useProfileStore((s) => s.setDisplayName);
   const setPfp = useProfileStore((s) => s.setPfp);

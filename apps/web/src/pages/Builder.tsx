@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot, ExternalLink } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
 import './Builder.css';
@@ -382,10 +382,28 @@ function BuilderInner() {
               >
                 {saving ? 'Saving...' : saved ? <><CheckSquare size={15} /> Saved</> : <><Save size={15} /> Save Form</>}
               </button>
-              <Link to={`/app/form/${currentFormId}`} className="b-view-btn">
-                <Eye size={15} />
-                Preview Form
-              </Link>
+              
+              <button className={`b-publish-btn ${isPublished ? 'active' : ''}`} onClick={handlePublish} style={{ width: '100%', marginTop: 8 }}>
+                {isPublished ? 'Unpublish' : 'Publish'}
+              </button>
+
+              {currentFormId && isPublished && (
+                <div className="b-share-link" style={{ marginTop: 12 }}>
+                  <span className="b-share-label">Public Link</span>
+                  <div className="b-share-row">
+                    <input type="text" className="b-share-input" value={`${window.location.origin}/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
+                    <button className="b-share-copy" onClick={copyLink}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <Link to={`/${currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', fontSize: '0.7rem' }}>
+                      <ExternalLink size={12} /> View Live
+                    </Link>
+                    <Link to={`/${currentFormId}?preview=true`} className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', fontSize: '0.7rem', opacity: 0.7 }}>
+                      <Eye size={12} /> Preview
+                    </Link>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <button className="b-create-btn" onClick={handleCreateForm}>
