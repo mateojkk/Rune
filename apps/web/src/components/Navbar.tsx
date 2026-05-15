@@ -53,6 +53,11 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', handler);
   }, [showDropdown]);
 
+  useEffect(() => {
+    // Reset stuck logging state on mount
+    useWalletStore.getState().setLoggingIn(false);
+  }, []);
+
   const handleZkLogin = async (provider: OAuthProvider) => {
     setConnecting(true);
     try {
