@@ -572,7 +572,7 @@ function BuilderInner() {
                         </div>
                       )}
 
-                      {(field.type === 'text' || field.type === 'number' || field.type === 'url' || field.type === 'email' || field.type === 'phone' || field.type === 'date') && editingField === field.id && (
+                      {(field.type === 'text' || field.type === 'textarea' || field.type === 'richtext' || field.type === 'number' || field.type === 'url' || field.type === 'email' || field.type === 'phone' || field.type === 'date' || field.type === 'file' || field.type === 'image' || field.type === 'video') && editingField === field.id && (
                         <input
                           type="text"
                           className="b-input b-placeholder-input"
