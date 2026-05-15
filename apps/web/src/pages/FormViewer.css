@@ -161,16 +161,68 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 20px;
-  max-width: 680px;
+  gap: 32px;
+  max-width: 540px;
   width: 100%;
   position: relative;
   z-index: 1;
-  padding: 40px;
+  padding: 48px;
   background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
+}
+
+.fv-start-profile {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fv-start-profile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fv-start-body h1 {
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.fv-start-body p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  max-width: 32ch;
+  margin: -8px 0 0;
+}
+
+.fv-start-btn {
+  height: 44px;
+  padding: 0 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fv-start-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
 }
 
 .fv-flow {
