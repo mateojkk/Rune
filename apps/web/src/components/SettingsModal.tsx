@@ -21,7 +21,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     setTheme(currentTheme);
     try {
       await saveProfile({
-        displayName: name.trim() || undefined,
+        display_name: name.trim() || undefined,
         pfp: pfpUrl.trim() || undefined,
         theme: currentTheme,
       });

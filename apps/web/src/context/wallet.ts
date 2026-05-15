@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { clearCurrentUser, setCurrentUser } from '../lib/forms';
+import { useProfileStore } from '../stores/profile';
 
 export type ConnectionMethod = 'zklogin' | 'wallet';
 
@@ -91,6 +92,7 @@ export const useWalletStore = create<WalletState>()(
         });
 
         clearCurrentUser();
+        useProfileStore.getState().reset();
         
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('rune_jwt');

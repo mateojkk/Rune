@@ -295,10 +295,6 @@ export async function fetchProfile(): Promise<{ displayName: string; pfp: string
   }
 }
 
-export async function saveProfile(profile: { displayName?: string; pfp?: string; theme?: string }): Promise<void> {
-  const body: Record<string, unknown> = {};
-  if (profile.displayName !== undefined) body.display_name = profile.displayName;
-  if (profile.pfp !== undefined) body.pfp = profile.pfp;
-  if (profile.theme !== undefined) body.theme = profile.theme;
-  await updateProfileApi(body);
+export async function saveProfile(profile: { display_name?: string; pfp?: string; theme?: string }): Promise<void> {
+  await updateProfileApi(profile);
 }

@@ -21,15 +21,18 @@ export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    if (!account?.address) return;
+    if (!account?.address || (!jwt && !token)) return;
     (async () => {
-      const p = await fetchProfile();
-      if (p.displayName) setDisplayName(p.displayName);
-      if (p.pfp) setPfp(p.pfp);
-      if (p.theme) setTheme(p.theme as 'light' | 'dark');
+      try {
+        const p = await fetchProfile();
+        setDisplayName(p.displayName || '');
+        setPfp(p.pfp || '');
+        setTheme((p.theme as 'light' | 'dark') || 'light');
+      } catch (e) {
+        console.error('Failed to fetch profile:', e);
+      }
     })();
-  }, [account?.address]);
-  // Only run when account address changes, not profile actions
+  }, [account?.address, jwt, token, setDisplayName, setPfp, setTheme]);
 
   return <>{children}</>;
 }

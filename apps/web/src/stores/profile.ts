@@ -10,6 +10,7 @@ interface ProfileState {
   setPfp: (url: string) => void;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  reset: () => void;
 }
 
 export const useProfileStore = create<ProfileState>()((set, get) => ({
@@ -20,4 +21,5 @@ export const useProfileStore = create<ProfileState>()((set, get) => ({
   setPfp: (url: string) => set({ pfp: url }),
   setTheme: (theme: Theme) => set({ theme }),
   toggleTheme: () => set({ theme: get().theme === 'dark' ? 'light' : 'dark' }),
+  reset: () => set({ displayName: '', pfp: '', theme: 'light' }),
 }));
