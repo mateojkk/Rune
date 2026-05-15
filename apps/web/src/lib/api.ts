@@ -15,6 +15,10 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     }
   }
 
+  if (import.meta.env.DEV) {
+    console.debug(`[API] Request to ${path} - Auth present: ${!!token}`);
+  }
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options?.headers as any,
@@ -27,15 +31,13 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     headers,
   });
 
-  if (res.status === 401) {
-    // Stale or invalid token - clear it
+    if (res.status === 401) {
+    // Stale or invalid token - clear it aggressively
     if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('rune_token');
-      sessionStorage.removeItem('rune_jwt');
-      // We don't want to force a reload in the middle of a render, 
-      // but we should clear the store.
-      const { useWalletStore } = await import('../context/wallet');
-      useWalletStore.getState().disconnect();
+      console.warn('Unauthorized request detected. Clearing session...');
+      sessionStorage.clear();
+      localStorage.removeItem('rune-wallet-storage');
+      window.location.href = '/';
     }
     throw new Error('Unauthorized');
   }
