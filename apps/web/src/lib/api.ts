@@ -10,12 +10,26 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     headers['Authorization'] = `Bearer ${token}`;
   }
   const res = await fetch(`${API_BASE}/api/data${path}`, {
-    headers,
     ...options,
+    headers,
   });
+
+  if (res.status === 401) {
+    // Stale or invalid token - clear it
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('rune_token');
+      sessionStorage.removeItem('rune_jwt');
+      // We don't want to force a reload in the middle of a render, 
+      // but we should clear the store.
+      const { useWalletStore } = await import('../context/wallet');
+      useWalletStore.getState().disconnect();
+    }
+    throw new Error('Unauthorized');
+  }
+
   if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || `Request failed: ${res.status}`);
+    const err = await res.json().catch(() => ({ detail: 'Unknown error' }));
+    throw new Error(err.detail || 'Request failed');
   }
   return res.json();
 }
@@ -84,6 +98,14 @@ export async function createWorkspaceApi(name: string): Promise<WorkspaceDTO> {
     method: 'POST',
     body: JSON.stringify({ name }),
   });
+}
+
+export async function deleteWorkspaceApi(uuid: string): Promise<void> {
+  await req(`/workspaces/${uuid}`, { method: 'DELETE' });
+}
+
+export async function renameWorkspaceApi(uuid: string, name: string): Promise<void> {
+  await req(`/workspaces/${uuid}?name=${encodeURIComponent(name)}`, { method: 'PUT' });
 }
 
 // --- Forms ---

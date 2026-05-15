@@ -1,5 +1,5 @@
 import type { FormSchema, FormSubmission, FormField, UserProfile, Workspace } from '../types/form';
-import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi, getProfileApi, updateProfileApi, type SubmissionCreatePayload } from './api';
+import { getWorkspaces as apiGetWorkspaces, createWorkspaceApi, deleteWorkspaceApi, renameWorkspaceApi, getForms, getFormApi, createFormApi, updateFormApi, deleteFormApi, getSubmissionsApi, createSubmissionApi, deleteSubmissionApi, getProfileApi, updateProfileApi, type SubmissionCreatePayload } from './api';
 export type { Workspace };
 
 // --- Synchronous helpers (local state) ---
@@ -84,23 +84,12 @@ export async function createWorkspace(name: string): Promise<Workspace> {
   return { id: w.uuid, name: w.name, formIds: w.formIds, createdAt: w.createdAt, updatedAt: w.updatedAt };
 }
 
-async function _fetch(url: string, opts?: RequestInit): Promise<void> {
-  const token = typeof window !== 'undefined' ? sessionStorage.getItem('rune_token') : null;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(url, { ...opts, headers });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(body || `Request failed: ${res.status}`);
-  }
-}
-
 export async function renameWorkspace(workspaceId: string, name: string): Promise<void> {
-  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}`, { method: 'PUT' });
+  await renameWorkspaceApi(workspaceId, name);
 }
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
-  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}`, { method: 'DELETE' });
+  await deleteWorkspaceApi(workspaceId);
 }
 
 // --- Forms ---
