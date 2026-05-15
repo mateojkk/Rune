@@ -221,7 +221,6 @@ export function FormViewer() {
       const ownerAddress = form.walletAddress;
       if (!ownerAddress) throw new Error('Form owner address not found. Cannot encrypt.');
 
-      // Import encryption helper from encrypted-storage lib
       const { encryptAndStoreWithWallet } = await import('../lib/encrypted-storage');
 
       const { blobId } = await encryptAndStoreWithWallet(
@@ -229,20 +228,7 @@ export function FormViewer() {
         ownerAddress,
         walletAddr,
         async (tx: any) => {
-          // Robust handling for different wallet feature versions
-          if (walletRef.features['sui:signAndExecuteTransactionBlock']) {
-            return await walletRef.features['sui:signAndExecuteTransactionBlock'].signAndExecuteTransactionBlock({
-              transactionBlock: tx,
-              account: walletRef.accounts[0],
-            });
-          } else if (walletRef.features['sui:signAndExecuteTransaction']) {
-            return await walletRef.features['sui:signAndExecuteTransaction'].signAndExecuteTransaction({
-              transaction: tx,
-              account: walletRef.accounts[0],
-            });
-          } else {
-            throw new Error('Wallet does not support transaction signing.');
-          }
+          return await walletRef.signAndExecuteTransaction(tx);
         }
       );
 
