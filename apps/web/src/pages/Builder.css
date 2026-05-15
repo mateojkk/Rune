@@ -1404,3 +1404,25 @@
     font-size: 0.82rem;
   }
 }
+
+/* Field Preview Enhancements */
+.radio-fake {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.b-textarea-preview {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--subtle);
+  font-size: 0.85rem;
+  resize: none;
+  font-family: inherit;
+  margin-top: 4px;
+}

@@ -52,6 +52,7 @@ export interface FormDTO {
   profilePicture?: string;
   coverPicture?: string;
   isPublished?: boolean;
+  walletAddress?: string;
   createdAt: string;
   updatedAt: string;
 }

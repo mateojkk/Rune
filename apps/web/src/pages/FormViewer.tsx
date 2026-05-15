@@ -4,7 +4,6 @@ import { Star, Upload, ArrowLeft, ArrowRight, Wallet, ExternalLink, Clock, Alert
 import type { FormSchema } from '../types/form';
 import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
-import { encryptAndStoreWithWallet } from '../lib/encrypted-storage';
 import { getFormApi } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
 import { getSuiChain } from '../lib/network';
@@ -222,8 +221,8 @@ export function FormViewer() {
       const ownerAddress = form.walletAddress;
       if (!ownerAddress) throw new Error('Form owner address not found. Cannot encrypt.');
 
-      // Import encryption helper from walrus lib
-      const { encryptAndStoreWithWallet } = await import('../lib/walrus');
+      // Import encryption helper from encrypted-storage lib
+      const { encryptAndStoreWithWallet } = await import('../lib/encrypted-storage');
 
       const { blobId } = await encryptAndStoreWithWallet(
         finalData,
