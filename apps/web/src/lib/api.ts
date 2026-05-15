@@ -1,14 +1,34 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('rune_token') : null;
+  const headers: Record<string, string> = { 
+    'Content-Type': 'application/json', 
+    ...options?.headers as any 
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE}/api/data${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    headers,
     ...options,
   });
   if (!res.ok) {
     const body = await res.text();
     throw new Error(body || `Request failed: ${res.status}`);
   }
+  return res.json();
+}
+
+export async function loginApi(address: string, message: string, signature: string): Promise<{ token: string }> {
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ address, message, signature }),
+  });
+  if (!res.ok) throw new Error('Login failed');
   return res.json();
 }
 
@@ -33,7 +53,7 @@ export interface FormDTO {
   blobId?: string;
   profilePicture?: string;
   coverPicture?: string;
-  is_published?: boolean;
+  isPublished?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -44,6 +44,7 @@ class FormUpdate(BaseModel):
     blob_id: Optional[str] = None
     profile_picture: Optional[str] = None
     cover_picture: Optional[str] = None
+    is_published: Optional[bool] = None
 
 class FormOut(BaseModel):
     id: str
@@ -54,6 +55,7 @@ class FormOut(BaseModel):
     blobId: Optional[str] = None
     profilePicture: Optional[str] = None
     coverPicture: Optional[str] = None
+    isPublished: bool = False
     createdAt: str
     updatedAt: str
 

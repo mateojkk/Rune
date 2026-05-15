@@ -4,6 +4,7 @@ import { Wallet, LogOut, Copy, Loader2, Settings, ChevronDown } from 'lucide-rea
 import { useWalletStore } from '../context/wallet';
 import { getCurrentUserAddress, setCurrentUser } from '../lib/forms';
 import { getOAuthUrl, clearSession, type OAuthProvider } from '../lib/zklogin';
+import { loginWithWallet } from '../lib/auth-helper';
 import { useProfileStore } from '../stores/profile';
 import { useBalances } from '../hooks/useBalances';
 import { WalletLogin } from './WalletLogin';
@@ -161,10 +162,17 @@ export function Navbar() {
               </div>
             ) : (
               <div className="login-body">
-                <WalletLogin onConnected={(addr) => {
-                  connectWallet(addr, 'wallet-extension');
-                  setShowLogin(false);
-                  navigate('/app/dashboard');
+                <WalletLogin onConnected={async (addr, sign) => {
+                  try {
+                    connectWallet(addr, 'wallet-extension');
+                    const token = await loginWithWallet(addr, sign);
+                    useWalletStore.getState().setToken(token);
+                    setShowLogin(false);
+                    navigate('/app/dashboard');
+                  } catch (e) {
+                    console.error('Login failed:', e);
+                    alert('Authentication failed. Please try again.');
+                  }
                 }} />
               </div>
             )}

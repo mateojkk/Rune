@@ -29,3 +29,9 @@ def init_db():
     except Exception as e:
         import sys
         print(f"WARNING: DB migration failed: {e}", file=sys.stderr)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

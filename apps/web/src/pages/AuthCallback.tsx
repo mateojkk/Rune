@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { handleOAuthCallback } from '../lib/zklogin';
 import { useWalletStore } from '../context/wallet';
+import { loginWithEphemeralKey } from '../lib/auth-helper';
 import './FormViewer.css';
 
 export function AuthCallback() {
   const navigate = useNavigate();
-  const connectZkLogin = useWalletStore((s) => s.connectZkLogin);
+  const { connectZkLogin, setToken } = useWalletStore();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -20,7 +21,13 @@ export function AuthCallback() {
           throw new Error('No Google sign-in response was found.');
         }
 
-        connectZkLogin(result.address, result.provider, result.jwt, result.session.ephemeralKeyPair.privateKey);
+        const privKey = result.session.ephemeralKeyPair.privateKey;
+        connectZkLogin(result.address, result.provider, result.jwt, privKey);
+        
+        // LOGIN to backend
+        const token = await loginWithEphemeralKey(result.address, privKey);
+        setToken(token);
+
         window.location.hash = '';
 
         if (!cancelled) {

@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from server.config import API_HOST, API_PORT, get_network, is_mainnet, get_settings
 from server.models import ZkProofRequest
 from server.handlers.data import router as data_router
+from server.handlers.auth import router as auth_router
 from server.database import init_db
 
 
@@ -24,6 +25,7 @@ app.add_middleware(
 )
 
 app.include_router(data_router)
+app.include_router(auth_router)
 
 
 @app.get("/api/config")
@@ -45,33 +47,41 @@ def network_info():
 
 
 @app.post("/api/zklogin/prove")
-def zk_proof(request: ZkProofRequest):
+async def zk_proof(request: ZkProofRequest):
     try:
-        import hashlib
-        import json
-
-        nonce_inputs = f"{request.ephemeral_public_key}:{request.max_epoch}:{request.jwt_randomness}"
-        nonce_hash = hashlib.sha256(nonce_inputs.encode()).hexdigest()[:40]
-
-        addr_seed = f"{request.sub}:{request.user_salt}:{request.kc_name}"
-        addr_seed_hash = hashlib.sha256(addr_seed.encode()).hexdigest()
-
-        proof = {
-            "proof": {
-                "a": [nonce_hash[:20], nonce_hash[20:40]],
-                "b": [[addr_seed_hash[:16], addr_seed_hash[16:32]]],
-                "c": [addr_seed_hash[32:48], addr_seed_hash[48:64]],
-            },
-            "commitment": addr_seed_hash[:64],
-            "nonce": nonce_hash,
-            "address_seed": addr_seed_hash[:64],
+        import httpx
+        
+        # Determine prover URL based on network
+        is_main = is_mainnet()
+        prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
+        
+        payload = {
+            "jwt": request.jwt,
+            "extendedEphemeralPublicKey": request.ephemeral_public_key,
+            "maxEpoch": str(request.max_epoch),
+            "jwtRandomness": request.jwt_randomness,
+            "salt": request.user_salt,
+            "keyClaimName": request.kc_name
         }
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(prover_url, json=payload, timeout=30.0)
+            
+        if response.status_code != 200:
+            error_data = response.json()
+            raise HTTPException(status_code=response.status_code, detail=f"Prover error: {error_data}")
+            
+        proof = response.json()
 
         return {
             "proof": proof,
             "network": get_network(),
             "max_epoch": request.max_epoch,
         }
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         if isinstance(e, HTTPException):
             raise e

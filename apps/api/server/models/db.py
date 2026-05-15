@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Text, DateTime, JSON, Integer
+from sqlalchemy import Column, String, Text, DateTime, JSON, Integer, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 from server.database import Base
 
 
@@ -23,6 +24,9 @@ class User(Base):
     created_at = Column(DateTime, default=_now)
     updated_at = Column(DateTime, default=_now, onupdate=_now)
 
+    workspaces = relationship("Workspace", back_populates="user", cascade="all, delete-orphan")
+    forms = relationship("Form", back_populates="user", cascade="all, delete-orphan")
+
 
 class Workspace(Base):
     __tablename__ = "workspaces"
@@ -31,9 +35,12 @@ class Workspace(Base):
     uuid = Column(String(36), unique=True, nullable=False, default=_uuid)
     name = Column(String(255), nullable=False)
     description = Column(Text, default="")
-    user_address = Column(String(128), nullable=False, index=True)
+    user_address = Column(String(128), ForeignKey("users.address", ondelete="CASCADE"), nullable=False, index=True)
     created_at = Column(DateTime, default=_now)
     updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+    user = relationship("User", back_populates="workspaces")
+    forms = relationship("Form", back_populates="workspace", cascade="all, delete-orphan")
 
 
 class Form(Base):
@@ -43,14 +50,19 @@ class Form(Base):
     uuid = Column(String(36), unique=True, nullable=False, default=_uuid)
     title = Column(String(255), nullable=False, default="")
     description = Column(Text, default="")
-    workspace_uuid = Column(String(36), nullable=False, index=True)
-    user_address = Column(String(128), nullable=False, index=True)
+    workspace_uuid = Column(String(36), ForeignKey("workspaces.uuid", ondelete="CASCADE"), nullable=False, index=True)
+    user_address = Column(String(128), ForeignKey("users.address", ondelete="CASCADE"), nullable=False, index=True)
     fields = Column(JSON, default=list)
     blob_id = Column(String(255), nullable=True)
     profile_picture = Column(Text, nullable=True)
     cover_picture = Column(Text, nullable=True)
+    is_published = Column(Boolean, default=False)
     created_at = Column(DateTime, default=_now)
     updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+    workspace = relationship("Workspace", back_populates="forms")
+    user = relationship("User", back_populates="forms")
+    submissions = relationship("Submission", back_populates="form", cascade="all, delete-orphan")
 
 
 class Submission(Base):
@@ -58,8 +70,10 @@ class Submission(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     uuid = Column(String(36), unique=True, nullable=False, default=_uuid)
-    form_uuid = Column(String(36), nullable=False, index=True)
+    form_uuid = Column(String(36), ForeignKey("forms.uuid", ondelete="CASCADE"), nullable=False, index=True)
     data = Column(JSON, default=dict)
     wallet_address = Column(String(128), nullable=True)
     submitted_at = Column(DateTime, default=_now)
     blob_id = Column(String(255), nullable=True)
+
+    form = relationship("Form", back_populates="submissions")

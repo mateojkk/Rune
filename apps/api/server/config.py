@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     seal_key_server_2: Optional[str] = Field(default=None, validation_alias='SEAL_KEY_SERVER_2')
 
     database_url: Optional[str] = Field(default=None, validation_alias='DATABASE_URL')
+    jwt_secret: str = Field(default='rune-fallback-secret-hackathon-2024', validation_alias='JWT_SECRET')
+    jwt_algorithm: str = Field(default='HS256', validation_alias='JWT_ALGORITHM')
 
     @field_validator('network', mode='before')
     @classmethod

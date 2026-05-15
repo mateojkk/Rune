@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Wallet, Loader2 } from 'lucide-react';
 
-export function WalletLogin({ onConnected }: { onConnected: (address: string) => void }) {
+export function WalletLogin({ onConnected }: { onConnected: (address: string, sign: (msg: { message: Uint8Array }) => Promise<any>) => void }) {
   const [WalletProvider, setWalletProvider] = useState<any>(null);
   const [Inner, setInner] = useState<any>(null);
 
@@ -10,11 +10,11 @@ export function WalletLogin({ onConnected }: { onConnected: (address: string) =>
       const kit = await import('@suiet/wallet-kit');
       setWalletProvider(() => kit.WalletProvider);
       setInner(() => function WalletInner() {
-        const { address, select, connecting, allAvailableWallets } = kit.useWallet();
+        const { address, select, connecting, allAvailableWallets, signPersonalMessage } = kit.useWallet();
 
         useEffect(() => {
-          if (address) onConnected(address);
-        }, [address]);
+          if (address && signPersonalMessage) onConnected(address, signPersonalMessage);
+        }, [address, signPersonalMessage]);
 
         return (
           <>
