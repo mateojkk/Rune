@@ -32,6 +32,7 @@ export function AppPage() {
 
   const jwt = useWalletStore(s => s.jwt);
   const token = useWalletStore(s => s.token);
+  const isLoggingIn = useWalletStore(s => s.isLoggingIn);
 
   useEffect(() => {
     const unsub = useWalletStore.persist.onFinishHydration(() => setHydrated(true));
@@ -40,15 +41,15 @@ export function AppPage() {
   }, []);
 
   const refresh = async () => {
-    if (!account?.address || (!jwt && !token)) return;
+    if (!account?.address || (!jwt && !token) || isLoggingIn) return;
     setWorkspaces(await getWorkspaces());
   };
 
   useEffect(() => {
-    if (hydrated && account?.address && (jwt || token)) {
+    if (hydrated && account?.address && (jwt || token) && !isLoggingIn) {
       refresh();
     }
-  }, [path, hydrated, account?.address, jwt, token]);
+  }, [path, hydrated, account?.address, jwt, token, isLoggingIn]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

@@ -9,6 +9,7 @@ export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   const account = useWalletStore((s) => s.account);
   const jwt = useWalletStore((s) => s.jwt);
   const token = useWalletStore((s) => s.token);
+  const isLoggingIn = useWalletStore((s) => s.isLoggingIn);
   const theme = useProfileStore((s) => s.theme);
   const setDisplayName = useProfileStore((s) => s.setDisplayName);
   const setPfp = useProfileStore((s) => s.setPfp);
@@ -23,7 +24,7 @@ export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    if (!account?.address || (!jwt && !token)) return;
+    if (!account?.address || (!jwt && !token) || isLoggingIn) return;
     (async () => {
       try {
         const p = await fetchProfile();

@@ -18,9 +18,11 @@ interface WalletState {
   account: WalletAccount | null;
   jwt: string | null;
   token: string | null;
+  isLoggingIn: boolean;
   ephemeralPrivateKey: string | null;
   
-  setToken: (token: string) => void;
+  setToken: (token: string | null) => void;
+  setLoggingIn: (val: boolean) => void;
   connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => void;
   connectWallet: (address: string, provider: string, publicKey?: string) => void;
   disconnect: () => void;
@@ -34,14 +36,19 @@ export const useWalletStore = create<WalletState>()(
       account: null,
       jwt: null,
       token: null,
+      isLoggingIn: false,
       ephemeralPrivateKey: null,
 
-      setToken: (token: string) => {
+      setToken: (token: string | null) => {
         set({ token });
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && token) {
           sessionStorage.setItem('rune_token', token);
+        } else if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('rune_token');
         }
       },
+
+      setLoggingIn: (val: boolean) => set({ isLoggingIn: val }),
 
       connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => {
         const normalizedAddress = address.toLowerCase();
@@ -89,6 +96,7 @@ export const useWalletStore = create<WalletState>()(
           jwt: null,
           token: null,
           ephemeralPrivateKey: null,
+          isLoggingIn: false,
         });
 
         clearCurrentUser();
@@ -113,6 +121,8 @@ export const useWalletStore = create<WalletState>()(
       partialize: (state) => ({
         isConnected: state.isConnected,
         account: state.account,
+        jwt: state.jwt,
+        token: state.token,
       }),
     }
   )

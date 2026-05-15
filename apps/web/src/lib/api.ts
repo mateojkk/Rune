@@ -7,16 +7,23 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
 
   // Pull token from persisted Zustand storage
   let token = null;
+  let isLoggingIn = false;
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem('rune-wallet-storage');
+      const stored = localStorage.getItem('rune-wallet');
       if (stored) {
         const parsed = JSON.parse(stored);
         token = parsed.state.jwt || parsed.state.token || null;
+        isLoggingIn = !!parsed.state.isLoggingIn;
       }
     } catch (e) {
       /* ignore */
     }
+  }
+
+  if (isLoggingIn && path !== '/profile') {
+    // Block background data fetches during login, but allow profile fetch if it's the one triggered by login
+    throw new Error('Login in progress...');
   }
 
   const headers: Record<string, string> = {
