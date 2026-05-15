@@ -27,14 +27,16 @@ async function writeBlobFlow(
   await flow.encode();
 
   const regTx = flow.register({ epochs: 2, owner: address, deletable: false });
-  const regResult = await signTx(regTx as unknown as Record<string, unknown>);
+  const regBytes = await regTx.build({ client: client as any });
+  const regResult = await signTx({ transaction: regBytes as any });
   const r = regResult as Record<string, unknown>;
   const digest = (r?.digest as string) || ((r?.effects as Record<string, unknown>)?.transactionDigest as string);
   if (!digest) throw new Error('Registration failed');
   await flow.upload({ digest });
 
   const certTx = flow.certify();
-  await signTx(certTx as unknown as Record<string, unknown>);
+  const certBytes = await certTx.build({ client: client as any });
+  await signTx({ transaction: certBytes as any });
 
   const blobId = (flow as unknown as Record<string, unknown>).blobId as string;
   if (!blobId) throw new Error('No blobId from Walrus flow');
