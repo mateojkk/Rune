@@ -439,9 +439,19 @@
 }
 
 .fv-textarea {
-  resize: none;
+  resize: vertical;
   line-height: 1.6;
-  min-height: 100px;
+  min-height: 120px;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  padding: 12px !important;
+  background: rgba(255, 255, 255, 0.03);
+  margin-top: 24px;
+}
+
+.fv-textarea:focus {
+  border-color: var(--muted) !important;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .fv-select {
