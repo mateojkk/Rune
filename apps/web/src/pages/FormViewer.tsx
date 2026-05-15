@@ -112,6 +112,10 @@ export function FormViewer() {
   const [minLoadingDone, setMinLoadingDone] = useState(false);
 
   useEffect(() => {
+    // Safety check: Clear any stuck logging state
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('rune_is_logging_in');
+    }
     const timer = setTimeout(() => setMinLoadingDone(true), 2000);
     return () => clearTimeout(timer);
   }, []);
