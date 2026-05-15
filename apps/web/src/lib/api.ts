@@ -2,26 +2,29 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 let isRedirecting = false;
 
-let walletStore: any = null;
-
-async function getWalletState() {
-  if (typeof window === 'undefined') return { token: null, jwt: null, isLoggingIn: false };
-  if (!walletStore) {
-    try {
-      walletStore = (await import('../context/wallet')).useWalletStore;
-    } catch (e) {
-      return { token: null, jwt: null, isLoggingIn: false };
-    }
-  }
-  return walletStore.getState();
-}
-
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
   if (isRedirecting) throw new Error('Redirecting...');
 
-  const state = await getWalletState();
-  const token = state.jwt || state.token || null;
-  const isLoggingIn = !!state.isLoggingIn;
+  let token = null;
+  let isLoggingIn = false;
+
+  if (typeof window !== 'undefined') {
+    const w = window as any;
+    if (w.__getRuneToken) {
+      token = w.__getRuneToken();
+      isLoggingIn = w.__isRuneLoggingIn();
+    } else {
+      // Fallback to localStorage if the store hasn't mounted yet
+      try {
+        const stored = localStorage.getItem('rune-wallet');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          token = parsed.state.jwt || parsed.state.token || null;
+          isLoggingIn = !!parsed.state.isLoggingIn;
+        }
+      } catch (e) {}
+    }
+  }
 
   if (isLoggingIn) {
     // Block ALL background data fetches during login
@@ -32,7 +35,9 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     'Content-Type': 'application/json',
     ...options?.headers as any,
   };
-  headers['Authorization'] = `Bearer ${token}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${API_BASE}/api/data${path}`, {
     ...options,
@@ -45,6 +50,14 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     
     if (typeof window !== 'undefined') {
       console.warn('[API] 401 detected. Clearing session and resetting...');
+      
+      // Crucial: Clear Zustand state in memory BEFORE clearing localStorage,
+      // otherwise Zustand will write the stale token back to localStorage on page unload!
+      const w = window as any;
+      if (w.__disconnectRune) {
+        try { w.__disconnectRune(); } catch (e) {}
+      }
+
       localStorage.removeItem('rune-wallet');
       sessionStorage.clear();
       window.location.href = '/';
