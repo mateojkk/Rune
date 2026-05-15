@@ -2,15 +2,13 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
   const token = typeof window !== 'undefined' ? sessionStorage.getItem('rune_token') : null;
-  const headers: Record<string, string> = { 
-    'Content-Type': 'application/json', 
-    ...options?.headers as any 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options?.headers as any,
   };
-  
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-
   const res = await fetch(`${API_BASE}/api/data${path}`, {
     headers,
     ...options,
@@ -76,12 +74,12 @@ export interface SubmissionCreatePayload {
 
 // --- Workspaces ---
 
-export async function getWorkspaces(address: string): Promise<WorkspaceDTO[]> {
-  return req(`/workspaces?address=${encodeURIComponent(address)}`);
+export async function getWorkspaces(): Promise<WorkspaceDTO[]> {
+  return req(`/workspaces`);
 }
 
-export async function createWorkspaceApi(address: string, name: string): Promise<WorkspaceDTO> {
-  return req(`/workspaces?address=${encodeURIComponent(address)}`, {
+export async function createWorkspaceApi(name: string): Promise<WorkspaceDTO> {
+  return req(`/workspaces`, {
     method: 'POST',
     body: JSON.stringify({ name }),
   });
@@ -89,9 +87,9 @@ export async function createWorkspaceApi(address: string, name: string): Promise
 
 // --- Forms ---
 
-export async function getForms(address: string, workspaceId?: string): Promise<FormDTO[]> {
-  let url = `/forms?address=${encodeURIComponent(address)}`;
-  if (workspaceId) url += `&workspace_id=${encodeURIComponent(workspaceId)}`;
+export async function getForms(workspaceId?: string): Promise<FormDTO[]> {
+  let url = `/forms`;
+  if (workspaceId) url += `?workspace_id=${encodeURIComponent(workspaceId)}`;
   return req(url);
 }
 
@@ -103,22 +101,22 @@ export async function getFormApi(uuid: string): Promise<FormDTO | null> {
   }
 }
 
-export async function createFormApi(address: string, title: string, description: string, workspaceId: string): Promise<FormDTO> {
-  return req(`/forms?address=${encodeURIComponent(address)}`, {
+export async function createFormApi(title: string, description: string, workspaceId: string): Promise<FormDTO> {
+  return req(`/forms`, {
     method: 'POST',
     body: JSON.stringify({ title, description, workspace_uuid: workspaceId }),
   });
 }
 
-export async function updateFormApi(address: string, uuid: string, data: Record<string, unknown>): Promise<FormDTO> {
-  return req(`/forms/${uuid}?address=${encodeURIComponent(address)}`, {
+export async function updateFormApi(uuid: string, data: Record<string, unknown>): Promise<FormDTO> {
+  return req(`/forms/${uuid}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 }
 
-export async function deleteFormApi(address: string, uuid: string): Promise<void> {
-  await req(`/forms/${uuid}?address=${encodeURIComponent(address)}`, { method: 'DELETE' });
+export async function deleteFormApi(uuid: string): Promise<void> {
+  await req(`/forms/${uuid}`, { method: 'DELETE' });
 }
 
 // --- Submissions ---
@@ -134,8 +132,8 @@ export async function createSubmissionApi(formUuid: string, payload: SubmissionC
   });
 }
 
-export async function deleteSubmissionApi(address: string, uuid: string): Promise<void> {
-  await req(`/submissions/${uuid}?address=${encodeURIComponent(address)}`, { method: 'DELETE' });
+export async function deleteSubmissionApi(uuid: string): Promise<void> {
+  await req(`/submissions/${uuid}`, { method: 'DELETE' });
 }
 
 // --- Profile ---
@@ -146,12 +144,12 @@ export interface ProfileDTO {
   theme: string;
 }
 
-export async function getProfileApi(address: string): Promise<ProfileDTO> {
-  return req(`/profile?address=${encodeURIComponent(address)}`);
+export async function getProfileApi(): Promise<ProfileDTO> {
+  return req(`/profile`);
 }
 
-export async function updateProfileApi(address: string, data: Record<string, unknown>): Promise<ProfileDTO> {
-  return req(`/profile?address=${encodeURIComponent(address)}`, {
+export async function updateProfileApi(data: Record<string, unknown>): Promise<ProfileDTO> {
+  return req(`/profile`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });

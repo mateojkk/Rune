@@ -59,19 +59,13 @@ export function getCurrentUserAddress(): string | null {
 
 // --- Async API-backed functions ---
 
-function address(): string {
-  const a = getCurrentUserAddress();
-  if (!a) throw new Error('No user address');
-  return a;
-}
-
 // --- Workspaces ---
 
 let _workspaceCache: { uuid: string; name: string; description: string; formIds: string[]; createdAt: string; updatedAt: string }[] = [];
 
 export async function getWorkspaces(): Promise<Workspace[]> {
   try {
-    const data = await apiGetWorkspaces(address());
+    const data = await apiGetWorkspaces();
     _workspaceCache = data;
     return data.map(w => ({
       id: w.uuid,
@@ -86,12 +80,15 @@ export async function getWorkspaces(): Promise<Workspace[]> {
 }
 
 export async function createWorkspace(name: string): Promise<Workspace> {
-  const w = await createWorkspaceApi(address(), name);
+  const w = await createWorkspaceApi(name);
   return { id: w.uuid, name: w.name, formIds: w.formIds, createdAt: w.createdAt, updatedAt: w.updatedAt };
 }
 
 async function _fetch(url: string, opts?: RequestInit): Promise<void> {
-  const res = await fetch(url, opts);
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('rune_token') : null;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(url, { ...opts, headers });
   if (!res.ok) {
     const body = await res.text();
     throw new Error(body || `Request failed: ${res.status}`);
@@ -99,11 +96,11 @@ async function _fetch(url: string, opts?: RequestInit): Promise<void> {
 }
 
 export async function renameWorkspace(workspaceId: string, name: string): Promise<void> {
-  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address())}`, { method: 'PUT' });
+  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?name=${encodeURIComponent(name)}`, { method: 'PUT' });
 }
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
-  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}?address=${encodeURIComponent(address())}`, { method: 'DELETE' });
+  await _fetch(`${import.meta.env.VITE_API_BASE}/api/data/workspaces/${workspaceId}`, { method: 'DELETE' });
 }
 
 // --- Forms ---
@@ -112,7 +109,7 @@ let _formCache: FormSchema[] = [];
 
 export async function getAllForms(): Promise<FormSchema[]> {
   try {
-    const data = await getForms(address());
+    const data = await getForms();
     _formCache = data.map(f => ({
       id: f.id,
       title: f.title,
@@ -125,7 +122,7 @@ export async function getAllForms(): Promise<FormSchema[]> {
       profilePicture: f.profilePicture,
       coverPicture: f.coverPicture,
       isPublished: f.isPublished,
-      walletAddress: address(),
+      walletAddress: getCurrentUserAddress() || '',
     }));
     return _formCache;
   } catch {
@@ -144,7 +141,8 @@ export async function getForm(formId: string): Promise<FormSchema | null> {
       workspaceId: f.workspaceId, fields: f.fields as FormField[],
       createdAt: f.createdAt, updatedAt: f.updatedAt,
       blobId: f.blobId, profilePicture: f.profilePicture,
-      coverPicture: f.coverPicture, isPublished: f.isPublished, walletAddress: address(),
+      coverPicture: f.coverPicture, isPublished: f.isPublished,
+      walletAddress: getCurrentUserAddress() || '',
     };
   } catch {
     return null;
@@ -156,7 +154,7 @@ export async function createForm(title: string, description: string, workspaceId
   if (!wsId) {
     const workspaces = _workspaceCache.length > 0
       ? _workspaceCache
-      : await apiGetWorkspaces(address());
+      : await apiGetWorkspaces();
     _workspaceCache = workspaces;
     if (workspaces.length === 1) {
       wsId = workspaces[0].uuid;
@@ -164,13 +162,14 @@ export async function createForm(title: string, description: string, workspaceId
       throw new Error('Select a workspace before creating a form');
     }
   }
-  const f = await createFormApi(address(), title, description, wsId);
+  const f = await createFormApi(title, description, wsId);
   const form: FormSchema = {
     id: f.id, title: f.title, description: f.description,
     workspaceId: f.workspaceId, fields: f.fields as FormField[],
     createdAt: f.createdAt, updatedAt: f.updatedAt,
     blobId: f.blobId, profilePicture: f.profilePicture,
-    coverPicture: f.coverPicture, isPublished: f.isPublished, walletAddress: address(),
+    coverPicture: f.coverPicture, isPublished: f.isPublished,
+    walletAddress: getCurrentUserAddress() || '',
   };
   _formCache.push(form);
   return form;
@@ -185,7 +184,7 @@ export async function updateForm(formId: string, updates: Partial<FormSchema>): 
   if (updates.profilePicture !== undefined) body.profile_picture = updates.profilePicture;
   if (updates.coverPicture !== undefined) body.cover_picture = updates.coverPicture;
   if (updates.isPublished !== undefined) body.is_published = updates.isPublished;
-  const updated = await updateFormApi(address(), formId, body);
+  const updated = await updateFormApi(formId, body);
   const idx = _formCache.findIndex(f => f.id === formId);
   if (idx !== -1) {
     _formCache[idx] = {
@@ -196,7 +195,7 @@ export async function updateForm(formId: string, updates: Partial<FormSchema>): 
 }
 
 export async function deleteForm(formId: string): Promise<void> {
-  await deleteFormApi(address(), formId);
+  await deleteFormApi(formId);
   _formCache = _formCache.filter(f => f.id !== formId);
 }
 
@@ -250,7 +249,7 @@ export async function addSubmission(formId: string, submission: SubmissionCreate
 }
 
 export async function deleteSubmission(_formId: string, submissionId: string): Promise<void> {
-  await deleteSubmissionApi(address(), submissionId);
+  await deleteSubmissionApi(submissionId);
 }
 
 const _submissionCache: Record<string, FormSubmission[]> = {};
@@ -283,9 +282,9 @@ export async function deleteWorkspaceAndForms(workspaceId: string): Promise<void
 
 // --- Profile ---
 
-export async function fetchProfile(address: string): Promise<{ displayName: string; pfp: string; theme: string }> {
+export async function fetchProfile(): Promise<{ displayName: string; pfp: string; theme: string }> {
   try {
-    const data = await getProfileApi(address);
+    const data = await getProfileApi();
     return {
       displayName: data.display_name || '',
       pfp: data.pfp || '',
@@ -296,10 +295,10 @@ export async function fetchProfile(address: string): Promise<{ displayName: stri
   }
 }
 
-export async function saveProfile(address: string, profile: { displayName?: string; pfp?: string; theme?: string }): Promise<void> {
+export async function saveProfile(profile: { displayName?: string; pfp?: string; theme?: string }): Promise<void> {
   const body: Record<string, unknown> = {};
   if (profile.displayName !== undefined) body.display_name = profile.displayName;
   if (profile.pfp !== undefined) body.pfp = profile.pfp;
   if (profile.theme !== undefined) body.theme = profile.theme;
-  await updateProfileApi(address, body);
+  await updateProfileApi(body);
 }

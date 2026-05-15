@@ -23,7 +23,7 @@ export function ConfigInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!account?.address) return;
     (async () => {
-      const p = await fetchProfile(account.address);
+      const p = await fetchProfile();
       if (p.displayName) setDisplayName(p.displayName);
       if (p.pfp) setPfp(p.pfp);
       if (p.theme) setTheme(p.theme as 'light' | 'dark');

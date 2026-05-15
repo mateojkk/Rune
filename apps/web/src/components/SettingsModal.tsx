@@ -20,7 +20,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     setPfp(pfpUrl.trim());
     setTheme(currentTheme);
     try {
-      await saveProfile(account.address, {
+      await saveProfile({
         displayName: name.trim() || undefined,
         pfp: pfpUrl.trim() || undefined,
         theme: currentTheme,
