@@ -1,5 +1,5 @@
 import { SealClient, SessionKey } from '@mysten/seal';
-import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
+import { SuiGrpcClient } from '@mysten/sui/grpc';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromHex } from '@mysten/bcs';
 import { storeBlobWithKeypair, storeBlobWithWallet } from './walrus';
@@ -17,13 +17,13 @@ function getSealConfig() {
   };
 }
 
-let _suiClient: SuiJsonRpcClient | null = null;
+let _suiClient: SuiGrpcClient | null = null;
 let _suiClientNetwork: string | null = null;
 
 function getSuiClient() {
   const network = getCurrentNetwork();
   if (!_suiClient || _suiClientNetwork !== network) {
-    _suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network });
+    _suiClient = new SuiGrpcClient({ network, baseUrl: getSuiRpcUrl() });
     _suiClientNetwork = network;
   }
   return _suiClient;

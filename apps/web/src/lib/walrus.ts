@@ -2,12 +2,15 @@ import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
 import { getCurrentNetwork, getSuiRpcUrl } from './network';
 
 async function getWalrusClient() {
-  const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
-  const { walrus } = await import('@mysten/walrus');
-  return new SuiJsonRpcClient({
-    url: getSuiRpcUrl(),
-    network: getCurrentNetwork(),
-  }).$extend(walrus());
+  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
+  const { walrus, MAINNET_WALRUS_PACKAGE_CONFIG, TESTNET_WALRUS_PACKAGE_CONFIG } = await import('@mysten/walrus');
+  const network = getCurrentNetwork();
+  return new SuiGrpcClient({
+    network,
+    baseUrl: getSuiRpcUrl(),
+  }).$extend(walrus({
+    packageConfig: network === 'mainnet' ? MAINNET_WALRUS_PACKAGE_CONFIG : TESTNET_WALRUS_PACKAGE_CONFIG,
+  }));
 }
 
 async function writeBlobFlow(
