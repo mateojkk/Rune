@@ -161,10 +161,10 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
   const handlePublish = async () => {
     if (!currentFormId) return;
-    const next = !isPublished;
-    await updateForm(currentFormId, { isPublished: next });
+    const target = !isPublished;
+    await updateForm(currentFormId, { isPublished: target });
     const form = await getForm(currentFormId);
-    if (form) {
+    if (form && form.isPublished === target) {
       setIsPublished(!!form.isPublished);
       setPublishId(form.publishId);
     }
