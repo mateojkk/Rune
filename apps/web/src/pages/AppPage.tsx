@@ -30,15 +30,25 @@ export function AppPage() {
   const renameRef = useRef<HTMLInputElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  const jwt = useWalletStore(s => s.jwt);
+  const token = useWalletStore(s => s.token);
+
   useEffect(() => {
     const unsub = useWalletStore.persist.onFinishHydration(() => setHydrated(true));
     if (useWalletStore.persist.hasHydrated()) setHydrated(true);
     return () => unsub();
   }, []);
 
-  const refresh = async () => setWorkspaces(await getWorkspaces());
+  const refresh = async () => {
+    if (!account?.address || (!jwt && !token)) return;
+    setWorkspaces(await getWorkspaces());
+  };
 
-  useEffect(() => { refresh(); }, [path]);
+  useEffect(() => {
+    if (hydrated && account?.address && (jwt || token)) {
+      refresh();
+    }
+  }, [path, hydrated, account?.address, jwt, token]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

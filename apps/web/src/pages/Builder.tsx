@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { Plus, Trash2, GripVertical, Save, ArrowLeft, Star, CheckSquare, Upload, ChevronDown, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Clock, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot, ExternalLink } from 'lucide-react';
 import type { FormField, FieldType, Workspace, FormSchema } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getAllForms, getSubmissions, getWorkspaces } from '../lib/forms';
+import { useWalletStore } from '../context/wallet';
 import './Builder.css';
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: React.ReactNode }[] = [
@@ -29,6 +30,8 @@ function BuilderInner() {
   const { formId } = useParams();
   const navigate = useNavigate();
   const address = getCurrentUserAddress();
+  const jwt = useWalletStore((s) => s.jwt);
+  const token = useWalletStore((s) => s.token);
   const [searchParams] = useSearchParams();
   const workspaceContext = searchParams.get('ws');
 
@@ -68,6 +71,8 @@ function BuilderInner() {
       return;
     }
 
+    if (!address || (!jwt && !token)) return;
+
     const load = async () => {
       const [ws, all] = await Promise.all([getWorkspaces(), getAllForms()]);
       setWorkspaces(ws);
@@ -101,7 +106,7 @@ function BuilderInner() {
       }
     };
     load();
-  }, [formId, navigate]);
+  }, [formId, address, jwt, token, navigate]);
 
   useEffect(() => {
     if (showFieldPalette) {
