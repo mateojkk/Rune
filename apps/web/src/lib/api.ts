@@ -22,17 +22,21 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
   }
 
   if (isLoggingIn && path !== '/profile') {
-    // Block background data fetches during login, but allow profile fetch if it's the one triggered by login
+    // Block background data fetches during login
     throw new Error('Login in progress...');
+  }
+
+  if (!token) {
+    // Definitive fix: Do not even send the request if we don't have a token.
+    // This stops the 401 from ever reaching the server logs.
+    throw new Error('No authentication token available.');
   }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options?.headers as any,
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}/api/data${path}`, {
     ...options,

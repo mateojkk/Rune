@@ -123,6 +123,7 @@ export const useWalletStore = create<WalletState>()(
         account: state.account,
         jwt: state.jwt,
         token: state.token,
+        isLoggingIn: state.isLoggingIn,
       }),
     }
   )
