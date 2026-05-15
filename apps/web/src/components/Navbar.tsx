@@ -164,9 +164,16 @@ export function Navbar() {
               <div className="login-body">
                 <WalletLogin onConnected={async (addr, sign) => {
                   try {
-                    connectWallet(addr, 'wallet-extension');
+                    // Clear any stale state first
+                    useWalletStore.getState().setToken(null);
+                    
+                    // Get the token BEFORE marking as connected to prevent 401 race
                     const token = await loginWithWallet(addr, sign);
+                    
+                    // Now set both connection and token
+                    connectWallet(addr, 'wallet-extension');
                     useWalletStore.getState().setToken(token);
+                    
                     setShowLogin(false);
                     navigate('/app/dashboard');
                   } catch (e) {
