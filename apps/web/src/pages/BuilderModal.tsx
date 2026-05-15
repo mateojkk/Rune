@@ -164,6 +164,8 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
     const next = !isPublished;
     setIsPublished(next);
     await updateForm(currentFormId, { isPublished: next });
+    const form = await getForm(currentFormId);
+    if (form) setPublishId(form.publishId);
   };
 
   const handleDeleteField = async (fieldId: string) => {

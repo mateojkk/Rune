@@ -208,6 +208,8 @@ function BuilderInner() {
     const next = !isPublished;
     setIsPublished(next);
     await updateForm(currentFormId, { isPublished: next });
+    const form = await getForm(currentFormId);
+    if (form) setPublishId(form.publishId);
   };
 
   const copyLink = async () => {

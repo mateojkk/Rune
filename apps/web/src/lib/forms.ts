@@ -180,7 +180,10 @@ export async function updateForm(formId: string, updates: Partial<FormSchema>): 
   const idx = _formCache.findIndex(f => f.id === formId);
   if (idx !== -1) {
     _formCache[idx] = {
-      ..._formCache[idx], ...updates,
+      ..._formCache[idx],
+      ...updates,
+      isPublished: updated.isPublished ?? _formCache[idx].isPublished,
+      publishId: updated.publishId,
       updatedAt: updated.updatedAt,
     };
   }
