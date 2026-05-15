@@ -49,7 +49,7 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
     
     if (typeof window !== 'undefined') {
       console.warn('[API] 401 detected. Clearing session and resetting...');
-      localStorage.removeItem('rune-wallet-storage');
+      localStorage.removeItem('rune-wallet');
       sessionStorage.clear();
       window.location.href = '/';
     }
