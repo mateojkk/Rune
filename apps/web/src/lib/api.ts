@@ -9,26 +9,20 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
   let isLoggingIn = false;
 
   if (typeof window !== 'undefined') {
-    // 1. Try sessionStorage first (fastest, synchronous, set instantly on login)
+    // 1. Check if we are currently logging in (prevents race conditions during redirects)
+    isLoggingIn = !!sessionStorage.getItem('rune_is_logging_in');
+
+    // 2. Try sessionStorage first (fastest, synchronous, set instantly on login)
     token = sessionStorage.getItem('rune_token') || sessionStorage.getItem('rune_jwt');
     
-    // 2. Try live Zustand state
-    const w = window as any;
-    if (w.__getRuneToken && !token) {
-      token = w.__getRuneToken();
-    }
-    if (w.__isRuneLoggingIn) {
-      isLoggingIn = w.__isRuneLoggingIn();
-    }
-
-    // 3. Fallback to localStorage if the store hasn't mounted yet
-    if (!token) {
+    // 3. Fallback to localStorage if the store hasn't mounted/hydrated yet
+    if (!token && !isLoggingIn) {
       try {
         const stored = localStorage.getItem('rune-wallet');
         if (stored) {
           const parsed = JSON.parse(stored);
           token = parsed.state.jwt || parsed.state.token || null;
-          isLoggingIn = isLoggingIn || !!parsed.state.isLoggingIn;
+          isLoggingIn = !!parsed.state.isLoggingIn;
         }
       } catch (e) {}
     }

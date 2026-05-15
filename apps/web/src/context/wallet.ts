@@ -48,7 +48,13 @@ export const useWalletStore = create<WalletState>()(
         }
       },
 
-      setLoggingIn: (val: boolean) => set({ isLoggingIn: val }),
+      setLoggingIn: (val: boolean) => {
+        set({ isLoggingIn: val });
+        if (typeof window !== 'undefined') {
+          if (val) sessionStorage.setItem('rune_is_logging_in', 'true');
+          else sessionStorage.removeItem('rune_is_logging_in');
+        }
+      },
 
       connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => {
         const normalizedAddress = address.toLowerCase();
