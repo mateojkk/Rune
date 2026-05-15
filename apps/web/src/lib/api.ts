@@ -1,7 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+let isRedirecting = false;
+
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
-  // Pull token from persisted Zustand storage to avoid source-of-truth mismatch
+  if (isRedirecting) throw new Error('Redirecting...');
+
+  // Pull token from persisted Zustand storage
   let token = null;
   if (typeof window !== 'undefined') {
     try {
@@ -11,12 +15,8 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
         token = parsed.state.jwt || parsed.state.token || null;
       }
     } catch (e) {
-      console.error('Failed to parse auth token:', e);
+      /* ignore */
     }
-  }
-
-  if (import.meta.env.DEV) {
-    console.debug(`[API] Request to ${path} - Auth present: ${!!token}`);
   }
 
   const headers: Record<string, string> = {
@@ -26,17 +26,20 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
+
   const res = await fetch(`${API_BASE}/api/data${path}`, {
     ...options,
     headers,
   });
 
-    if (res.status === 401) {
-    // Stale or invalid token - clear it aggressively
+  if (res.status === 401) {
+    if (isRedirecting) throw new Error('Unauthorized');
+    isRedirecting = true;
+    
     if (typeof window !== 'undefined') {
-      console.warn('Unauthorized request detected. Clearing session...');
-      sessionStorage.clear();
+      console.warn('[API] 401 detected. Clearing session and resetting...');
       localStorage.removeItem('rune-wallet-storage');
+      sessionStorage.clear();
       window.location.href = '/';
     }
     throw new Error('Unauthorized');
