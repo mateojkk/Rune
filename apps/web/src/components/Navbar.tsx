@@ -54,8 +54,11 @@ export function Navbar() {
   }, [showDropdown]);
 
   useEffect(() => {
-    // Reset stuck logging state on mount
-    useWalletStore.getState().setLoggingIn(false);
+    // Only reset stuck isLoggingIn if we're NOT mid-callback
+    // (AuthCallback sets this flag; clearing it here would break the flow)
+    if (!window.location.pathname.includes('/auth/callback')) {
+      useWalletStore.getState().setLoggingIn(false);
+    }
   }, []);
 
   const handleZkLogin = async (provider: OAuthProvider) => {
