@@ -2,34 +2,30 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 let isRedirecting = false;
 
+let walletStore: any = null;
+
+async function getWalletState() {
+  if (typeof window === 'undefined') return { token: null, jwt: null, isLoggingIn: false };
+  if (!walletStore) {
+    try {
+      walletStore = (await import('../context/wallet')).useWalletStore;
+    } catch (e) {
+      return { token: null, jwt: null, isLoggingIn: false };
+    }
+  }
+  return walletStore.getState();
+}
+
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
   if (isRedirecting) throw new Error('Redirecting...');
 
-  // Pull token from persisted Zustand storage
-  let token = null;
-  let isLoggingIn = false;
-  if (typeof window !== 'undefined') {
-    try {
-      const stored = localStorage.getItem('rune-wallet');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        token = parsed.state.jwt || parsed.state.token || null;
-        isLoggingIn = !!parsed.state.isLoggingIn;
-      }
-    } catch (e) {
-      /* ignore */
-    }
-  }
+  const state = await getWalletState();
+  const token = state.jwt || state.token || null;
+  const isLoggingIn = !!state.isLoggingIn;
 
-  if (isLoggingIn && path !== '/profile') {
-    // Block background data fetches during login
+  if (isLoggingIn) {
+    // Block ALL background data fetches during login
     throw new Error('Login in progress...');
-  }
-
-  if (!token) {
-    // Definitive fix: Do not even send the request if we don't have a token.
-    // This stops the 401 from ever reaching the server logs.
-    throw new Error('No authentication token available.');
   }
 
   const headers: Record<string, string> = {
