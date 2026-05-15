@@ -41,12 +41,12 @@ export function AppPage() {
   }, []);
 
   const refresh = async () => {
-    if (!account?.address || (!jwt && !token) || isLoggingIn) return;
+    if (!account?.address || !token || isLoggingIn) return;
     setWorkspaces(await getWorkspaces());
   };
 
   useEffect(() => {
-    if (hydrated && account?.address && (jwt || token) && !isLoggingIn) {
+    if (hydrated && account?.address && token && !isLoggingIn) {
       refresh();
     }
   }, [path, hydrated, account?.address, jwt, token, isLoggingIn]);

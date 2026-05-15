@@ -143,7 +143,7 @@ export const getStoredWallet = () => {
 if (typeof window !== 'undefined') {
   (window as any).__getRuneToken = () => {
     const s = useWalletStore.getState();
-    return s.jwt || s.token || null;
+    return s.token || s.jwt || null;
   };
   (window as any).__isRuneLoggingIn = () => useWalletStore.getState().isLoggingIn;
   (window as any).__disconnectRune = () => useWalletStore.getState().disconnect();

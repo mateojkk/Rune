@@ -68,11 +68,10 @@ export function Dashboard() {
     }));
   };
 
-  const jwt = useWalletStore((s) => s.jwt);
   const token = useWalletStore((s) => s.token);
 
   useEffect(() => {
-    if (!address || (!jwt && !token)) return;
+    if (!address || !token) return;
     (async () => {
       const wsId = workspaceFilter || '';
       setWorkspaceId(wsId);

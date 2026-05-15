@@ -71,7 +71,7 @@ function BuilderInner() {
       return;
     }
 
-    if (!address || (!jwt && !token)) return;
+    if (!address || !token) return;
 
     const load = async () => {
       const [ws, all] = await Promise.all([getWorkspaces(), getAllForms()]);
