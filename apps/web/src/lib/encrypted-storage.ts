@@ -116,7 +116,7 @@ export async function decryptAndRead(
 
   const tx = new Transaction();
   tx.moveCall({
-    target: `${policyPkg}::seal_approve`,
+    target: `${policyPkg}::policy::seal_approve`,
     arguments: [tx.pure.vector('u8', Array.from(fromHex(ownerAddress)))],
   });
   const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
