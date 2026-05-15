@@ -44,7 +44,7 @@ export function Dashboard() {
   const activeWorkspaceId = workspaceFilter || workspaceId;
 
   const copyFormLink = async (formId: string) => {
-    await navigator.clipboard.writeText(`${window.location.origin}/form/${formId}`);
+    await navigator.clipboard.writeText(`${window.location.origin}/${formId}`);
     setCopiedFormId(formId);
     setTimeout(() => setCopiedFormId(null), 2000);
   };

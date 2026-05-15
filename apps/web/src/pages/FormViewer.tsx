@@ -228,7 +228,22 @@ export function FormViewer() {
         finalData,
         ownerAddress,
         walletAddr,
-        walletRef.signAndExecuteTransaction
+        async (tx: any) => {
+          // Robust handling for different wallet feature versions
+          if (walletRef.features['sui:signAndExecuteTransactionBlock']) {
+            return await walletRef.features['sui:signAndExecuteTransactionBlock'].signAndExecuteTransactionBlock({
+              transactionBlock: tx,
+              account: walletRef.accounts[0],
+            });
+          } else if (walletRef.features['sui:signAndExecuteTransaction']) {
+            return await walletRef.features['sui:signAndExecuteTransaction'].signAndExecuteTransaction({
+              transaction: tx,
+              account: walletRef.accounts[0],
+            });
+          } else {
+            throw new Error('Wallet does not support transaction signing.');
+          }
+        }
       );
 
       // Store submission with the blob ID

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Save, Star, CheckSquare, Upload, ChevronDown, ChevronUp, FileText, AlignLeft, Hash, Link as LinkIcon, List, AlertTriangle, Eye, Folder, Copy, Check, Image as ImageIcon, X, Mail, Calendar, Phone, Sliders, CircleDot, ExternalLink } from 'lucide-react';
 import type { FormField, FieldType, Workspace } from '../types/form';
 import { createForm, updateForm, getForm, addField, updateField, deleteField, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
 import './Builder.css';
@@ -444,16 +444,23 @@ function BuilderModalInner({ formId, workspaceId, onClose }: Props) {
 
                     {currentFormId && isPublished && (
                       <div className="b-share-link">
-                        <span className="b-share-label">Form link</span>
+                        <span className="b-share-label">Public Share Link</span>
                         <div className="b-share-row">
                           <input type="text" className="b-share-input" value={`${window.location.origin}/${currentFormId}`} readOnly onClick={e => (e.target as HTMLInputElement).select()} />
-                          <button className="b-share-copy" onClick={copyLink}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
+                          <button className="b-share-copy" onClick={copyLink} title="Copy public link">
+                            {copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy Link</>}
+                          </button>
+                        </div>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                          <Link to={`/${currentFormId}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none' }}>
+                            <ExternalLink size={14} /> View Live Form
+                          </Link>
+                          <Link to={`/${currentFormId}?preview=true`} className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', opacity: 0.7 }}>
+                            <Eye size={14} /> Preview Mode
+                          </Link>
                         </div>
                       </div>
                     )}
-                    <Link to={`/${currentFormId}?preview=true`} className="b-view-btn" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 12px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', transition: 'all 0.2s' }}>
-                      <Eye size={15} /> Preview Form
-                    </Link>
                   </div>
                 )}
               </>
