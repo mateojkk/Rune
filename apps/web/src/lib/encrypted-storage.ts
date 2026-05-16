@@ -2,7 +2,7 @@ import { SealClient, SessionKey } from '@mysten/seal';
 import { SuiGrpcClient } from '@mysten/sui/grpc';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromHex } from '@mysten/bcs';
-import { storeBlobWithKeypair, storeBlobWithWallet } from './walrus';
+import { storeBlobWithKeypair, storeBlobWithWallet, type WalrusUploadStage } from './walrus';
 import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
 import { useConfigStore } from '../stores/config';
 
@@ -53,12 +53,14 @@ export async function encryptAndStore(
   ownerAddress: string,
   keypair: { toSuiAddress(): string },
   submitterAddress: string,
+  onProgress?: (stage: 'encrypting' | WalrusUploadStage) => void,
 ): Promise<{ blobId: string }> {
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
   const policyPkg = getPolicyPackageId();
 
+  onProgress?.('encrypting');
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
     packageId: policyPkg,
@@ -66,20 +68,22 @@ export async function encryptAndStore(
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
 
-  return storeBlobWithKeypair(encryptedObject, keypair, submitterAddress);
+  return storeBlobWithKeypair(encryptedObject, keypair, submitterAddress, onProgress);
 }
 
 export async function encryptAndStoreWithWallet(
   data: unknown,
   ownerAddress: string,
   submitterAddress: string,
-  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>
+  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>,
+  onProgress?: (stage: 'encrypting' | WalrusUploadStage) => void,
 ): Promise<{ blobId: string }> {
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
   const policyPkg = getPolicyPackageId();
 
+  onProgress?.('encrypting');
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
     packageId: policyPkg,
@@ -87,7 +91,7 @@ export async function encryptAndStoreWithWallet(
     data: new TextEncoder().encode(JSON.stringify(data)),
   });
 
-  return storeBlobWithWallet(encryptedObject, submitterAddress, signAndExecute);
+  return storeBlobWithWallet(encryptedObject, submitterAddress, signAndExecute, onProgress);
 }
 
 export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {

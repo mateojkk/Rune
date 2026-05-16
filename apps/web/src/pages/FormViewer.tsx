@@ -9,6 +9,55 @@ import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-stand
 import { getSuiChain, getSuiRpcUrl, getCurrentNetwork } from '../lib/network';
 import './FormViewer.css';
 
+function getSubmissionStatusMessage(stage: string): string {
+  switch (stage) {
+    case 'uploading-file':
+      return 'Uploading file to Walrus...';
+    case 'encrypting':
+      return 'Encrypting your response...';
+    case 'encoding':
+      return 'Preparing encrypted data for Walrus...';
+    case 'registering':
+      return 'Registering blob on Sui...';
+    case 'uploading':
+      return 'Uploading blob to Walrus storage nodes...';
+    case 'certifying':
+      return 'Certifying blob on Sui...';
+    case 'saving':
+      return 'Saving submission record...';
+    default:
+      return 'Submitting your response...';
+  }
+}
+
+function getSubmissionErrorMessage(error: unknown): string {
+  const detail = error instanceof Error ? error.message : String(error || 'Unknown error');
+  const normalized = detail.toLowerCase();
+
+  if (
+    normalized.includes('insufficient balance') ||
+    normalized.includes('insufficient gas') ||
+    normalized.includes('gasbalancetoolow') ||
+    normalized.includes('no valid gas coins') ||
+    normalized.includes('cannot find gas') ||
+    normalized.includes('coinwithbalance') ||
+    normalized.includes('balance too low')
+  ) {
+    return 'Your wallet balance is too low to submit this form. Add a little more SUI for gas, then try again.';
+  }
+
+  if (
+    normalized.includes('rejected') ||
+    normalized.includes('user denied') ||
+    normalized.includes('user cancelled') ||
+    normalized.includes('user canceled')
+  ) {
+    return 'The transaction was canceled before it was submitted.';
+  }
+
+  return detail;
+}
+
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
   const [wallets, setWallets] = useState<any[]>([]);
   const [connecting, setConnecting] = useState<string | null>(null);
@@ -123,6 +172,8 @@ export function FormViewer() {
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const directionRef = useRef<'next' | 'back'>('next');
   const [minLoadingDone, setMinLoadingDone] = useState(false);
@@ -161,6 +212,7 @@ export function FormViewer() {
   const handleFieldChange = (fieldId: string, value: any) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
     setErrors(prev => ({ ...prev, [fieldId]: '' }));
+    setSubmitError(null);
   };
 
   const handleCheckbox = (fieldId: string, current: any, option: string) => {
@@ -242,6 +294,8 @@ export function FormViewer() {
       alert('Please connect your wallet to submit this form.');
       return;
     }
+    setSubmitError(null);
+    setSubmitStatus('Submitting your response...');
     setSubmitting(true);
     try {
       const finalData: Record<string, any> = { ...formData };
@@ -251,7 +305,13 @@ export function FormViewer() {
         if (field.type === 'file' || field.type === 'image' || field.type === 'video') {
           const file = formData[field.id];
           if (file instanceof File) {
-            const { blobId: fileBlobId } = await storeBlobWithWallet(file, addr, ref.signAndExecuteTransaction);
+            setSubmitStatus(getSubmissionStatusMessage('uploading-file'));
+            const { blobId: fileBlobId } = await storeBlobWithWallet(
+              file,
+              addr,
+              ref.signAndExecuteTransaction,
+              (stage) => setSubmitStatus(getSubmissionStatusMessage(stage)),
+            );
             finalData[field.id] = fileBlobId;
           }
         }
@@ -269,10 +329,12 @@ export function FormViewer() {
         addr,
         async (tx: any) => {
           return await ref.signAndExecuteTransaction(tx);
-        }
+        },
+        (stage) => setSubmitStatus(getSubmissionStatusMessage(stage)),
       );
 
       // Store submission with the blob ID
+      setSubmitStatus(getSubmissionStatusMessage('saving'));
       await addSubmission(form.id, {
         blobId,
         data: {}, // Data is safely encrypted on Walrus
@@ -280,11 +342,12 @@ export function FormViewer() {
         submittedAt: new Date().toISOString(),
       });
 
+      setSubmitStatus(null);
       setSubmitted(true);
     } catch (e) {
       console.error('Submission failed:', e);
-      const detail = e instanceof Error ? e.message : 'Unknown error';
-      alert(`Failed to submit form: ${detail}`);
+      setSubmitStatus(null);
+      setSubmitError(getSubmissionErrorMessage(e));
     }
     setSubmitting(false);
   };
@@ -563,6 +626,20 @@ export function FormViewer() {
 
               {errors[field.id] && <p className="fv-error">{errors[field.id]}</p>}
             </div>
+
+            {submitError && (
+              <div className="fv-submit-notice" role="alert">
+                <AlertTriangle size={16} />
+                <span>{submitError}</span>
+              </div>
+            )}
+
+            {submitting && submitStatus && (
+              <div className="fv-submit-status" aria-live="polite">
+                <Clock size={16} />
+                <span>{submitStatus}</span>
+              </div>
+            )}
 
             <div className="fv-flow-actions">
               {/* Wallet status badge shown in form flow */}

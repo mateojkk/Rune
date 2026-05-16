@@ -2,6 +2,12 @@ import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
 import { getCurrentNetwork, getSuiRpcUrl } from './network';
 import type { Transaction } from '@mysten/sui/transactions';
 
+export type WalrusUploadStage =
+  | 'encoding'
+  | 'registering'
+  | 'uploading'
+  | 'certifying';
+
 async function getWalrusClient() {
   const { SuiGrpcClient } = await import('@mysten/sui/grpc');
   const { walrus, MAINNET_WALRUS_PACKAGE_CONFIG, TESTNET_WALRUS_PACKAGE_CONFIG } = await import('@mysten/walrus');
@@ -17,7 +23,8 @@ async function getWalrusClient() {
 async function writeBlobFlow(
   data: unknown,
   address: string,
-  signTx: (tx: Transaction) => Promise<Record<string, unknown>>
+  signTx: (tx: Transaction) => Promise<Record<string, unknown>>,
+  onProgress?: (stage: WalrusUploadStage) => void,
 ): Promise<string> {
   const client = await getWalrusClient();
   const blob = data instanceof Uint8Array 
@@ -25,36 +32,42 @@ async function writeBlobFlow(
     : new TextEncoder().encode(JSON.stringify(data));
     
   const flow = client.walrus.writeBlobFlow({ blob });
-  await flow.encode();
+  onProgress?.('encoding');
+  const encoded = await flow.encode();
+  const blobId = encoded.blobId;
 
+  onProgress?.('registering');
   const regTx = flow.register({ epochs: 2, owner: address, deletable: false });
   const regResult = await signTx(regTx as Transaction);
   const r = regResult as Record<string, unknown>;
   const digest = (r?.digest as string) || ((r?.effects as Record<string, unknown>)?.transactionDigest as string);
   if (!digest) throw new Error('Registration failed');
-  await flow.upload({ digest });
 
+  onProgress?.('uploading');
+  const uploaded = await flow.upload({ digest });
+
+  onProgress?.('certifying');
   const certTx = flow.certify();
   await signTx(certTx as Transaction);
 
-  const blobId = (flow as unknown as Record<string, unknown>).blobId as string;
-  if (!blobId) throw new Error('No blobId from Walrus flow');
-  return blobId;
+  return uploaded.blobId || blobId;
 }
 
 export async function storeBlobWithWallet(
   data: unknown,
   address: string,
-  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>
+  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>,
+  onProgress?: (stage: WalrusUploadStage) => void,
 ): Promise<{ blobId: string }> {
-  const blobId = await writeBlobFlow(data, address, signAndExecute);
+  const blobId = await writeBlobFlow(data, address, signAndExecute, onProgress);
   return { blobId };
 }
 
 export async function storeBlobWithKeypair(
   data: unknown,
   keypair: { toSuiAddress(): string },
-  address: string
+  address: string,
+  onProgress?: (stage: WalrusUploadStage) => void,
 ): Promise<{ blobId: string }> {
   const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
   const suiClient = new SuiJsonRpcClient({
@@ -68,7 +81,7 @@ export async function storeBlobWithKeypair(
     });
     return result as unknown as Record<string, unknown>;
   };
-  const blobId = await writeBlobFlow(data, address, signTx);
+  const blobId = await writeBlobFlow(data, address, signTx, onProgress);
   return { blobId };
 }
 

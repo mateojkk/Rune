@@ -541,6 +541,46 @@
   margin-top: 6px;
 }
 
+.fv-submit-notice {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid rgba(224, 82, 82, 0.24);
+  border-radius: 12px;
+  background: rgba(224, 82, 82, 0.08);
+  color: #f2b3b3;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.fv-submit-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fv-submit-status {
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.fv-submit-status svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* ── Editor back button ────────────────────────────────── */
 .fv-back-editor {
   position: absolute;
