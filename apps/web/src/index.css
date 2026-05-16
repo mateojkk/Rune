@@ -142,12 +142,12 @@ input, textarea, select {
 }
 
 .btn-primary {
-  background: var(--text);
+  background: var(--accent);
   color: var(--bg);
 }
 
 .btn-primary:hover {
-  opacity: 0.85;
+  background: var(--accent-hover);
 }
 
 .btn-outline {
@@ -193,8 +193,8 @@ input, textarea, select {
 
 .input:focus {
   outline: none;
-  border-color: var(--subtle);
-  box-shadow: 0 0 0 3px var(--border);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
 .label {
@@ -240,8 +240,8 @@ input, textarea, select {
 
 .tag {
   font-size: 0.7rem;
-  background: var(--tag);
-  color: var(--muted);
+  background: var(--accent-bg);
+  color: var(--accent);
   padding: 0.25rem 0.6rem;
   display: inline-block;
   border-radius: var(--radius-sm);

@@ -46,8 +46,8 @@
 }
 
 .settings-close:hover {
-  background: var(--tag);
-  color: var(--text);
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .settings-body {

@@ -35,8 +35,8 @@
 }
 
 .app-nav-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .app-nav-item.active {

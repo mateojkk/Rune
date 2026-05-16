@@ -1,7 +1,4 @@
 .builder {
-  --accent: var(--text);
-  --accent-hover: var(--text);
-  --accent-bg: rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: row-reverse;
   min-height: 100%;
@@ -117,8 +114,8 @@
 
 .b-input:focus {
   outline: none;
-  border-color: var(--subtle);
-  box-shadow: 0 0 0 3px var(--border);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
 .b-input::placeholder {
@@ -292,7 +289,7 @@
 
 .b-create-btn,
 .b-save-btn {
-  background: var(--text);
+  background: var(--accent);
   color: var(--bg);
   border: none;
 }
@@ -352,9 +349,9 @@
 }
 
 .b-view-btn:hover {
-  border-color: var(--muted);
-  color: var(--text);
-  box-shadow: 0 0 0 2px var(--border);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
 /* ─── Share link ─── */
@@ -394,8 +391,8 @@
 
 .b-share-input:focus {
   outline: none;
-  border-color: var(--subtle);
-  box-shadow: 0 0 0 2px var(--border);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
 }
 
 .b-share-copy {
@@ -647,7 +644,7 @@
 }
 
 .b-recent-card:hover {
-  border-color: var(--text);
+  border-color: var(--accent-bg);
   box-shadow: var(--shadow);
 }
 
@@ -767,8 +764,8 @@
 }
 
 .b-field-card.editing {
-  border-color: var(--text);
-  box-shadow: 0 0 0 1px var(--border);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-bg);
   background: var(--surface);
 }
 

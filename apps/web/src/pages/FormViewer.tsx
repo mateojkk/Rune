@@ -429,36 +429,6 @@ export function FormViewer() {
             <h1 className="fv-start-title">{form.title}</h1>
             {form.description && <p className="fv-start-desc">{form.description}</p>}
 
-            {/* Wallet connect on start screen */}
-            <div className="fv-start-wallet-section">
-              {walletAddr ? (
-                <div className="fv-wallet-badge">
-                  <Wallet size={14} />
-                  <span>{walletAddr.slice(0, 6)}…{walletAddr.slice(-4)}</span>
-                  <span className="fv-wallet-badge-dot" />
-                </div>
-              ) : (
-                <>
-                  <button
-                    className="fv-wallet-connect-btn"
-                    onClick={() => setShowPicker(!showPicker)}
-                  >
-                    <Wallet size={16} />
-                    Connect Wallet
-                  </button>
-                  {showPicker && (
-                    <div className="fv-start-picker">
-                      <div className="fv-start-picker-header">
-                        <span>Select your wallet</span>
-                        <button className="fv-picker-close" onClick={() => setShowPicker(false)}>✕</button>
-                      </div>
-                      <WalletConnection onConnected={handleWalletConnected} />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
             <div className="fv-start-actions">
               <button className="fv-start-btn" onClick={() => setStep(0)}>
                 Start <ArrowRight size={18} />

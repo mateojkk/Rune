@@ -44,7 +44,7 @@ export function Home() {
           <div className="feature-card">
             <Database size={24} />
             <h3>walrus storage</h3>
-            <p>submissions stored immutably on walrus testnet. no database setup.</p>
+            <p>submissions stored immutably on walrus mainnet. no database setup.</p>
           </div>
           <div className="feature-card">
             <Lock size={24} />

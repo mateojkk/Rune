@@ -336,8 +336,8 @@
 }
 
 .method-toggle button.active {
-  background: var(--surface);
-  color: var(--text);
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .login-body {
