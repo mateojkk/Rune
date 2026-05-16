@@ -64,8 +64,6 @@ async def zk_proof(request: ZkProofRequest):
         # Shinami uses JSON-RPC, while Mysten uses a flat REST payload
         is_shinami = "shinami.com" in prover_url
         
-        print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url} (Shinami mode: {is_shinami})")
-        
         if is_shinami:
             # Shinami expects params as: [jwt, maxEpoch, extendedEphemeralPublicKey, jwtRandomness, salt]
             # jwt_randomness from frontend may be hex; convert to decimal BigInt string for Shinami
@@ -106,17 +104,13 @@ async def zk_proof(request: ZkProofRequest):
         
         headers = {"Content-Type": "application/json"}
         if settings.zklogin_prover_api_key:
-            print(f"DEBUG: API Key detected (length: {len(settings.zklogin_prover_api_key)})")
             headers["X-API-Key"] = settings.zklogin_prover_api_key
-        else:
-            print("DEBUG: No API Key detected in settings")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(prover_url, json=payload, headers=headers, timeout=30.0)
             
         if response.status_code != 200:
             error_text = response.text
-            print(f"ERROR: Prover returned status {response.status_code}. Raw response: {error_text}")
             try:
                 error_data = response.json()
             except Exception:
@@ -129,7 +123,6 @@ async def zk_proof(request: ZkProofRequest):
             # Or { "jsonrpc": "2.0", "error": { ... }, "id": 1 }
             if is_shinami:
                 if "error" in result:
-                    print(f"ERROR: Shinami Prover Error: {result['error']}")
                     raise HTTPException(status_code=400, detail=f"Shinami Prover Error: {result['error']}")
                 shinami_result = result.get("result", {})
                 proof = shinami_result.get("zkProof")
@@ -138,12 +131,10 @@ async def zk_proof(request: ZkProofRequest):
                 proof = result.get("proof") if isinstance(result, dict) else result
             
             if not proof:
-                print(f"ERROR: Prover returned empty proof. Full response: {result}")
                 raise HTTPException(status_code=500, detail="Prover returned empty proof")
         except Exception as e:
             if isinstance(e, HTTPException):
                 raise e
-            print(f"ERROR: Failed to parse prover JSON response: {response.text}")
             raise HTTPException(status_code=500, detail=f"Invalid JSON from prover: {str(e)}")
 
         return {

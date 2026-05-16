@@ -18,7 +18,6 @@ export function WalletRelinker() {
       if (account?.method === 'wallet' && account.address.toLowerCase() === address.toLowerCase()) {
         const store = useWalletStore.getState();
         if (!store.personalMessageSigner) {
-          console.log('[WalletRelinker] Restoring signer for connected wallet:', address);
           connectWallet(address, 'wallet-extension', undefined, signPersonalMessage);
         }
       }

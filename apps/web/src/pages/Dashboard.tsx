@@ -126,9 +126,7 @@ export function Dashboard() {
           };
         }
 
-        console.log(`[Dashboard] Attempting to decrypt blob ${blobId} for ${currentAddress}...`);
         const decryptedData = await decryptAndRead(raw, signer, currentAddress);
-        console.log('[Dashboard] Decryption successful:', decryptedData);
         return { ...sub, data: decryptedData as any };
       } catch (err) {
         console.error(`[Dashboard] Decryption failed for blob ${blobId}:`, err);
