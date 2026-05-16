@@ -36,9 +36,6 @@ export interface ZkLoginSession {
   createdAt: number;
 }
 
-const BN254_FIELD_SIZE =
-  21888242871839275222246405745257275088548364400416034343698204186575808495617n;
-
 export async function generateEphemeralKeyPair(): Promise<EphemeralKeyPair> {
   const keypair = new Secp256k1Keypair();
   const privateKey = keypair.getSecretKey();
@@ -136,9 +133,10 @@ export async function getUserSalt(sub: string, iss: string): Promise<string> {
   const input = `${iss}:${sub}:rune-2024`;
   const encoder = new TextEncoder();
   const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(input));
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  // Take first 16 bytes for 128-bit salt (required by Mysten prover)
+  const hashArray = Array.from(new Uint8Array(hashBuffer)).slice(0, 16);
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return (BigInt(`0x${hashHex}`) % BN254_FIELD_SIZE).toString(10);
+  return BigInt(`0x${hashHex}`).toString(10);
 }
 
 export async function handleOAuthCallback(): Promise<{

@@ -103,17 +103,11 @@ export function Dashboard() {
       if (!blobId) return sub;
       try {
         const raw = await downloadBlob(blobId);
-        if (!raw) {
-          console.warn(`[Dashboard] Failed to download blob: ${blobId}`);
-          return sub;
-        }
+        if (!raw) return sub;
 
         const walletState = useWalletStore.getState();
         const currentAddress = getCurrentUserAddress();
-        if (!currentAddress) {
-          console.warn('[Dashboard] No current address found for decryption');
-          return sub;
-        }
+        if (!currentAddress) return sub;
 
         let signer:
           | { toSuiAddress(): string; signPersonalMessage(msg: Uint8Array): Promise<{ signature: string }> }
@@ -132,17 +126,10 @@ export function Dashboard() {
           };
         }
 
-        if (!signer) {
-          console.warn('[Dashboard] No signer found for decryption');
-          return sub;
-        }
-
-        console.log(`[Dashboard] Attempting to decrypt blob ${blobId} for ${currentAddress}...`);
+        if (!signer) return sub;
         const decryptedData = await decryptAndRead(raw, signer, currentAddress);
-        console.log('[Dashboard] Decryption successful:', decryptedData);
         return { ...sub, data: decryptedData as any };
       } catch (err) {
-        console.error(`[Dashboard] Decryption failed for blob ${blobId}:`, err);
         return sub;
       }
     }));
