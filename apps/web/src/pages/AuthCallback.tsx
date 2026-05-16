@@ -30,7 +30,7 @@ export function AuthCallback() {
 
         // Access store imperatively — avoids stale closure / changing ref issues
         const store = useWalletStore.getState();
-        store.connectZkLogin(result.address, result.provider, result.jwt, privKey);
+        store.connectZkLogin(result.address, result.provider, result.jwt, result.session);
 
         // Login to backend with the ephemeral key
         const token = await loginWithEphemeralKey(result.address, privKey);

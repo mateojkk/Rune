@@ -3,6 +3,7 @@ import { decodeJwt, generateNonce, generateRandomness, computeZkLoginAddress, ge
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { getSuiRpcUrl, getCurrentNetwork } from './network';
 import { useConfigStore } from '../stores/config';
+import { useWalletStore } from '../context/wallet';
 
 export type OAuthProvider = 'google';
 
@@ -246,8 +247,10 @@ export async function createZkLoginPersonalMessageSigner(address: string): Promi
   toSuiAddress(): string;
   signPersonalMessage(message: Uint8Array): Promise<{ signature: string }>;
 }> {
-  const session = getSession();
-  const jwt = typeof window !== 'undefined' ? sessionStorage.getItem('zklogin_jwt') : null;
+  const walletStore = useWalletStore.getState();
+  const session = getSession() || walletStore.zkLoginSession;
+  const jwt = (typeof window !== 'undefined' ? sessionStorage.getItem('zklogin_jwt') : null) || walletStore.jwt;
+  
   if (!session || !jwt) {
     throw new Error('zkLogin session is missing. Please sign in again.');
   }

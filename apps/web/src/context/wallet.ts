@@ -22,12 +22,13 @@ interface WalletState {
   token: string | null;
   isLoggingIn: boolean;
   ephemeralPrivateKey: string | null;
+  zkLoginSession: any | null;
   personalMessageSigner: PersonalMessageSigner | null;
   
   setToken: (token: string | null) => void;
   setLoggingIn: (val: boolean) => void;
   setPersonalMessageSigner: (signer: PersonalMessageSigner | null) => void;
-  connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => void;
+  connectZkLogin: (address: string, provider: string, jwt: string, session: any) => void;
   connectWallet: (address: string, provider: string, publicKey?: string, signer?: PersonalMessageSigner | null) => void;
   disconnect: () => void;
 }
@@ -42,6 +43,7 @@ export const useWalletStore = create<WalletState>()(
       token: null,
       isLoggingIn: false,
       ephemeralPrivateKey: null,
+      zkLoginSession: null,
       personalMessageSigner: null,
 
       setToken: (token: string | null) => {
@@ -65,7 +67,7 @@ export const useWalletStore = create<WalletState>()(
         set({ personalMessageSigner: signer });
       },
 
-      connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => {
+      connectZkLogin: (address: string, provider: string, jwt: string, session: any) => {
         const normalizedAddress = address.toLowerCase();
         set({
           isConnected: true,
@@ -76,7 +78,8 @@ export const useWalletStore = create<WalletState>()(
             method: 'zklogin',
           },
           jwt,
-          ephemeralPrivateKey: ephemeralKey || null,
+          ephemeralPrivateKey: session?.ephemeralKeyPair?.privateKey || null,
+          zkLoginSession: session || null,
           personalMessageSigner: null,
         });
 
@@ -84,6 +87,7 @@ export const useWalletStore = create<WalletState>()(
         
         if (typeof window !== 'undefined') {
           sessionStorage.setItem('rune_jwt', jwt);
+          if (session) sessionStorage.setItem('zklogin_session', JSON.stringify(session));
         }
       },
 
@@ -113,6 +117,7 @@ export const useWalletStore = create<WalletState>()(
           jwt: null,
           token: null,
           ephemeralPrivateKey: null,
+          zkLoginSession: null,
           personalMessageSigner: null,
           isLoggingIn: false,
         });
@@ -142,6 +147,8 @@ export const useWalletStore = create<WalletState>()(
         jwt: state.jwt,
         token: state.token,
         isLoggingIn: state.isLoggingIn,
+        ephemeralPrivateKey: state.ephemeralPrivateKey,
+        zkLoginSession: state.zkLoginSession,
       }),
     }
   )
