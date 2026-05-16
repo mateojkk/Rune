@@ -69,6 +69,7 @@ async def zk_proof(request: ZkProofRequest):
             
         if response.status_code != 200:
             error_data = response.json()
+            print(f"DEBUG: Prover error response for address {request.sub}: {error_data}")
             raise HTTPException(status_code=response.status_code, detail=f"Prover error: {error_data}")
             
         proof = response.json()
