@@ -73,11 +73,13 @@ async def zk_proof(request: ZkProofRequest):
                 "id": 1,
                 "method": "shinami_zkp_createZkLoginProof",
                 "params": [
-                    request.jwt,
-                    int(request.max_epoch),
-                    request.jwt_randomness,
-                    request.ephemeral_public_key,
-                    request.user_salt
+                    {
+                        "jwt": request.jwt,
+                        "maxEpoch": str(request.max_epoch),
+                        "jwtRandomness": request.jwt_randomness,
+                        "ephemeralPublicKey": request.ephemeral_public_key,
+                        "salt": request.user_salt
+                    }
                 ]
             }
         else:
