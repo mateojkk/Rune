@@ -211,7 +211,8 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
       const ephemeralPublicKey = new Secp256k1PublicKey(session.ephemeralKeyPair.publicKey);
       const aud = Array.isArray(decoded.aud) ? decoded.aud[0] : decoded.aud;
 
-      const randomnessHex = BigInt(session.randomness).toString(16);
+      const randomnessBigInt = BigInt(session.randomness);
+      const randomnessHex = randomnessBigInt.toString(16);
       if (randomnessHex.length > 32) {
         throw new Error(
           'Your zkLogin session has invalid randomness (>16 bytes). ' +
@@ -225,7 +226,7 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
           jwt,
           ephemeral_public_key: getExtendedEphemeralPublicKey(ephemeralPublicKey),
           max_epoch: session.maxEpoch,
-          jwt_randomness: randomnessHex.padStart(32, '0'),
+          jwt_randomness: randomnessBigInt.toString(),
           user_salt: userSalt,
           sub: decoded.sub,
           iss: decoded.iss,

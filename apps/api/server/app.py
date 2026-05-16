@@ -67,7 +67,17 @@ async def zk_proof(request: ZkProofRequest):
         print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url} (Shinami mode: {is_shinami})")
         
         if is_shinami:
-            # Shinami JSON-RPC format: shinami_zkp_createZkLoginProof
+            # Shinami expects params as: [jwt, maxEpoch, extendedEphemeralPublicKey, jwtRandomness, salt]
+            # jwt_randomness from frontend may be hex; convert to decimal BigInt string for Shinami
+            raw = request.jwt_randomness
+            try:
+                if raw and not raw.isdigit():
+                    jwt_randomness_dec = str(int(raw, 16))
+                else:
+                    jwt_randomness_dec = raw
+            except ValueError:
+                jwt_randomness_dec = raw
+
             payload = {
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -75,8 +85,8 @@ async def zk_proof(request: ZkProofRequest):
                 "params": [
                     request.jwt,
                     str(request.max_epoch),
-                    request.jwt_randomness,
                     request.ephemeral_public_key,
+                    jwt_randomness_dec,
                     request.user_salt
                 ]
             }
