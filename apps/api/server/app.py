@@ -54,7 +54,12 @@ async def zk_proof(request: ZkProofRequest):
         
         # Strictly use Mainnet/Testnet prover based on network config
         is_main = is_mainnet()
-        prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
+        settings = get_settings()
+        
+        if settings.zklogin_prover_url:
+            prover_url = settings.zklogin_prover_url
+        else:
+            prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
         
         print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url}")
 
@@ -71,11 +76,9 @@ async def zk_proof(request: ZkProofRequest):
         }
         
         headers = {"Content-Type": "application/json"}
-        env_api_key = os.getenv("ZKLOGIN_PROVER_API_KEY")
-        if env_api_key:
-            headers["X-API-Key"] = env_api_key
-            # Some provers use 'Authorization: Bearer' instead
-            headers["Authorization"] = f"Bearer {env_api_key}"
+        if settings.zklogin_prover_api_key:
+            headers["X-API-Key"] = settings.zklogin_prover_api_key
+            headers["Authorization"] = f"Bearer {settings.zklogin_prover_api_key}"
         
         async with httpx.AsyncClient() as client:
             response = await client.post(prover_url, json=payload, headers=headers, timeout=30.0)

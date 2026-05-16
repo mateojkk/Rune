@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(default='rune-fallback-secret-hackathon-2024', validation_alias='JWT_SECRET')
     jwt_algorithm: str = Field(default='HS256', validation_alias='JWT_ALGORITHM')
 
+    zklogin_prover_url: Optional[str] = Field(default=None, validation_alias='ZKLOGIN_PROVER_URL')
+    zklogin_prover_api_key: Optional[str] = Field(default=None, validation_alias='ZKLOGIN_PROVER_API_KEY')
+
     @field_validator('network', mode='before')
     @classmethod
     def normalize_network(cls, v: Optional[str]) -> str:
