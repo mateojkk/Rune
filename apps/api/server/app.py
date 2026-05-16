@@ -96,8 +96,10 @@ async def zk_proof(request: ZkProofRequest):
         
         headers = {"Content-Type": "application/json"}
         if settings.zklogin_prover_api_key:
+            print(f"DEBUG: API Key detected (length: {len(settings.zklogin_prover_api_key)})")
             headers["X-API-Key"] = settings.zklogin_prover_api_key
-            headers["Authorization"] = f"Bearer {settings.zklogin_prover_api_key}"
+        else:
+            print("DEBUG: No API Key detected in settings")
         
         async with httpx.AsyncClient() as client:
             response = await client.post(prover_url, json=payload, headers=headers, timeout=30.0)
