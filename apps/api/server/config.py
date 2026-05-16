@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     walrus_aggregator_url: Optional[str] = Field(default=None, validation_alias='WALRUS_AGGREGATOR_URL')
 
     seal_package_id: Optional[str] = Field(default=None, validation_alias='SEAL_PACKAGE_ID')
+    seal_policy_package_id: Optional[str] = Field(default=None, validation_alias='SEAL_POLICY_PACKAGE_ID')
     seal_key_server_1: Optional[str] = Field(default=None, validation_alias='SEAL_KEY_SERVER_1')
     seal_key_server_2: Optional[str] = Field(default=None, validation_alias='SEAL_KEY_SERVER_2')
 
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
             return 'testnet'
         return v.strip().lower()
 
-    @field_validator('walrus_publisher_url', 'walrus_aggregator_url', 'seal_package_id', 'seal_key_server_1', 'seal_key_server_2', mode='before')
+    @field_validator('walrus_publisher_url', 'walrus_aggregator_url', 'seal_package_id', 'seal_policy_package_id', 'seal_key_server_1', 'seal_key_server_2', mode='before')
     @classmethod
     def empty_to_none(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
@@ -74,6 +75,12 @@ class Settings(BaseSettings):
         return '0xcb83a248bda5f7a0a431e6bf9e96d184e604130ec5218696e3f1211113b447b7'
 
     @property
+    def seal_policy_package(self) -> Optional[str]:
+        if self.seal_policy_package_id:
+            return self.seal_policy_package_id
+        return None
+
+    @property
     def seal_key_servers(self) -> list[dict]:
         servers = []
         if self.seal_key_server_1:
@@ -92,7 +99,7 @@ class Settings(BaseSettings):
             },
             'seal': {
                 'packageId': self.seal_package,
-                'policyPackageId': self.seal_package,
+                'policyPackageId': self.seal_policy_package,
                 'keyServers': self.seal_key_servers,
             },
         }

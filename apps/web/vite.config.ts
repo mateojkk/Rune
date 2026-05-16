@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_WALRUS_PUBLISHER_URL': JSON.stringify(env.WALRUS_PUBLISHER_URL || ''),
       'import.meta.env.VITE_WALRUS_AGGREGATOR_URL': JSON.stringify(env.WALRUS_AGGREGATOR_URL || ''),
       'import.meta.env.VITE_SEAL_PACKAGE_ID': JSON.stringify(env.SEAL_PACKAGE_ID || ''),
+      'import.meta.env.VITE_SEAL_POLICY_PACKAGE_ID': JSON.stringify(env.VITE_SEAL_POLICY_PACKAGE_ID || env.SEAL_POLICY_PACKAGE_ID || ''),
       'import.meta.env.VITE_SEAL_KEY_SERVER_1': JSON.stringify(env.SEAL_KEY_SERVER_1 || ''),
       'import.meta.env.VITE_SEAL_KEY_SERVER_2': JSON.stringify(env.SEAL_KEY_SERVER_2 || ''),
       'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(env.VITE_GOOGLE_CLIENT_ID || ''),

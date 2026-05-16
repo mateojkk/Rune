@@ -17,6 +17,16 @@ function getSealConfig() {
   };
 }
 
+function getPolicyPackageId() {
+  const { policyPackageId } = getSealConfig();
+  if (!policyPackageId) {
+    throw new Error(
+      'Seal policy package is not configured. Set SEAL_POLICY_PACKAGE_ID on the backend or VITE_SEAL_POLICY_PACKAGE_ID in the web app.'
+    );
+  }
+  return policyPackageId;
+}
+
 let _suiClient: SuiGrpcClient | null = null;
 let _suiClientNetwork: string | null = null;
 
@@ -47,8 +57,7 @@ export async function encryptAndStore(
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
-  const { packageId: sealPkg, policyPackageId } = getSealConfig();
-  const policyPkg = policyPackageId || sealPkg;
+  const policyPkg = getPolicyPackageId();
 
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
@@ -69,8 +78,7 @@ export async function encryptAndStoreWithWallet(
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
-  const { packageId: sealPkg, policyPackageId } = getSealConfig();
-  const policyPkg = policyPackageId || sealPkg;
+  const policyPkg = getPolicyPackageId();
 
   const { encryptedObject } = await sealClient.encrypt({
     threshold: 1,
@@ -100,8 +108,7 @@ export async function decryptAndRead(
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
 
-  const { packageId: sealPkg, policyPackageId } = getSealConfig();
-  const policyPkg = policyPackageId || sealPkg;
+  const policyPkg = getPolicyPackageId();
 
   const sessionKey = await SessionKey.create({
     address: ownerAddress,
