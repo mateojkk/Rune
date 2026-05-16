@@ -84,11 +84,19 @@ async def zk_proof(request: ZkProofRequest):
             response = await client.post(prover_url, json=payload, headers=headers, timeout=30.0)
             
         if response.status_code != 200:
-            error_data = response.json()
-            print(f"ERROR: Prover error response for address {request.sub}: {error_data}")
+            error_text = response.text
+            print(f"ERROR: Prover returned status {response.status_code}. Raw response: {error_text}")
+            try:
+                error_data = response.json()
+            except Exception:
+                error_data = {"error": error_text}
             raise HTTPException(status_code=response.status_code, detail=f"Prover error: {error_data}")
             
-        proof = response.json()
+        try:
+            proof = response.json()
+        except Exception as e:
+            print(f"ERROR: Failed to parse prover JSON response: {response.text}")
+            raise HTTPException(status_code=500, detail=f"Invalid JSON from prover: {str(e)}")
 
         return {
             "proof": proof,
