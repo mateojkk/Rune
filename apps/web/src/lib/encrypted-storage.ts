@@ -116,16 +116,19 @@ export async function decryptAndRead(
   const sealClient = getSealClient(suiClient);
 
   const policyPkg = getPolicyPackageId();
+  const sessionKeySigner = {
+    getPublicKey: () => ({
+      toSuiAddress: () => ownerAddress,
+    }),
+    signPersonalMessage: (msg: Uint8Array) => keypair.signPersonalMessage(msg),
+  };
   const sessionKey = await SessionKey.create({
     address: ownerAddress,
     packageId: policyPkg,
     ttlMin: 10,
+    signer: sessionKeySigner,
     suiClient,
   });
-
-  const message = sessionKey.getPersonalMessage();
-  const { signature } = await keypair.signPersonalMessage(message);
-  sessionKey.setPersonalMessageSignature(signature);
 
   const tx = new Transaction();
   tx.moveCall({
