@@ -13,10 +13,10 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  /* Greyscale brand — accent = text colour */
-  --accent: #1A1A18;
-  --accent-hover: #3A3A38;
-  --accent-bg: rgba(26, 26, 24, 0.07);
+  /* Light brown accent */
+  --accent: #B8956A;
+  --accent-hover: #A07E56;
+  --accent-bg: rgba(184, 149, 106, 0.12);
   --bg: #FFFFFF;
   --surface: #F5F5F4;
   --surface-elevated: #EFEFED;
@@ -38,9 +38,9 @@
 }
 
 .dark {
-  --accent: #FAF9F5;
-  --accent-hover: #D8D7D3;
-  --accent-bg: rgba(250, 249, 245, 0.08);
+  --accent: #D4B896;
+  --accent-hover: #E8CDAD;
+  --accent-bg: rgba(212, 184, 150, 0.12);
   --bg: #141413;
   --surface: #1F1F1E;
   --surface-elevated: #2A2A28;
