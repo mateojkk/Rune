@@ -22,12 +22,16 @@ export function getSuiRpcUrl(): string {
 }
 
 export function getWalrusAggregatorUrl(): string {
-  const configured = useConfigStore.getState().config?.walrus?.aggregator;
-  if (configured) {
-    return configured;
-  }
+  return getWalrusAggregatorUrls()[0];
+}
 
-  return getCurrentNetwork() === 'mainnet'
-    ? 'https://aggregator.walrus.space'
-    : 'https://aggregator.walrus-testnet.walrus.space';
+export function getWalrusAggregatorUrls(): string[] {
+  const configured = useConfigStore.getState().config?.walrus?.aggregator;
+  const defaults = getCurrentNetwork() === 'mainnet'
+    ? ['https://aggregator.walrus-mainnet.walrus.space', 'https://aggregator.walrus.space']
+    : ['https://aggregator.walrus-testnet.walrus.space'];
+
+  return configured
+    ? [configured, ...defaults.filter(url => url !== configured)]
+    : defaults;
 }

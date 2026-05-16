@@ -26,7 +26,7 @@ const API_BASE = import.meta.env.VITE_API_BASE;
 
 const DEFAULT_WALRUS_URLS = {
   publisher: import.meta.env.VITE_WALRUS_PUBLISHER_URL || '',
-  aggregator: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.walrus.space',
+  aggregator: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || 'https://aggregator.walrus-mainnet.walrus.space',
 };
 
 const DEFAULT_SEAL_CONFIG = {

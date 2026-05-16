@@ -103,11 +103,33 @@ export function Dashboard() {
       try {
         const raw = await downloadBlob(blobId);
         if (!raw) return sub;
-        const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
-        const ephemeralKey = useWalletStore.getState().ephemeralPrivateKey;
-        if (!ephemeralKey) return sub;
-        const keypair = Secp256k1Keypair.fromSecretKey(ephemeralKey);
-        const decryptedData = await decryptAndRead(raw, keypair, getCurrentUserAddress()!);
+
+        const walletState = useWalletStore.getState();
+        const currentAddress = getCurrentUserAddress();
+        if (!currentAddress) return sub;
+
+        let signer:
+          | { toSuiAddress(): string; signPersonalMessage(msg: Uint8Array): Promise<{ signature: string }> }
+          | null = null;
+
+        if (walletState.account?.method === 'zklogin') {
+          const ephemeralKey = walletState.ephemeralPrivateKey;
+          if (!ephemeralKey) return sub;
+          const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
+          signer = Secp256k1Keypair.fromSecretKey(ephemeralKey);
+        } else if (walletState.personalMessageSigner) {
+          const signPersonalMessage = walletState.personalMessageSigner;
+          signer = {
+            toSuiAddress: () => currentAddress,
+            signPersonalMessage: async (msg: Uint8Array) => {
+              const { signature } = await signPersonalMessage({ message: msg });
+              return { signature };
+            },
+          };
+        }
+
+        if (!signer) return sub;
+        const decryptedData = await decryptAndRead(raw, signer, currentAddress);
         return { ...sub, data: decryptedData as any };
       } catch {
         return sub;

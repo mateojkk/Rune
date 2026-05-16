@@ -12,6 +12,8 @@ export interface WalletAccount {
   publicKey?: string;
 }
 
+export type PersonalMessageSigner = (msg: { message: Uint8Array }) => Promise<{ signature: string }>;
+
 interface WalletState {
   isConnected: boolean;
   isConnecting: boolean;
@@ -20,11 +22,13 @@ interface WalletState {
   token: string | null;
   isLoggingIn: boolean;
   ephemeralPrivateKey: string | null;
+  personalMessageSigner: PersonalMessageSigner | null;
   
   setToken: (token: string | null) => void;
   setLoggingIn: (val: boolean) => void;
+  setPersonalMessageSigner: (signer: PersonalMessageSigner | null) => void;
   connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => void;
-  connectWallet: (address: string, provider: string, publicKey?: string) => void;
+  connectWallet: (address: string, provider: string, publicKey?: string, signer?: PersonalMessageSigner | null) => void;
   disconnect: () => void;
 }
 
@@ -38,6 +42,7 @@ export const useWalletStore = create<WalletState>()(
       token: null,
       isLoggingIn: false,
       ephemeralPrivateKey: null,
+      personalMessageSigner: null,
 
       setToken: (token: string | null) => {
         set({ token });
@@ -56,6 +61,10 @@ export const useWalletStore = create<WalletState>()(
         }
       },
 
+      setPersonalMessageSigner: (signer: PersonalMessageSigner | null) => {
+        set({ personalMessageSigner: signer });
+      },
+
       connectZkLogin: (address: string, provider: string, jwt: string, ephemeralKey?: string) => {
         const normalizedAddress = address.toLowerCase();
         set({
@@ -68,6 +77,7 @@ export const useWalletStore = create<WalletState>()(
           },
           jwt,
           ephemeralPrivateKey: ephemeralKey || null,
+          personalMessageSigner: null,
         });
 
         setCurrentUser(normalizedAddress);
@@ -77,7 +87,7 @@ export const useWalletStore = create<WalletState>()(
         }
       },
 
-      connectWallet: (address: string, provider: string, publicKey?: string) => {
+      connectWallet: (address: string, provider: string, publicKey?: string, signer?: PersonalMessageSigner | null) => {
         const normalizedAddress = address.toLowerCase();
         set({
           isConnected: true,
@@ -88,6 +98,7 @@ export const useWalletStore = create<WalletState>()(
             method: 'wallet',
             publicKey,
           },
+          personalMessageSigner: signer || null,
         });
 
         setCurrentUser(normalizedAddress);
@@ -102,6 +113,7 @@ export const useWalletStore = create<WalletState>()(
           jwt: null,
           token: null,
           ephemeralPrivateKey: null,
+          personalMessageSigner: null,
           isLoggingIn: false,
         });
 

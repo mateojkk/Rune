@@ -66,7 +66,7 @@ class Settings(BaseSettings):
     def walrus_aggregator(self) -> str:
         if self.walrus_aggregator_url:
             return self.walrus_aggregator_url
-        return 'https://aggregator.walrus.space' if self.is_mainnet else 'https://aggregator.walrus-testnet.walrus.space'
+        return 'https://aggregator.walrus-mainnet.walrus.space' if self.is_mainnet else 'https://aggregator.walrus-testnet.walrus.space'
 
     @property
     def seal_package(self) -> str:

@@ -181,7 +181,7 @@ export function Navbar() {
                     const token = await loginWithWallet(addr, sign);
                     
                     // Now set both connection and token
-                    connectWallet(addr, 'wallet-extension');
+                    connectWallet(addr, 'wallet-extension', undefined, sign);
                     store.setToken(token);
                     store.setLoggingIn(false);
                     

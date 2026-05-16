@@ -3,7 +3,7 @@ import { SuiGrpcClient } from '@mysten/sui/grpc';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromHex } from '@mysten/bcs';
 import { storeBlobWithKeypair, storeBlobWithWallet, type WalrusUploadStage } from './walrus';
-import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrl } from './network';
+import { getCurrentNetwork, getSuiRpcUrl, getWalrusAggregatorUrls } from './network';
 import { useConfigStore } from '../stores/config';
 
 function getSealConfig() {
@@ -95,13 +95,16 @@ export async function encryptAndStoreWithWallet(
 }
 
 export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {
-  try {
-    const res = await fetch(`${getWalrusAggregatorUrl()}/v1/blobs/${blobId}`);
-    if (!res.ok) return null;
-    return new Uint8Array(await res.arrayBuffer());
-  } catch {
-    return null;
+  for (const aggregatorUrl of getWalrusAggregatorUrls()) {
+    try {
+      const res = await fetch(`${aggregatorUrl}/v1/blobs/${blobId}`);
+      if (!res.ok) continue;
+      return new Uint8Array(await res.arrayBuffer());
+    } catch {
+      continue;
+    }
   }
+  return null;
 }
 
 export async function decryptAndRead(
