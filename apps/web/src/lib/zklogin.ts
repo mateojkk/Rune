@@ -52,23 +52,22 @@ export async function createSession(): Promise<ZkLoginSession> {
   const privateKey = keypair.getSecretKey();
   const publicKey = new Secp256k1PublicKey(keypair.getPublicKey().toRawBytes());
   
-  // Use crypto.getRandomValues to ensure exactly 16 bytes (128 bits)
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  const randomness128 = BigInt('0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')).toString();
-  console.log('[zkLogin] Generated 128-bit randomness:', randomness128);
+  const randomnessHex = '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  const randomnessBigInt = BigInt(randomnessHex);
 
   const suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network: getCurrentNetwork() });
   const { epoch } = await suiClient.getLatestSuiSystemState();
   const maxEpoch = Number(epoch) + 10;
 
-  const nonce = generateNonce(publicKey, maxEpoch, randomness128);
+  const nonce = generateNonce(publicKey, maxEpoch, randomnessBigInt);
   
   return {
     ephemeralKeyPair: { privateKey, publicKey: keypair.getPublicKey().toBase64() },
     nonce,
     maxEpoch,
-    randomness: randomness128,
+    randomness: randomnessHex,
     createdAt: Date.now(),
   };
 }
