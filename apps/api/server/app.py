@@ -61,19 +61,38 @@ async def zk_proof(request: ZkProofRequest):
         else:
             prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
         
-        print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url}")
-
-        payload = {
-            "jwt": request.jwt,
-            "extendedEphemeralPublicKey": request.ephemeral_public_key,
-            "maxEpoch": int(request.max_epoch),
-            "jwtRandomness": request.jwt_randomness,
-            "salt": request.user_salt,
-            "sub": request.sub,
-            "iss": request.iss,
-            "aud": request.aud,
-            "keyClaimName": request.kc_name
-        }
+        # Shinami uses JSON-RPC, while Mysten uses a flat REST payload
+        is_shinami = "shinami.com" in prover_url
+        
+        print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url} (Shinami mode: {is_shinami})")
+        
+        if is_shinami:
+            # Shinami JSON-RPC format: shinami_zkp_createZkLoginProof
+            payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "shinami_zkp_createZkLoginProof",
+                "params": [
+                    request.jwt,
+                    request.ephemeral_public_key,
+                    int(request.max_epoch),
+                    request.jwt_randomness,
+                    request.user_salt
+                ]
+            }
+        else:
+            # Standard Mysten REST format
+            payload = {
+                "jwt": request.jwt,
+                "extendedEphemeralPublicKey": request.ephemeral_public_key,
+                "maxEpoch": int(request.max_epoch),
+                "jwtRandomness": request.jwt_randomness,
+                "salt": request.user_salt,
+                "sub": request.sub,
+                "iss": request.iss,
+                "aud": request.aud,
+                "keyClaimName": request.kc_name
+            }
         
         headers = {"Content-Type": "application/json"}
         if settings.zklogin_prover_api_key:
@@ -93,7 +112,12 @@ async def zk_proof(request: ZkProofRequest):
             raise HTTPException(status_code=response.status_code, detail=f"Prover error: {error_data}")
             
         try:
-            proof = response.json()
+            result = response.json()
+            # Shinami returns { "result": "..." }, Mysten returns { "proof": "..." } or the proof directly
+            if is_shinami:
+                proof = result.get("result")
+            else:
+                proof = result.get("proof") if isinstance(result, dict) else result
         except Exception as e:
             print(f"ERROR: Failed to parse prover JSON response: {response.text}")
             raise HTTPException(status_code=500, detail=f"Invalid JSON from prover: {str(e)}")
