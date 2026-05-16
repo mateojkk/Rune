@@ -51,33 +51,34 @@ async def zk_proof(request: ZkProofRequest):
     try:
         import httpx
         
-        # Determine prover URL based on network
+        # Strictly use Mainnet/Testnet prover based on network config
         is_main = is_mainnet()
         prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
         
-        print(f"DEBUG: Using network {get_network()} (is_mainnet={is_main}). Calling prover: {prover_url}")
+        print(f"DEBUG: Using network {get_network()}. Calling prover: {prover_url}")
 
         payload = {
             "jwt": request.jwt,
             "extendedEphemeralPublicKey": request.ephemeral_public_key,
-            "maxEpoch": str(request.max_epoch),
+            "maxEpoch": int(request.max_epoch),
             "jwtRandomness": request.jwt_randomness,
             "salt": request.user_salt,
+            "sub": request.sub,
+            "iss": request.iss,
+            "aud": request.aud,
             "keyClaimName": request.kc_name
         }
         
+        headers = {"Content-Type": "application/json"}
+        env_api_key = os.getenv("ZKLOGIN_PROVER_API_KEY")
+        if env_api_key:
+            headers["X-API-Key"] = env_api_key
+            # Some provers use 'Authorization: Bearer' instead
+            headers["Authorization"] = f"Bearer {env_api_key}"
+        
         async with httpx.AsyncClient() as client:
-            response = await client.post(prover_url, json=payload, timeout=30.0)
+            response = await client.post(prover_url, json=payload, headers=headers, timeout=30.0)
             
-        # Smart Fallback: If mainnet prover fails because of audience, try the dev prover
-        if response.status_code != 200 and is_main:
-            error_data = response.json()
-            if "not supported" in str(error_data).lower() or "audience" in str(error_data).lower():
-                print(f"WARNING: Mainnet prover rejected audience. Falling back to Dev Prover...")
-                prover_url = "https://prover-dev.mystenlabs.com/v1"
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(prover_url, json=payload, timeout=30.0)
-
         if response.status_code != 200:
             error_data = response.json()
             print(f"ERROR: Prover error response for address {request.sub}: {error_data}")
