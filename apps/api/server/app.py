@@ -115,12 +115,23 @@ async def zk_proof(request: ZkProofRequest):
             
         try:
             result = response.json()
-            # Shinami returns { "result": "..." }, Mysten returns { "proof": "..." } or the proof directly
+            # Shinami uses JSON-RPC: { "jsonrpc": "2.0", "result": { ... }, "id": 1 }
+            # Or { "jsonrpc": "2.0", "error": { ... }, "id": 1 }
             if is_shinami:
+                if "error" in result:
+                    print(f"ERROR: Shinami Prover Error: {result['error']}")
+                    raise HTTPException(status_code=400, detail=f"Shinami Prover Error: {result['error']}")
                 proof = result.get("result")
             else:
+                # Mysten returns { "proof": "..." } or the proof directly
                 proof = result.get("proof") if isinstance(result, dict) else result
+            
+            if not proof:
+                print(f"ERROR: Prover returned empty proof. Full response: {result}")
+                raise HTTPException(status_code=500, detail="Prover returned empty proof")
         except Exception as e:
+            if isinstance(e, HTTPException):
+                raise e
             print(f"ERROR: Failed to parse prover JSON response: {response.text}")
             raise HTTPException(status_code=500, detail=f"Invalid JSON from prover: {str(e)}")
 
