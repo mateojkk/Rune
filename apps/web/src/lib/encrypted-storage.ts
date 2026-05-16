@@ -131,16 +131,9 @@ export async function decryptAndRead(
   const tx = new Transaction();
   tx.moveCall({
     target: `${policyPkg}::policy::seal_approve`,
-    arguments: [tx.pure.vector('u8', Array.from(fromHex(ownerAddress)))],
+    arguments: [tx.pure.vector('u8', Array.from(fromHex(ownerAddress.replace('0x', ''))))],
   });
   const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
-
-  await sealClient.fetchKeys({
-    ids: getSealConfig().keyServers.map(s => s.objectId),
-    txBytes,
-    sessionKey,
-    threshold: 1,
-  });
 
   const decrypted = await sealClient.decrypt({
     data: encryptedData,
