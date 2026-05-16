@@ -64,7 +64,7 @@ export async function encryptAndStoreWithWallet(
   data: unknown,
   ownerAddress: string,
   submitterAddress: string,
-  signAndExecute: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>
 ): Promise<{ blobId: string }> {
   const suiClient = getSuiClient();
   const sealClient = getSealClient(suiClient);
