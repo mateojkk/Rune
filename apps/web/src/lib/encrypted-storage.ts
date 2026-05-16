@@ -116,7 +116,7 @@ export async function decryptAndRead(
   const sealClient = getSealClient(suiClient);
 
   const policyPkg = getPolicyPackageId();
-
+  console.log(`[Seal] Creating session key for ${ownerAddress}...`);
   const sessionKey = await SessionKey.create({
     address: ownerAddress,
     packageId: policyPkg,
@@ -125,6 +125,7 @@ export async function decryptAndRead(
   });
 
   const message = sessionKey.getPersonalMessage();
+  console.log('[Seal] Signing personal message...');
   const { signature } = await keypair.signPersonalMessage(message);
   sessionKey.setPersonalMessageSignature(signature);
 
@@ -135,11 +136,14 @@ export async function decryptAndRead(
   });
   const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
 
+  console.log('[Seal] Calling sealClient.decrypt...');
   const decrypted = await sealClient.decrypt({
     data: encryptedData,
     sessionKey,
     txBytes,
   });
 
-  return JSON.parse(new TextDecoder().decode(decrypted));
+  const text = new TextDecoder().decode(decrypted);
+  console.log('[Seal] Decoded text:', text);
+  return JSON.parse(text);
 }

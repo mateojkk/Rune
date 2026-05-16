@@ -1,12 +1,8 @@
-# Rune ᚱ
-
-### feedback, *permanently stored.*
+## Rune
 
 **Rune** is a next-generation, decentralized form builder that leverages the power of **Walrus** and **Sui** to provide immutable, private, and permanent storage for structured feedback. No traditional databases, no centralized backends—just pure decentralization.
 
 ---
-
-## 🚀 Key Features for Hackathon Judges
 
 ### 1. Permanent Immutable Storage (Walrus)
 Unlike traditional form builders that store data in centralized SQL databases, **Rune** stores every submission as a blob on the **Walrus** testnet. Once submitted, feedback is immutable and globally accessible through the Walrus protocol.
