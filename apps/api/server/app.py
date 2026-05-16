@@ -131,7 +131,8 @@ async def zk_proof(request: ZkProofRequest):
                 if "error" in result:
                     print(f"ERROR: Shinami Prover Error: {result['error']}")
                     raise HTTPException(status_code=400, detail=f"Shinami Prover Error: {result['error']}")
-                proof = result.get("result")
+                shinami_result = result.get("result", {})
+                proof = shinami_result.get("zkProof")
             else:
                 # Mysten returns { "proof": "..." } or the proof directly
                 proof = result.get("proof") if isinstance(result, dict) else result
