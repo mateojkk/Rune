@@ -1,5 +1,6 @@
 import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
 import { getCurrentNetwork, getSuiRpcUrl } from './network';
+import type { Transaction } from '@mysten/sui/transactions';
 
 async function getWalrusClient() {
   const { SuiGrpcClient } = await import('@mysten/sui/grpc');
@@ -16,7 +17,7 @@ async function getWalrusClient() {
 async function writeBlobFlow(
   data: unknown,
   address: string,
-  signTx: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+  signTx: (tx: Transaction) => Promise<Record<string, unknown>>
 ): Promise<string> {
   const client = await getWalrusClient();
   const blob = data instanceof Uint8Array 
@@ -27,16 +28,14 @@ async function writeBlobFlow(
   await flow.encode();
 
   const regTx = flow.register({ epochs: 2, owner: address, deletable: false });
-  const regBytes = await regTx.build({ client: client as any });
-  const regResult = await signTx({ transaction: regBytes as any });
+  const regResult = await signTx(regTx as Transaction);
   const r = regResult as Record<string, unknown>;
   const digest = (r?.digest as string) || ((r?.effects as Record<string, unknown>)?.transactionDigest as string);
   if (!digest) throw new Error('Registration failed');
   await flow.upload({ digest });
 
   const certTx = flow.certify();
-  const certBytes = await certTx.build({ client: client as any });
-  await signTx({ transaction: certBytes as any });
+  await signTx(certTx as Transaction);
 
   const blobId = (flow as unknown as Record<string, unknown>).blobId as string;
   if (!blobId) throw new Error('No blobId from Walrus flow');
@@ -46,7 +45,7 @@ async function writeBlobFlow(
 export async function storeBlobWithWallet(
   data: unknown,
   address: string,
-  signAndExecute: (tx: Record<string, unknown>) => Promise<Record<string, unknown>>
+  signAndExecute: (tx: Transaction) => Promise<Record<string, unknown>>
 ): Promise<{ blobId: string }> {
   const blobId = await writeBlobFlow(data, address, signAndExecute);
   return { blobId };
@@ -62,9 +61,9 @@ export async function storeBlobWithKeypair(
     url: getSuiRpcUrl(),
     network: getCurrentNetwork(),
   });
-  const signTx = async (tx: Record<string, unknown>) => {
+  const signTx = async (tx: Transaction) => {
     const result = await suiClient.signAndExecuteTransaction({
-      transaction: tx as never,
+      transaction: tx,
       signer: keypair as never,
     });
     return result as unknown as Record<string, unknown>;
