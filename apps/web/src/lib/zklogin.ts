@@ -219,7 +219,7 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
           jwt,
           ephemeral_public_key: getExtendedEphemeralPublicKey(ephemeralPublicKey),
           max_epoch: session.maxEpoch,
-          jwt_randomness: session.randomness,
+          jwt_randomness: BigInt(session.randomness).toString(16).padStart(32, '0'),
           user_salt: userSalt,
           sub: decoded.sub,
           iss: decoded.iss,
