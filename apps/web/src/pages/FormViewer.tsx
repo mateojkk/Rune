@@ -6,7 +6,7 @@ import { addSubmission } from '../lib/forms';
 import { storeBlobWithWallet } from '../lib/walrus';
 import { getFormApi, getFormByPublishId } from '../lib/api';
 import { getWallets, isWalletWithRequiredFeatureSet } from '@mysten/wallet-standard';
-import { getSuiChain } from '../lib/network';
+import { getSuiChain, getSuiRpcUrl, getCurrentNetwork } from '../lib/network';
 import './FormViewer.css';
 
 function WalletConnection({ onConnected }: { onConnected: (address: string, wallet: any) => void }) {
@@ -38,10 +38,25 @@ function WalletConnection({ onConnected }: { onConnected: (address: string, wall
       const signFeature = wallet.features['sui:signAndExecuteTransaction'];
       if (!signFeature) throw new Error('Wallet does not support signing');
 
+      const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
+      const suiClient = new SuiJsonRpcClient({
+        url: getSuiRpcUrl(),
+        network: getCurrentNetwork(),
+      });
+
       onConnected(account.address, {
         signAndExecuteTransaction: async (tx: any) => {
+          const transaction = tx.transaction || tx;
+          if (transaction && typeof transaction.setSenderIfNotSet === 'function') {
+            transaction.setSenderIfNotSet(account.address);
+          }
+
           const result = await signFeature.signAndExecuteTransaction({
-            transaction: tx.transaction || tx,
+            transaction: transaction && typeof transaction.toJSON === 'function'
+              ? {
+                  toJSON: () => transaction.toJSON({ client: suiClient }),
+                }
+              : transaction,
             account,
             chain: getSuiChain(),
           });
