@@ -277,6 +277,41 @@
 
 .d-subs-back:hover { color: var(--accent); background: var(--accent-bg); }
 
+.d-sub-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.d-loading-bar {
+  width: 160px;
+  height: 4px;
+  background: var(--subtle);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.d-loading-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--accent);
+  border-radius: 4px;
+  animation: d-loading-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes d-loading-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
 .d-subs-header h1 {
   flex: 1;
   font-size: 1.2rem;

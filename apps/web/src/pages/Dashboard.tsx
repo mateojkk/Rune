@@ -41,6 +41,7 @@ export function Dashboard() {
   const [confirmDeleteSub, setConfirmDeleteSub] = useState<string | null>(null);
   const [deletingSub, setDeletingSub] = useState<string | null>(null);
   const [copiedFormId, setCopiedFormId] = useState<string | null>(null);
+  const [loadingSubs, setLoadingSubs] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const activeWorkspaceId = workspaceFilter || workspaceId;
 
@@ -88,6 +89,8 @@ export function Dashboard() {
     setShowNewForm(false);
     setSearchQuery('');
     setExpandedSub(null);
+    setLoadingSubs(true);
+    try {
     const subs = await getSubmissions(form.id);
 
     // Decrypt any encrypted submissions
@@ -130,12 +133,16 @@ export function Dashboard() {
 
     cacheSubmissions(form.id, decrypted);
     setSubmissions(decrypted);
+    } finally {
+      setLoadingSubs(false);
+    }
   };
 
   const closeSubmissions = () => {
     setViewingSubs(null);
     setSubmissions([]);
     setSearchQuery('');
+    setLoadingSubs(false);
   };
 
   const handleDeleteForm = async (id: string) => {
@@ -271,7 +278,12 @@ export function Dashboard() {
             </div>
           </div>
 
-          {displaySubmissions.length === 0 ? (
+          {loadingSubs ? (
+            <div className="d-sub-loading">
+              <div className="d-loading-bar" />
+              <span>Decrypting submissions…</span>
+            </div>
+          ) : displaySubmissions.length === 0 ? (
             <div className="d-sub-empty">
               <FileText size={24} />
               <h3>{searchQuery ? 'No results' : 'No submissions yet'}</h3>
