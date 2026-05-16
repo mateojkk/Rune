@@ -51,21 +51,23 @@ export async function createSession(): Promise<ZkLoginSession> {
   const keypair = new Secp256k1Keypair();
   const privateKey = keypair.getSecretKey();
   const publicKey = new Secp256k1PublicKey(keypair.getPublicKey().toRawBytes());
-  const randomness = generateRandomness();
+  // Shinami requires 16-byte (128-bit) randomness
+  const randomness = generateRandomness(); 
+  // If generateRandomness returns > 16 bytes, we need to ensure it's in the 128-bit range
+  const randomness128 = (BigInt(randomness) % (2n**128n)).toString();
 
-  // Fetch the current Sui epoch from the RPC — maxEpoch must be a real Sui
-  // epoch number (small integer, ~800 on mainnet), NOT a Unix timestamp.
+  // Fetch the current Sui epoch from the RPC
   const suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network: getCurrentNetwork() });
   const { epoch } = await suiClient.getLatestSuiSystemState();
-  const maxEpoch = Number(epoch) + 10; // ~10 epochs ≈ ~10 days validity
+  const maxEpoch = Number(epoch) + 10;
 
-  const nonce = generateNonce(publicKey, maxEpoch, randomness);
+  const nonce = generateNonce(publicKey, maxEpoch, randomness128);
   
   return {
     ephemeralKeyPair: { privateKey, publicKey: keypair.getPublicKey().toBase64() },
     nonce,
     maxEpoch,
-    randomness,
+    randomness: randomness128,
     createdAt: Date.now(),
   };
 }
