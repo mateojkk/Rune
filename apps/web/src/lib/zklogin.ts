@@ -1,5 +1,5 @@
 import { Secp256k1Keypair, Secp256k1PublicKey } from '@mysten/sui/keypairs/secp256k1';
-import { decodeJwt, generateNonce, computeZkLoginAddress, getExtendedEphemeralPublicKey, getZkLoginSignature } from '@mysten/sui/zklogin';
+import { decodeJwt, generateNonce, computeZkLoginAddress, getExtendedEphemeralPublicKey, getZkLoginSignature, genAddressSeed } from '@mysten/sui/zklogin';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { getSuiRpcUrl, getCurrentNetwork } from './network';
 import { useConfigStore } from '../stores/config';
@@ -241,7 +241,11 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
       }
 
       const result = await response.json();
-      return result.proof;
+      const proof = result.proof;
+      if (proof && !proof.addressSeed) {
+        proof.addressSeed = genAddressSeed(userSalt, 'sub', decoded.sub, aud).toString();
+      }
+      return proof;
     })().catch((error) => {
       zkLoginProofCache = null;
       throw error;
