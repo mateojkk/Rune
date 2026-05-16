@@ -211,6 +211,13 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
       const ephemeralPublicKey = new Secp256k1PublicKey(session.ephemeralKeyPair.publicKey);
       const aud = Array.isArray(decoded.aud) ? decoded.aud[0] : decoded.aud;
 
+      const randomnessHex = BigInt(session.randomness).toString(16);
+      if (randomnessHex.length > 32) {
+        throw new Error(
+          'Your zkLogin session has invalid randomness (>16 bytes). ' +
+          'Please sign out and sign back in to create a fresh session.'
+        );
+      }
       const response = await fetch(`${apiBase}/api/zklogin/prove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -218,7 +225,7 @@ async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: Zk
           jwt,
           ephemeral_public_key: getExtendedEphemeralPublicKey(ephemeralPublicKey),
           max_epoch: session.maxEpoch,
-          jwt_randomness: BigInt(session.randomness).toString(16).padStart(32, '0'),
+          jwt_randomness: randomnessHex.padStart(32, '0'),
           user_salt: userSalt,
           sub: decoded.sub,
           iss: decoded.iss,
