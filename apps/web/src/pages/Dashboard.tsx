@@ -5,6 +5,7 @@ import type { FormSchema, FormSubmission } from '../types/form';
 import { getAllForms, deleteForm, getSubmissions, cacheSubmissions, getCachedSubmissions, filterSubmissions, deleteSubmission, getCurrentUserAddress, getWorkspaces } from '../lib/forms';
 import { useWalletStore } from '../context/wallet';
 import { downloadBlob, decryptAndRead } from '../lib/encrypted-storage';
+import { createZkLoginPersonalMessageSigner } from '../lib/zklogin';
 import type { Workspace } from '../types/form';
 import { BuilderModal } from './BuilderModal';
 import './Dashboard.css';
@@ -113,10 +114,7 @@ export function Dashboard() {
           | null = null;
 
         if (walletState.account?.method === 'zklogin') {
-          const ephemeralKey = walletState.ephemeralPrivateKey;
-          if (!ephemeralKey) return sub;
-          const { Secp256k1Keypair } = await import('@mysten/sui/keypairs/secp256k1');
-          signer = Secp256k1Keypair.fromSecretKey(ephemeralKey);
+          signer = await createZkLoginPersonalMessageSigner(currentAddress);
         } else if (walletState.personalMessageSigner) {
           const signPersonalMessage = walletState.personalMessageSigner;
           signer = {

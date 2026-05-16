@@ -1,7 +1,8 @@
 import { Secp256k1Keypair, Secp256k1PublicKey } from '@mysten/sui/keypairs/secp256k1';
-import { decodeJwt, generateNonce, generateRandomness, computeZkLoginAddress } from '@mysten/sui/zklogin';
+import { decodeJwt, generateNonce, generateRandomness, computeZkLoginAddress, getExtendedEphemeralPublicKey, getZkLoginSignature } from '@mysten/sui/zklogin';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { getSuiRpcUrl, getCurrentNetwork } from './network';
+import { useConfigStore } from '../stores/config';
 
 export type OAuthProvider = 'google';
 
@@ -114,10 +115,15 @@ export function getSession(): ZkLoginSession | null {
 
 export function clearSession() {
   if (typeof window === 'undefined') return;
+  zkLoginProofCache = null;
   sessionStorage.removeItem('zklogin_session');
   sessionStorage.removeItem('zklogin_nonce');
   sessionStorage.removeItem('zklogin_provider');
   sessionStorage.removeItem('zklogin_jwt');
+}
+
+function getApiBase() {
+  return useConfigStore.getState().apiBase || import.meta.env.VITE_API_BASE || '';
 }
 
 export function getStoredProvider(): string | null {
@@ -185,5 +191,85 @@ export async function handleOAuthCallback(): Promise<{
     provider,
     jwt,
     session,
+  };
+}
+
+type ZkLoginJwt = {
+  sub: string;
+  iss: string;
+  aud: string | string[];
+};
+
+let zkLoginProofCache: Promise<unknown> | null = null;
+
+async function getZkLoginProof(session: ZkLoginSession, jwt: string, decoded: ZkLoginJwt) {
+  if (!zkLoginProofCache) {
+    zkLoginProofCache = (async () => {
+      const apiBase = getApiBase();
+      const userSalt = await getUserSalt(decoded.sub, decoded.iss);
+      const ephemeralPublicKey = new Secp256k1PublicKey(session.ephemeralKeyPair.publicKey);
+      const aud = Array.isArray(decoded.aud) ? decoded.aud[0] : decoded.aud;
+
+      const response = await fetch(`${apiBase}/api/zklogin/prove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jwt,
+          ephemeral_public_key: getExtendedEphemeralPublicKey(ephemeralPublicKey),
+          max_epoch: session.maxEpoch,
+          jwt_randomness: session.randomness,
+          user_salt: userSalt,
+          sub: decoded.sub,
+          iss: decoded.iss,
+          aud,
+          kc_name: 'sub',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`zkLogin proof request failed: ${error || response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.proof;
+    })().catch((error) => {
+      zkLoginProofCache = null;
+      throw error;
+    });
+  }
+
+  return zkLoginProofCache;
+}
+
+export async function createZkLoginPersonalMessageSigner(address: string): Promise<{
+  toSuiAddress(): string;
+  signPersonalMessage(message: Uint8Array): Promise<{ signature: string }>;
+}> {
+  const session = getSession();
+  const jwt = typeof window !== 'undefined' ? sessionStorage.getItem('zklogin_jwt') : null;
+  if (!session || !jwt) {
+    throw new Error('zkLogin session is missing. Please sign in again.');
+  }
+
+  const decoded = decodeJwt(jwt) as ZkLoginJwt | null;
+  if (!decoded) {
+    throw new Error('Stored zkLogin token is invalid. Please sign in again.');
+  }
+
+  const ephemeralKeypair = Secp256k1Keypair.fromSecretKey(session.ephemeralKeyPair.privateKey);
+
+  return {
+    toSuiAddress: () => address,
+    signPersonalMessage: async (message: Uint8Array) => {
+      const proof = await getZkLoginProof(session, jwt, decoded);
+      const { signature: userSignature } = await ephemeralKeypair.signPersonalMessage(message);
+      const signature = getZkLoginSignature({
+        inputs: proof as never,
+        maxEpoch: session.maxEpoch,
+        userSignature,
+      });
+      return { signature };
+    },
   };
 }
