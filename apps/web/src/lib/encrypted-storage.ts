@@ -126,7 +126,7 @@ export async function decryptAndRead(
     address: ownerAddress,
     packageId: policyPkg,
     ttlMin: 10,
-    signer: sessionKeySigner,
+    signer: sessionKeySigner as any,
     suiClient,
   });
 
