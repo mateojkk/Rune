@@ -1,5 +1,5 @@
 import { Secp256k1Keypair, Secp256k1PublicKey } from '@mysten/sui/keypairs/secp256k1';
-import { decodeJwt, generateNonce, generateRandomness, computeZkLoginAddress, getExtendedEphemeralPublicKey, getZkLoginSignature } from '@mysten/sui/zklogin';
+import { decodeJwt, generateNonce, computeZkLoginAddress, getExtendedEphemeralPublicKey, getZkLoginSignature } from '@mysten/sui/zklogin';
 import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
 import { getSuiRpcUrl, getCurrentNetwork } from './network';
 import { useConfigStore } from '../stores/config';
@@ -51,12 +51,13 @@ export async function createSession(): Promise<ZkLoginSession> {
   const keypair = new Secp256k1Keypair();
   const privateKey = keypair.getSecretKey();
   const publicKey = new Secp256k1PublicKey(keypair.getPublicKey().toRawBytes());
-  // Shinami requires 16-byte (128-bit) randomness
-  const randomness = generateRandomness(); 
-  // If generateRandomness returns > 16 bytes, we need to ensure it's in the 128-bit range
-  const randomness128 = (BigInt(randomness) % (2n**128n)).toString();
+  
+  // Use crypto.getRandomValues to ensure exactly 16 bytes (128 bits)
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  const randomness128 = BigInt('0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')).toString();
+  console.log('[zkLogin] Generated 128-bit randomness:', randomness128);
 
-  // Fetch the current Sui epoch from the RPC
   const suiClient = new SuiJsonRpcClient({ url: getSuiRpcUrl(), network: getCurrentNetwork() });
   const { epoch } = await suiClient.getLatestSuiSystemState();
   const maxEpoch = Number(epoch) + 10;
