@@ -55,6 +55,8 @@ async def zk_proof(request: ZkProofRequest):
         is_main = is_mainnet()
         prover_url = "https://prover.mystenlabs.com/v1" if is_main else "https://prover-dev.mystenlabs.com/v1"
         
+        print(f"DEBUG: Using network {get_network()} (is_mainnet={is_main}). Calling prover: {prover_url}")
+
         payload = {
             "jwt": request.jwt,
             "extendedEphemeralPublicKey": request.ephemeral_public_key,
@@ -67,9 +69,18 @@ async def zk_proof(request: ZkProofRequest):
         async with httpx.AsyncClient() as client:
             response = await client.post(prover_url, json=payload, timeout=30.0)
             
+        # Smart Fallback: If mainnet prover fails because of audience, try the dev prover
+        if response.status_code != 200 and is_main:
+            error_data = response.json()
+            if "not supported" in str(error_data).lower() or "audience" in str(error_data).lower():
+                print(f"WARNING: Mainnet prover rejected audience. Falling back to Dev Prover...")
+                prover_url = "https://prover-dev.mystenlabs.com/v1"
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(prover_url, json=payload, timeout=30.0)
+
         if response.status_code != 200:
             error_data = response.json()
-            print(f"DEBUG: Prover error response for address {request.sub}: {error_data}")
+            print(f"ERROR: Prover error response for address {request.sub}: {error_data}")
             raise HTTPException(status_code=response.status_code, detail=f"Prover error: {error_data}")
             
         proof = response.json()
