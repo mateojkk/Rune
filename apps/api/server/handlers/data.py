@@ -35,8 +35,7 @@ def _get_or_create_user(db: Session, address: str) -> User:
     return user
 
 
-def _ws_out(ws: Workspace, db: Session) -> WorkspaceOut:
-    form_ids = [f.uuid for f in db.query(Form).filter(Form.workspace_uuid == ws.uuid).all()]
+def _ws_out(ws: Workspace, form_ids: list[str]) -> WorkspaceOut:
     return WorkspaceOut(
         uuid=ws.uuid,
         name=ws.name,
@@ -87,7 +86,13 @@ def list_workspaces(db: Session = Depends(get_db), address: str = Depends(get_cu
         db.add(default)
         db.commit()
         workspaces = [default]
-    return [_ws_out(ws, db) for ws in workspaces]
+    ws_uuids = [ws.uuid for ws in workspaces]
+    form_map: dict[str, list[str]] = {ws.uuid: [] for ws in workspaces}
+    if ws_uuids:
+        rows = db.query(Form.uuid, Form.workspace_uuid).filter(Form.workspace_uuid.in_(ws_uuids)).all()
+        for f_uuid, ws_uuid in rows:
+            form_map.setdefault(ws_uuid, []).append(f_uuid)
+    return [_ws_out(ws, form_map.get(ws.uuid, [])) for ws in workspaces]
 
 
 @router.post("/workspaces")
@@ -108,7 +113,8 @@ def rename_workspace(uuid: str, name: str, db: Session = Depends(get_db), addres
     ws.name = name
     db.commit()
     db.refresh(ws)
-    return _ws_out(ws, db)
+    form_ids = [f.uuid for f in db.query(Form.uuid).filter(Form.workspace_uuid == ws.uuid).all()]
+    return _ws_out(ws, form_ids)
 
 
 @router.delete("/workspaces/{uuid}")
@@ -128,11 +134,11 @@ def delete_workspace(uuid: str, db: Session = Depends(get_db), address: str = De
 # --- Forms ---
 
 @router.get("/forms")
-def list_forms(workspace_id: Optional[str] = None, db: Session = Depends(get_db), address: str = Depends(get_current_user_address)):
+def list_forms(workspace_id: Optional[str] = None, limit: int = 50, offset: int = 0, db: Session = Depends(get_db), address: str = Depends(get_current_user_address)):
     q = db.query(Form).filter(Form.user_address == address.lower())
     if workspace_id:
         q = q.filter(Form.workspace_uuid == workspace_id)
-    forms = q.all()
+    forms = q.order_by(Form.created_at.desc()).limit(limit).offset(offset).all()
     return [_form_out(f) for f in forms]
 
 
@@ -244,12 +250,12 @@ def move_form(uuid: str, body: MoveFormRequest, db: Session = Depends(get_db), a
 # --- Submissions ---
 
 @router.get("/submissions")
-def list_submissions(form_uuid: str, db: Session = Depends(get_db), address: str = Depends(get_current_user_address)):
+def list_submissions(form_uuid: str, limit: int = 100, offset: int = 0, db: Session = Depends(get_db), address: str = Depends(get_current_user_address)):
     # Verify ownership
     f = db.query(Form).filter(Form.uuid == form_uuid, Form.user_address == address.lower()).first()
     if not f:
         raise HTTPException(403, "Not authorized to view submissions for this form")
-    subs = db.query(SubmissionModel).filter(SubmissionModel.form_uuid == form_uuid).all()
+    subs = db.query(SubmissionModel).filter(SubmissionModel.form_uuid == form_uuid).order_by(SubmissionModel.submitted_at.desc()).limit(limit).offset(offset).all()
     return [_sub_out(s) for s in subs]
 
 

@@ -64,12 +64,6 @@ export function Dashboard() {
     setWorkspaces(wss);
     const filtered = wsId ? all.filter(f => f.workspaceId === wsId) : all;
     setForms(filtered);
-    await Promise.all(all.map(async f => {
-      if (getCachedSubmissions(f.id).length === 0) {
-        const subs = await getSubmissions(f.id);
-        cacheSubmissions(f.id, subs);
-      }
-    }));
   };
 
   const token = useWalletStore((s) => s.token);

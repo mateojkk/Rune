@@ -1,6 +1,9 @@
 import type { FormSchema, FormSubmission, UserProfile } from '../types/form';
 import { getCurrentNetwork, getSuiRpcUrl } from './network';
 import type { Transaction } from '@mysten/sui/transactions';
+import { SuiGrpcClient } from '@mysten/sui/grpc';
+import { SuiJsonRpcClient } from '@mysten/sui/jsonRpc';
+import { walrus, MAINNET_WALRUS_PACKAGE_CONFIG, TESTNET_WALRUS_PACKAGE_CONFIG } from '@mysten/walrus';
 
 export type WalrusUploadStage =
   | 'encoding'
@@ -8,16 +11,21 @@ export type WalrusUploadStage =
   | 'uploading'
   | 'certifying';
 
-async function getWalrusClient() {
-  const { SuiGrpcClient } = await import('@mysten/sui/grpc');
-  const { walrus, MAINNET_WALRUS_PACKAGE_CONFIG, TESTNET_WALRUS_PACKAGE_CONFIG } = await import('@mysten/walrus');
+let _walrusClient: any = null;
+let _walrusClientNetwork: string | null = null;
+
+function getWalrusClient() {
   const network = getCurrentNetwork();
-  return new SuiGrpcClient({
-    network,
-    baseUrl: getSuiRpcUrl(),
-  }).$extend(walrus({
-    packageConfig: network === 'mainnet' ? MAINNET_WALRUS_PACKAGE_CONFIG : TESTNET_WALRUS_PACKAGE_CONFIG,
-  }));
+  if (!_walrusClient || _walrusClientNetwork !== network) {
+    _walrusClient = new SuiGrpcClient({
+      network,
+      baseUrl: getSuiRpcUrl(),
+    }).$extend(walrus({
+      packageConfig: network === 'mainnet' ? MAINNET_WALRUS_PACKAGE_CONFIG : TESTNET_WALRUS_PACKAGE_CONFIG,
+    })) as any;
+    _walrusClientNetwork = network;
+  }
+  return _walrusClient!;
 }
 
 async function writeBlobFlow(
@@ -26,7 +34,7 @@ async function writeBlobFlow(
   signTx: (tx: Transaction) => Promise<Record<string, unknown>>,
   onProgress?: (stage: WalrusUploadStage) => void,
 ): Promise<string> {
-  const client = await getWalrusClient();
+  const client = getWalrusClient()!;
   const blob = data instanceof Uint8Array 
     ? data 
     : new TextEncoder().encode(JSON.stringify(data));
@@ -69,7 +77,6 @@ export async function storeBlobWithKeypair(
   address: string,
   onProgress?: (stage: WalrusUploadStage) => void,
 ): Promise<{ blobId: string }> {
-  const { SuiJsonRpcClient } = await import('@mysten/sui/jsonRpc');
   const suiClient = new SuiJsonRpcClient({
     url: getSuiRpcUrl(),
     network: getCurrentNetwork(),

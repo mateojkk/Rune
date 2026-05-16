@@ -29,6 +29,8 @@ function getPolicyPackageId() {
 
 let _suiClient: SuiGrpcClient | null = null;
 let _suiClientNetwork: string | null = null;
+let _sealClient: SealClient | null = null;
+let _sealClientKey: string | null = null;
 
 function getSuiClient() {
   const network = getCurrentNetwork();
@@ -41,11 +43,44 @@ function getSuiClient() {
 
 function getSealClient(suiClient: ReturnType<typeof getSuiClient>) {
   const { keyServers } = getSealConfig();
-  return new SealClient({
+  const key = JSON.stringify(keyServers);
+  if (!_sealClient || _sealClientKey !== key) {
+    _sealClient = new SealClient({
+      suiClient,
+      serverConfigs: keyServers,
+      verifyKeyServers: false,
+    });
+    _sealClientKey = key;
+  }
+  return _sealClient;
+}
+
+let _sessionKey: SessionKey | null = null;
+let _sessionKeyOwner: string | null = null;
+let _sessionKeyPkg: string | null = null;
+let _sessionKeyExpiry = 0;
+
+async function getCachedSessionKey(
+  ownerAddress: string,
+  policyPkg: string,
+  suiClient: ReturnType<typeof getSuiClient>,
+  signer: any,
+) {
+  if (_sessionKey && _sessionKeyOwner === ownerAddress && _sessionKeyPkg === policyPkg && Date.now() < _sessionKeyExpiry) {
+    return _sessionKey;
+  }
+  const sessionKey = await SessionKey.create({
+    address: ownerAddress,
+    packageId: policyPkg,
+    ttlMin: 10,
+    signer,
     suiClient,
-    serverConfigs: keyServers,
-    verifyKeyServers: false,
   });
+  _sessionKey = sessionKey;
+  _sessionKeyOwner = ownerAddress;
+  _sessionKeyPkg = policyPkg;
+  _sessionKeyExpiry = Date.now() + 9 * 60 * 1000;
+  return sessionKey;
 }
 
 export async function encryptAndStore(
@@ -95,13 +130,20 @@ export async function encryptAndStoreWithWallet(
 }
 
 export async function downloadBlob(blobId: string): Promise<Uint8Array | null> {
-  for (const aggregatorUrl of getWalrusAggregatorUrls()) {
+  const urls = getWalrusAggregatorUrls().map(u => `${u}/v1/blobs/${blobId}`);
+  if (urls.length === 1) {
     try {
-      const res = await fetch(`${aggregatorUrl}/v1/blobs/${blobId}`);
-      if (!res.ok) continue;
+      const res = await fetch(urls[0]);
+      if (!res.ok) return null;
       return new Uint8Array(await res.arrayBuffer());
     } catch {
-      continue;
+      return null;
+    }
+  }
+  const results = await Promise.allSettled(urls.map(url => fetch(url)));
+  for (const result of results) {
+    if (result.status === 'fulfilled' && result.value.ok) {
+      return new Uint8Array(await result.value.arrayBuffer());
     }
   }
   return null;
@@ -122,13 +164,7 @@ export async function decryptAndRead(
     }),
     signPersonalMessage: (msg: Uint8Array) => keypair.signPersonalMessage(msg),
   };
-  const sessionKey = await SessionKey.create({
-    address: ownerAddress,
-    packageId: policyPkg,
-    ttlMin: 10,
-    signer: sessionKeySigner as any,
-    suiClient,
-  });
+  const sessionKey = await getCachedSessionKey(ownerAddress, policyPkg, suiClient, sessionKeySigner);
 
   const tx = new Transaction();
   tx.moveCall({
